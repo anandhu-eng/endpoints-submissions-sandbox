@@ -8,39 +8,10 @@ import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KE
 import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
 
 // ---------------------------------------------------------------------------
-// Metric tiles. Each tile names the filter it applies.
+// Metric cards. Display only: filtering happens in the sidebar.
 
-export const TILE_FILTERS = {
-  M1: { wait: ['submitter'] },
-  M2: { wait: ['reviewer'] },
-  M3: { nofind: true },
-  M4: { stage: STAGES.filter((s) => s.status === 'REVIEW_PENDING').map((s) => s.code) },
-  M5: { stage: ['FIN_RDI', 'FIN_WAITING'] },
-  M6: { stage: ['RP_PAST_WK6'] },
-  M8: { stage: ['RP_OBJECTION'] },
-  M9: { wait: ['submitter'] },
-  M10: { wait: ['submitter', 'reviewer'] },
-  M11: { due: ['pen1'] },
-  M12: { due: ['stuck'] },
-  M13: { due: ['overdue', 'open12'] },
-  M14: { stage: STAGES.filter((s) => s.status === 'REVIEW_PENDING').map((s) => s.code), pen: ['1', '2', '3'] },
-  M15: { stage: ['FIN_RDI', 'FIN_WAITING', 'PUBLISHED'] },
-  M16: { queue: ['ready'] },
-  M17: { queue: ['needschair'] },
-  RP_EARLY: { stage: ['RP_SETUP', 'RP_PEER'] },
-};
 // M6 (past Week 6) and M8 (Weeks 4–6) live inside the "Under review" card as its phases.
 const SECONDARY = ['M3', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17'];
-
-export function tileActive(state, id) {
-  const f = TILE_FILTERS[id];
-  return Object.entries(f).every(([k, v]) => {
-    if (k === 'nofind') return state.nofind === v;
-    const cur = k === 'stage' ? state.stage : state[k];
-    if (!cur) return false;
-    return cur.size === v.length && v.every((x) => cur.has(x));
-  });
-}
 
 // A response-time figure: the median is the value; mean, n and caveats go to the tooltip.
 function respStat(m, line, extra, calendar = false) {
@@ -54,37 +25,35 @@ function respStat(m, line, extra, calendar = false) {
   };
 }
 
-const press = (state, id) => `data-metric="${id}" aria-pressed="${tileActive(state, id)}"`;
-const tipFor = (state, id, detail = []) => esc([COPY.metrics[id].help, ...detail.filter(Boolean), tileActive(state, id) ? COPY.metrics.active : COPY.metrics.applies].join(' '));
+const tipFor = (id, detail = []) => esc([COPY.metrics[id].help, ...detail.filter(Boolean)].join(' '));
 
 // One metric card: a title, one large number and at most one supporting line (REQUIREMENTS §4).
 // `extra` is markup placed under the figure (a phase bar, a breakdown list).
-function card(state, id, t, extra = '') {
-  const on = tileActive(state, id);
-  return `<div class="mcard${on ? ' on' : ''}${t.warn ? ' warn' : ''}${t.wide ? ' wide' : ''}">
-    <button type="button" class="mcard-main" ${press(state, id)} title="${tipFor(state, id, t.detail)}">
+function card(id, t, extra = '') {
+  return `<div class="mcard${t.warn ? ' warn' : ''}${t.wide ? ' wide' : ''}">
+    <div class="mcard-main" title="${tipFor(id, t.detail)}">
       <span class="mcard-title">${esc(COPY.metrics[id].name)}</span>
       ${t.pill ? `<span class="period-pill">${esc(t.pill)}</span>` : ''}
       <span class="mcard-value">${t.warn ? icon('alert', 'mcard-warn') : ''}<span class="num">${esc(t.value)}</span>${t.unit ? `<span class="unit">${esc(t.unit)}</span>` : ''}</span>
       ${t.caption ? `<span class="mcard-caption">${esc(t.caption)}</span>` : ''}
-    </button>
+    </div>
     ${[].concat(t.line || []).filter(Boolean).map((l) => `<p class="mcard-line">${esc(l)}</p>`).join('')}
     ${extra}
   </div>`;
 }
 
-// "Under review" phases as a thin bar plus a legend that doubles as filter buttons.
-function phaseBlock(m, state) {
+// "Under review" phases as a thin bar plus a legend.
+function phaseBlock(m) {
   const parts = [
     { id: 'RP_EARLY', cls: 'p1', label: COPY.metrics.phases.early, n: m.M4 - m.M8.count - m.M6 },
     { id: 'M8', cls: 'p2', label: COPY.metrics.phases.objection, n: m.M8.count, detail: [COPY.metrics.M8second(m.M8.withTurn)] },
     { id: 'M6', cls: 'p3', label: COPY.metrics.phases.past, n: m.M6 },
   ];
-  const alert = m.M6 > 0 ? `<button type="button" class="alert-chip" ${press(state, 'M6')} title="${tipFor(state, 'M6')}">${icon('alert')}${esc(COPY.metrics.pastAlert(m.M6))}</button>` : '';
+  const alert = m.M6 > 0 ? `<span class="alert-chip" title="${tipFor('M6')}">${icon('alert')}${esc(COPY.metrics.pastAlert(m.M6))}</span>` : '';
   const bar = m.M4 > 0
     ? `<div class="phasebar" role="img" aria-label="${esc(COPY.metrics.phaseBar(parts[0].n, parts[1].n, parts[2].n))}">${parts.filter((p) => p.n > 0).map((p) => `<span class="seg ${p.cls}" style="flex-grow:${p.n}" title="${esc(`${p.label}: ${p.n}`)}"></span>`).join('')}</div>`
     : '';
-  const legend = `<ul class="legend">${parts.map((p) => `<li><button type="button" class="legend-item" ${press(state, p.id)} title="${tipFor(state, p.id, p.detail)}"><i class="dot ${p.cls}" aria-hidden="true"></i><span>${esc(p.label)}</span><b>${p.n}</b></button></li>`).join('')}</ul>`;
+  const legend = `<ul class="legend">${parts.map((p) => `<li><span class="legend-item" title="${tipFor(p.id, p.detail)}"><i class="dot ${p.cls}" aria-hidden="true"></i><span>${esc(p.label)}</span><b>${p.n}</b></span></li>`).join('')}</ul>`;
   return alert + bar + legend;
 }
 
@@ -93,27 +62,26 @@ function publishBlock(m) {
   const P = COPY.metrics.M5parts;
   const rows = [[P.rdi, m.M5.rdi], [P.embargoed, m.M5.embargoed], [P.penalty, m.M5.penalty], [P.onSchedule, m.M5.onSchedule]].filter(([, n]) => n > 0);
   if (!rows.length) return `<p class="mcard-line">${esc(COPY.metrics.noneToPublish)}</p>`;
-  return `<ul class="legend static">${rows.map(([label, n]) => `<li><span class="legend-item"><span>${esc(label)}</span><b>${n}</b></span></li>`).join('')}</ul>`;
+  return `<ul class="legend">${rows.map(([label, n]) => `<li><span class="legend-item"><span>${esc(label)}</span><b>${n}</b></span></li>`).join('')}</ul>`;
 }
 
 // Secondary metrics as compact rows: name (and one short line) on the left, value on the right.
-function metricRow(state, id, t) {
-  const on = tileActive(state, id);
+function metricRow(id, t) {
   const lines = [].concat(t.line || []).filter(Boolean);
-  return `<button type="button" class="mrow${on ? ' on' : ''}${t.warn ? ' warn' : ''}" ${press(state, id)} title="${tipFor(state, id, t.detail)}">
+  return `<div class="mrow${t.warn ? ' warn' : ''}" title="${tipFor(id, t.detail)}">
     <span class="mrow-text"><span class="mrow-name">${esc(COPY.metrics[id].name)}</span>${lines.map((l) => `<span class="mrow-sub">${esc(l)}</span>`).join('')}</span>
     <span class="mrow-value">${t.warn ? icon('alert', 'mrow-warn') : ''}<span class="num">${esc(t.value)}</span>${t.unit ? `<span class="unit">${esc(t.unit)}</span>` : ''}</span>
-  </button>`;
+  </div>`;
 }
 
 export function renderMetrics(m, state, showMore) {
   const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
   const M = COPY.metrics;
   const primary = [
-    card(state, 'M4', { value: m.M4, wide: true }, phaseBlock(m, state)),
-    card(state, 'M5', { value: m.M5.count, wide: true }, publishBlock(m)),
-    card(state, 'M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null]), pill }),
-    card(state, 'M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null]), pill }),
+    card('M4', { value: m.M4, wide: true }, phaseBlock(m)),
+    card('M5', { value: m.M5.count, wide: true }, publishBlock(m)),
+    card('M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null]), pill }),
+    card('M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null]), pill }),
   ];
   const secondary = {
     M3: respStat({ stats: m.M3.stats }, M.openTurns(m.M3.open, days1(m.M3.longestOpen)), [m.M3.excluded ? M.excluded(m.M3.excluded, M.noStart) : null]),
@@ -138,7 +106,7 @@ export function renderMetrics(m, state, showMore) {
       </div>
     </div>
     <div class="mcards">${primary.join('')}</div>
-    <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(state, id, secondary[id])).join('')}</div>
+    <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(id, secondary[id])).join('')}</div>
     <div class="metrics-foot">
       <button type="button" class="btn-link" id="more-metrics" aria-expanded="${showMore}" aria-controls="tiles-more">${esc(showMore ? COPY.metrics.fewer : COPY.metrics.more)}</button>
       <details class="caveats" id="caveats"><summary>${icon('info')}${esc(COPY.metrics.caveatsTitle)}</summary><ul>${COPY.metrics.caveats.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>
@@ -149,28 +117,19 @@ export function renderMetrics(m, state, showMore) {
 // ---------------------------------------------------------------------------
 // Stage counts (M7), grouped by DB status, terminal statuses folded into "Closed".
 
-export function renderStageCounts(counts, state) {
-  // One button per DB status with its total; the per-stage counts are in the tooltip and in
-  // the sidebar Stage filter (M7). Terminal statuses fold into "Closed" (D19).
-  const active = stageSet(state);
-  const isOnly = (codes) => state.stage && state.stage.size === codes.length && codes.every((c) => state.stage.has(c));
+export function renderStageCounts(counts) {
+  // One count per DB status; the per-stage counts are in the tooltip and in the sidebar
+  // Stage filter (M7). Terminal statuses fold into "Closed" (D19). Display only.
   const breakdown = (stages) => stages.map((s) => `${COPY.stages[s.code]}: ${counts[s.code]}`).join('\n');
-  const item = (label, codes, stages, attrs, pressed) => {
-    const total = codes.reduce((a, c) => a + counts[c], 0);
-    return `<button type="button" class="sc-pipe${total ? '' : ' zero'}" ${attrs} aria-pressed="${pressed}" title="${esc(breakdown(stages))}">
-      <span>${esc(label)}</span><b class="num">${total}</b></button>`;
+  const item = (label, stages) => {
+    const total = stages.reduce((a, s) => a + counts[s.code], 0);
+    return `<li class="sc-pipe${total ? '' : ' zero'}" title="${esc(breakdown(stages))}"><span>${esc(label)}</span><b class="num">${total}</b></li>`;
   };
-  const open = STATUS_ORDER.filter((s) => !TERMINAL.has(s)).map((status) => {
-    const stages = STAGES.filter((s) => s.status === status);
-    const codes = stages.map((s) => s.code);
-    return item(COPY.stageGroups[status], codes, stages, `data-stages="${codes.join(',')}"`, isOnly(codes));
-  });
-  const closedStages = STAGES.filter((s) => TERMINAL.has(s.status));
-  const closedCodes = closedStages.map((s) => s.code);
-  const closed = item(COPY.stageGroups.closed, closedCodes, closedStages, `id="sc-closed" data-closed="${closedCodes.join(',')}"`, closedCodes.every((c) => active.has(c)));
+  const open = STATUS_ORDER.filter((s) => !TERMINAL.has(s)).map((status) => item(COPY.stageGroups[status], STAGES.filter((s) => s.status === status)));
+  const closed = item(COPY.stageGroups.closed, STAGES.filter((s) => TERMINAL.has(s.status)));
   return `<section class="stage-counts" aria-labelledby="sc-h">
     <h2 id="sc-h" class="micro" title="${esc(COPY.metrics.M7.help)}">${esc(COPY.metrics.M7.name)}</h2>
-    <div class="sc-pipeline">${open.join('')}${closed}</div>
+    <ul class="sc-pipeline">${open.join('')}${closed}</ul>
   </section>`;
 }
 

@@ -9,7 +9,7 @@ import { esc, setTimeZone, dateTimeText, isoText } from './format.js';
 import { icon } from './icons.js';
 import { setPeople, personName, splitName, pickerName } from './ui.js';
 import {
-  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList, TILE_FILTERS, tileActive,
+  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList,
 } from './render-list.js';
 import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
 
@@ -195,12 +195,12 @@ function renderListView() {
     const ov = overviewOpen();
     $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
-    $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7, state) : '';
+    $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
     const [vRole, vLogin] = (state.view || '').split(':');
     $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7, canMe: !!vLogin || vRole === 'chair' });
     for (const el of $$('[data-indeterminate="true"]')) el.indeterminate = true;
     $('#groupbar').innerHTML = renderGroupBar(state);
-    $('#chips').innerHTML = viewToggles() + renderChips(state);
+    $('#chips').innerHTML = renderChips(state);
     const n = activeFilterCount();
     $('#filters-count').textContent = n ? String(n) : '';
     const rows = visibleRows();
@@ -209,7 +209,7 @@ function renderListView() {
     let hint = '';
     if (state.q) {
       const hidden = D.rows.filter((r) => rowMatches(r, state, { ignoreStage: true })).length - rows.length;
-      if (hidden > 0) hint = `<p class="note">${icon('info')}<span>${esc(COPY.filters.hiddenBySearch(hidden))}</span> <button type="button" class="btn-link" id="show-all-stages">${esc(COPY.filters.showAll)}</button></p>`;
+      if (hidden > 0) hint = `<p class="note">${icon('info')}<span>${esc(COPY.filters.hiddenBySearch(hidden))}</span></p>`;
     }
     $('#search-note').innerHTML = hint;
     // D19 / D10: say what the scope hides, with a one-click way back.
@@ -217,11 +217,11 @@ function renderListView() {
     const foot = [];
     if (state.view.includes(':') && !state.stage) {
       const n = D.rows.filter((r) => rowMatches(r, state, { ignoreStage: true })).length - rows.length;
-      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(state.view.startsWith('reviewer') ? COPY.list.hiddenClosed(n) : COPY.list.hiddenClosedRows(n))}</span> <button type="button" class="btn-link" id="show-closed">${esc(COPY.list.show)}</button></p>`);
+      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(state.view.startsWith('reviewer') ? COPY.list.hiddenClosed(n) : COPY.list.hiddenClosedRows(n))}</span></p>`);
     }
     if (state.queue.size) {
       const n = live({ ...state, queue: new Set() }) - rows.length;
-      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span> <button type="button" class="btn-link" id="clear-queue">${esc(COPY.list.show)}</button></p>`);
+      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
     }
     $('#list').innerHTML = renderList(rows, scope, state, {
       hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''),
@@ -230,17 +230,6 @@ function renderListView() {
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
   });
-}
-
-// "Waiting on me" (reviewer) and "My queue" (chair) toggles (D10).
-function viewToggles() {
-  const [role, login] = (state.view || '').split(':');
-  let label = null;
-  if (role === 'reviewer' && login) label = COPY.viewAs.waitingOnMe;
-  else if (role === 'chair') label = COPY.viewAs.myQueue;
-  if (!label) return '';
-  const on = state.queue.has('me');
-  return `<button type="button" class="chip chip-toggle${on ? ' on' : ''}" id="queue-me" aria-pressed="${on}" title="${esc(role === 'chair' ? COPY.viewAs.myQueueHelp : '')}">${icon(on ? 'tick' : 'filter')}<span>${esc(label)}</span></button>`;
 }
 
 function isExpanded(g) {
@@ -431,43 +420,10 @@ function bind() {
   const listView = $('#list-view');
   listView.addEventListener('click', (e) => {
     const tgt = e.target;
-    const tile = tgt.closest('[data-metric]');
-    if (tile) {
-      const id = tile.dataset.metric;
-      return update(() => {
-        const on = tileActive(state, id);
-        for (const [k, v] of Object.entries(TILE_FILTERS[id])) {
-          if (k === 'nofind') state.nofind = !on;
-          else if (k === 'stage') state.stage = on ? null : new Set(v);
-          else state[k] = on ? new Set() : new Set(v);
-        }
-      });
-    }
-    const st = tgt.closest('[data-stages]');
-    if (st) {
-      const codes = st.dataset.stages.split(',');
-      return update(() => {
-        const only = state.stage && state.stage.size === codes.length && codes.every((c) => state.stage.has(c));
-        state.stage = only ? null : new Set(codes);
-      });
-    }
     const per = tgt.closest('[data-period]');
     if (per) return update(() => { state.period = per.dataset.period; });
     if (tgt.closest('#more-metrics')) { ui.showMore = !ui.showMore; return render(); }
-    if (tgt.closest('#show-all-stages') || tgt.closest('#show-closed')) return update(() => { state.stage = new Set(); });
-    if (tgt.closest('#clear-queue')) return update(() => { state.queue = new Set(); });
-    if (tgt.closest('#queue-me')) return update(() => { state.queue.has('me') ? state.queue.delete('me') : state.queue.add('me'); });
     if (tgt.closest('#toggle-overview')) { ui.overview = !overviewOpen(); return render(); }
-    const closedBtn = tgt.closest('[data-closed]');
-    if (closedBtn) {
-      const codes = closedBtn.dataset.closed.split(',');
-      return update(() => {
-        const set = new Set(stageSet(state));
-        const on = codes.every((c) => set.has(c));
-        for (const c of codes) on ? set.delete(c) : set.add(c);
-        setStages(set);
-      });
-    }
     if (tgt.closest('#copy-link')) return copyLink();
     const chip = tgt.closest('[data-chip]');
     if (chip) {
