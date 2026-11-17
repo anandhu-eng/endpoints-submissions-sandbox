@@ -222,6 +222,7 @@ export const COPY = {
     hideOverview: 'Hide overview and stages',
     overviewHidden: 'Overview and stage counts are hidden.',
     caveatsTitle: 'Notes on these numbers',
+    definitionsTitle: 'What each number counts',
     caveats: [
       'Terms: a finding is one sub-issue of a tracking issue; the rules call it an objection. The reviewer is whoever filed it. A turn is the time a finding waits on one side, shown by the needs-submitter-attention or needs-reviewer-attention label. Business days skip weekends and US federal holidays.',
       'Turn labels are swapped by hand. When a turn ends with a label swap and no reply, its time measures the swap, not the reply.',

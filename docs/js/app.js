@@ -1,17 +1,20 @@
 // Wiring: load the snapshot, keep state in the URL, render, handle input.
 
-import { COPY } from './copy.js?v=0c38b22995';
-import { deriveAll, computeMetrics, DEFAULT_STAGES, STAGES, TERMINAL } from './derive.js?v=0c38b22995';
+import { COPY } from './copy.js';
+import { deriveAll, computeMetrics, DEFAULT_STAGES, STAGES, TERMINAL } from './derive.js';
 import {
   emptyState, domains, parseUrl, toQuery, rowMatches, sortRows, stageSet, SET_KEYS, UNASSIGNED,
-} from './query.js?v=0c38b22995';
-import { esc, setTimeZone, dateTimeText, isoText } from './format.js?v=0c38b22995';
-import { icon } from './icons.js?v=0c38b22995';
-import { setPeople, personName } from './ui.js?v=0c38b22995';
+} from './query.js';
+import { esc, setTimeZone, dateTimeText, isoText } from './format.js';
+import { icon } from './icons.js';
+import { setPeople, personName } from './ui.js';
 import {
   renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList,
-} from './render-list.js?v=0c38b22995';
-import { renderDetail, renderTimeline, renderConversation } from './render-detail.js?v=0c38b22995';
+} from './render-list.js';
+import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
+
+// Every import linked. index.html shows a load-error note if this never runs.
+window.reviewStatusReady = true;
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];

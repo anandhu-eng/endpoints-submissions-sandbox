@@ -1,6 +1,6 @@
 // Display helpers: escaping, Pacific dates, numbers, safe Markdown.
 
-import { COPY } from './copy.js?v=0c38b22995';
+import { COPY } from './copy.js';
 
 export function esc(v) {
   return String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

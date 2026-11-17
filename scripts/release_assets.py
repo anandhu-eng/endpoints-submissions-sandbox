@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Publish docs/js and docs/styles.css as a fixed build under docs/v/<hash>/.
+
+GitHub Pages ignores query strings and lets browsers cache each file for 10
+minutes. After a deploy a visitor can still hold the old index.html, some old
+modules, or both; if old and new modules meet, an import fails and the page is
+blank. So each build gets its own folder that never changes, and index.html
+points at the newest one. A cached old index.html still finds every file of
+its own build. The newest KEEP builds stay; older folders are deleted.
+
+Run it after any change under docs/js or to docs/styles.css, before committing:
+
+    python3 scripts/release_assets.py            # copy the build, point index.html at it
+    python3 scripts/release_assets.py --check    # exit 1 if index.html is not on the current build
+
+docs/js stays the source you edit. Only the copies under docs/v/ are served.
+"""
+
+import argparse
+import filecmp
+import hashlib
+import re
+import shutil
+import sys
+from pathlib import Path
+
+DOCS = Path(__file__).resolve().parent.parent / "docs"
+BUILDS = DOCS / "v"
+LIST = BUILDS / "builds.txt"
+KEEP = 4
+# The two local assets index.html loads, with or without a build folder in front.
+REFS = re.compile(r"""((?:src|href)=")(?:v/\w+/)?((?:js/app\.js|styles\.css)")""")
+# Any other local script or stylesheet in index.html would not be versioned.
+OTHER = re.compile(r"""(?:src|href)="(?!https?:|//|v/\w+/(?:js/app\.js|styles\.css)")[^"]+\.(?:js|css)\"""")
+
+
+def source_files():
+    return sorted((DOCS / "js").glob("*.js")) + [DOCS / "styles.css"]
+
+
+def build_id():
+    h = hashlib.sha256()
+    for f in source_files():
+        h.update(f.relative_to(DOCS).as_posix().encode())
+        h.update(f.read_bytes())
+    return h.hexdigest()[:10]
+
+
+def same_as_source(build):
+    return all(
+        (build / f.relative_to(DOCS)).is_file() and filecmp.cmp(f, build / f.relative_to(DOCS), shallow=False)
+        for f in source_files()
+    ) and sorted(p.name for p in (build / "js").glob("*.js")) == sorted(p.name for p in (DOCS / "js").glob("*.js"))
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--check", action="store_true", help="report problems, change nothing")
+    args = ap.parse_args()
+
+    bid = build_id()
+    build = BUILDS / bid
+    index = DOCS / "index.html"
+    html = index.read_text(encoding="utf-8")
+    new_html = REFS.sub(lambda m: f"{m.group(1)}v/{bid}/{m.group(2)}", html)
+
+    problems = [f"index.html loads {m} without a build folder" for m in OTHER.findall(new_html)]
+    if len(REFS.findall(html)) != 2:
+        problems.append("index.html must load js/app.js and styles.css exactly once each")
+    if args.check:
+        if new_html != html:
+            problems.append(f"index.html does not point at the current build v/{bid}/")
+        if not build.is_dir() or not same_as_source(build):
+            problems.append(f"docs/v/{bid}/ is missing or differs from docs/js and docs/styles.css")
+    if problems:
+        print("\n".join(problems) + "\nRun: python3 scripts/release_assets.py")
+        sys.exit(1)
+    if args.check:
+        print(f"v/{bid}: current")
+        return
+
+    if not build.is_dir():
+        (build / "js").mkdir(parents=True)
+        for f in source_files():
+            shutil.copy2(f, build / f.relative_to(DOCS))
+    if new_html != html:
+        index.write_text(new_html, encoding="utf-8")
+
+    order = [b for b in (LIST.read_text().split() if LIST.exists() else []) if b != bid] + [bid]
+    for old in order[:-KEEP]:
+        shutil.rmtree(BUILDS / old, ignore_errors=True)
+    LIST.write_text("\n".join(order[-KEEP:]) + "\n")
+    print(f"v/{bid}: index.html points here; kept {', '.join(order[-KEEP:])}")
+
+
+if __name__ == "__main__":
+    main()

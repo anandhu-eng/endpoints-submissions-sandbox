@@ -19,10 +19,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=0c38b22995">
-  <script type="module" src="js/app.js?v=0c38b22995"></script>
+  <script>
+    // If a module fails to load (e.g. a cached old file next to a new one), say so instead of
+    // leaving the page blank. Plain text here: copy.js may be the file that failed.
+    window.addEventListener('load', function () {
+      if (window.reviewStatusReady) return;
+      var n = document.getElementById('load-error');
+      if (n) n.hidden = false;
+    });
+  </script>
+  <link rel="stylesheet" href="v/e3b6f6d7f9/styles.css">
+  <script type="module" src="v/e3b6f6d7f9/js/app.js"></script>
 </head>
 <body>
+  <p id="load-error" class="load-error" role="alert" hidden>The page did not load. Reload it (Ctrl+Shift+R, or Cmd+Shift+R on a Mac). If it still fails, tell the page owner.</p>
   <a class="skip" href="#main" data-copy="app.skipToList">Skip to submissions</a>
 
   <header class="site-header">

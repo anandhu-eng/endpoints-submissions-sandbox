@@ -1,11 +1,11 @@
 // Main view: metrics, stage counts, filters sidebar, grouping toolbar and the list.
 
-import { COPY } from './copy.js?v=0c38b22995';
-import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, isoText } from './format.js?v=0c38b22995';
-import { icon } from './icons.js?v=0c38b22995';
-import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js?v=0c38b22995';
-import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js?v=0c38b22995';
-import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js?v=0c38b22995';
+import { COPY } from './copy.js';
+import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, isoText } from './format.js';
+import { icon } from './icons.js';
+import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
+import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
 
 // ---------------------------------------------------------------------------
 // Metric cards. Display only: filtering happens in the sidebar.
@@ -74,6 +74,13 @@ function metricRow(id, t) {
   </div>`;
 }
 
+// What each number counts. The same text is in each metric's tooltip; here it is readable
+// without a mouse.
+function definitions() {
+  const ids = ['M4', 'RP_EARLY', 'M8', 'M6', 'M5', 'M1', 'M2', 'M7', ...SECONDARY];
+  return `<h3 class="defs-title">${esc(COPY.metrics.definitionsTitle)}</h3><dl class="defs">${ids.map((id) => `<dt>${esc(COPY.metrics[id].name)}</dt><dd>${esc(COPY.metrics[id].help)}</dd>`).join('')}</dl>`;
+}
+
 export function renderMetrics(m, state, showMore) {
   const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
   const M = COPY.metrics;
@@ -109,7 +116,7 @@ export function renderMetrics(m, state, showMore) {
     <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(id, secondary[id])).join('')}</div>
     <div class="metrics-foot">
       <button type="button" class="btn-link" id="more-metrics" aria-expanded="${showMore}" aria-controls="tiles-more">${esc(showMore ? COPY.metrics.fewer : COPY.metrics.more)}</button>
-      <details class="caveats" id="caveats"><summary>${icon('info')}${esc(COPY.metrics.caveatsTitle)}</summary><ul>${COPY.metrics.caveats.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>
+      <details class="caveats" id="caveats"><summary>${icon('info')}${esc(COPY.metrics.caveatsTitle)}</summary><ul>${COPY.metrics.caveats.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>${definitions()}</details>
     </div>
   </section>`;
 }

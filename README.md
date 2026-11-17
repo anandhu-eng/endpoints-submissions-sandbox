@@ -11,7 +11,7 @@ Every org, person, model, system and number here is invented. Submitters are Ubu
 | `docs/` | The page: static HTML, CSS and plain JavaScript, with no build step. GitHub Pages serves this folder. |
 | `docs/data/snapshot.json` | The data the page reads. Generated; don't edit by hand. |
 | `scripts/build_snapshot.py` | Builds the snapshot from this repo through the GitHub API (GET requests only). |
-| `scripts/stamp_assets.py` | Puts a content version on every script and stylesheet URL, so a deploy never mixes cached old files with new ones. Run it after editing `docs/js` or `docs/styles.css`. |
+| `scripts/release_assets.py` | Copies `docs/js` and `docs/styles.css` into a fixed build folder `docs/v/<hash>/` and points `index.html` at it, so a deploy never mixes cached old files with new ones. Run it after editing `docs/js` or `docs/styles.css`. |
 | `seed/` | Scenarios, seeding script and validator for the simulated PRs, issues and comments. See `seed/README.md`. |
 | `sim/` | Personas, calendar (holidays, publication dates) and rows with no PR or issue. |
 | `DESIGN.md` | Design tokens, status colours and the references used. |
@@ -26,12 +26,14 @@ Then open http://127.0.0.1:8765/.
 
 ## Before you push a page change
 
-Browsers keep each file from GitHub Pages for 10 minutes. If one module is new and another is still the cached old copy, the page shows nothing. After editing anything in `docs/js` or `docs/styles.css`:
+Browsers keep each file from GitHub Pages for 10 minutes, and Pages ignores `?v=` query strings. If a cached old file meets a new one, an import fails and the page shows only a "did not load" note. So the page is served from fixed build folders. After editing anything in `docs/js` or `docs/styles.css`:
 
 ```
-python3 scripts/stamp_assets.py            # rewrite the ?v= stamps
-python3 scripts/stamp_assets.py --check    # must print "all stamps current"
+python3 scripts/release_assets.py            # copy the build to docs/v/<hash>/, point index.html at it
+python3 scripts/release_assets.py --check    # must print "current"
 ```
+
+Edit `docs/js`, never `docs/v/`. The newest 4 builds are kept, so a visitor with a cached older `index.html` still gets a matching set of files. The local preview also serves `docs/v/`, so run the script before checking a change in the browser.
 
 ## Rebuild the data
 

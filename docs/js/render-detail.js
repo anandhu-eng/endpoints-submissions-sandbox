@@ -1,11 +1,11 @@
 // Detail view (REQUIREMENTS section 6): header, PR timeline, issue tree and conversation.
 
-import { COPY } from './copy.js?v=0c38b22995';
-import { esc, days1, timeEl, timeElShort, markdown, dateText, dayTimeText, excerptHtml } from './format.js?v=0c38b22995';
-import { icon } from './icons.js?v=0c38b22995';
-import { ms } from './derive.js?v=0c38b22995';
-import { stagePill, waitChip, waitReasonText, flagBadge, personHtml, personName, roleBadge, turnBadge, extLink, person } from './ui.js?v=0c38b22995';
-import { reasonText, reviewDayText } from './render-list.js?v=0c38b22995';
+import { COPY } from './copy.js';
+import { esc, days1, timeEl, timeElShort, markdown, dateText, dayTimeText, excerptHtml } from './format.js';
+import { icon } from './icons.js';
+import { ms } from './derive.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, personHtml, personName, roleBadge, turnBadge, extLink, person } from './ui.js';
+import { reasonText, reviewDayText } from './render-list.js';
 
 const TL_TYPES = ['state', 'commit', 'comment', 'review', 'label', 'check', 'assign', 'db'];
 
