@@ -85,6 +85,7 @@ async function load() {
   if (snap.source?.repo) {
     const a = $('#source-link');
     a.href = snap.source.url || `https://github.com/${snap.source.repo}`;
+    a.title = COPY.githubTitle;
     a.hidden = false;
   }
   readUrl();

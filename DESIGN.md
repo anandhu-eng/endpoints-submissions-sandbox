@@ -9,12 +9,12 @@ This page is a static GitHub Pages site in `docs/`: plain HTML, CSS and JavaScri
 | `docs/index.html` | Page shell: header, sidebar, main area. A small inline script applies the theme before first paint. |
 | `docs/styles.css` | Colour tokens (light and dark), layout and components. |
 | `docs/js/copy.js` | **All user-facing text.** Edit wording here only. |
-| `docs/js/derive.js` | **All review rules:** stages, flags, Waiting on, turns, Pacific business days, penalties, deadlines, due cohort, metrics. No DOM code. |
-| `docs/js/query.js` | Filters, grouping, sort, URL state. Compares derived fields; contains no review rules. |
-| `docs/js/format.js` | Pacific date formatting, numbers, safe Markdown (escape first, then a few known tags). |
+| `docs/js/derive.js` | **All review rules:** stages, flags, Waiting on, turns, Pacific business days, penalties, deadlines, due cohort, metrics. No DOM code. Key single-source functions: `openTurnAsOf` (every open-turn count), `reviewerReplyDeadline` (11:59 PM PT, 2nd business day), `nextBotRun` (7:00 / 8:00 AM PT runs), `myWaits` / `owesAction` (View as). |
+| `docs/js/query.js` | Filters, grouping, sort, URL state, queues (ready, needs a chair, waiting on me) and the deadline that matched a filter. Compares derived fields; contains no review rules. |
+| `docs/js/format.js` | Pacific date formatting (12-hour clock everywhere), numbers, safe Markdown (escape first, then a few known tags, plus tables). Quotes use the same inline Markdown, so code spans are kept. |
 | `docs/js/ui.js`, `render-list.js`, `render-detail.js` | Rendering. |
 | `docs/js/app.js` | Loads the snapshot, keeps state in the URL, handles input. |
-| `docs/data/snapshot.json` | Data (section 7 of the spec). Currently a hand-made fixture. |
+| `docs/data/snapshot.json` | Data (section 7 of the spec), built from the sandbox seed. |
 
 Run it locally with `python3 -m http.server -d docs 8000`. ES modules do not load from `file://`.
 
@@ -33,7 +33,7 @@ Status is never shown by colour alone:
 - Stage pills have an icon and a label, and the DB status sits beside them.
 - Turn states, flags and check results always have text.
 - Deadlines that are close show a clock icon as well as colour.
-- All text pairs reach at least 4.5:1 contrast in both themes.
+- All text pairs reach at least 4.5:1 contrast in both themes (muted text `#596371` light, `#A3ACB8` dark; table headers `#5D6775`).
 
 | Stage group | Light fg / bg | Dark fg / bg | Icon |
 | --- | --- | --- | --- |
@@ -43,8 +43,16 @@ Status is never shown by colour alone:
 | Objection resolution | `#5B21B6` / `#EDE9FE` | `#DDD6FE` / `#2E2550` | scales |
 | Finalized | `#0F766E` / `#CCFBF1` | `#99F6E4` / `#12332F` | check circle |
 | Published | `#15803D` / `#DCFCE7` | `#86EFAC` / `#14321F` | award |
-| Closed (withdrawn, expired, superseded) | `#596371`, dashed outline | `#9099A5`, dashed outline | circle-slash |
+| Closed (withdrawn, expired, superseded) | `#596371`, dashed outline | `#A3ACB8`, dashed outline | circle-slash |
 | Provisional flag | `#B45309` / `#FEF3C7` | `#F1C281` / `#302818` | hourglass |
+
+## Layout decisions from persona rounds
+
+- Detail view: Waiting on, What to do and the review clock sit in one top band; submission facts and DB timestamps are in a collapsed Details block, so the PR and Issues panels start on the first screen at 1440×900.
+- Person views (submitter, reviewer) and phones start with the Overview and stage strip collapsed; chairs keep them open.
+- Phones: header links sit behind a menu button; the detail view opens on Issues when a finding is open; the turn table uses short dates.
+- The open turn always has a band in the conversation, so "Jump to current turn" always lands.
+- Known gap: the turn table has no "First reply" column.
 
 ## References
 

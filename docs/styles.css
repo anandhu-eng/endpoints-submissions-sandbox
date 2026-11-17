@@ -664,3 +664,4 @@ a.flag:hover { text-decoration: underline; }
   .turn-table .t-long { display: none; }
   .turn-table .t-short { display: inline; white-space: nowrap; }
 }
+.nowrap { white-space: nowrap; }

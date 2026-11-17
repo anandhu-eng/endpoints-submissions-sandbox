@@ -34,16 +34,16 @@ function todoItems(r, ctx) {
     const ask = f.latestAsk;
     // W2: the quote uses the thread's Markdown, so code spans and underscores stay as written.
     const askHtml = ask ? `<p class="todo-ask"><span class="meta">${esc(ask.fromChair ? T.chairNote(personName(ask.actor), dateText(ask.at)) : T.ask(personName(ask.actor), dateText(ask.at)))}</span> <q class="md-inline">${excerptHtml(ask.body)}</q> ${extLink(ask.url, COPY.detail.timeline.view, 'ev-link')}</p>` : '';
-    const since = `<p class="meta">${esc(T.waitingSince(days1(t.labelDays), dateText(t.start)))}</p>`;
+    const sinceText = f.turnState === 'waived' ? T.waitingSinceWaived : T.waitingSince;
+    const since = `<p class="meta">${esc(sinceText(days1(t.labelDays), dateText(t.start)))}</p>`;
     let due = ''; let miss = ''; let how = '';
     if (f.turnState === 'waived') {
       // W1: nothing to do. "The chairs are deciding" only when the row is referred or escalated.
       const deciding = r.stage === 'RP_PAST_WK6' || !!r.referral || f.escalated || r.flags.has('escalated');
       due = `<p class="todo-how">${esc(deciding ? T.waivedDeciding : T.waivedNoAction)}</p>`;
     } else if (f.turnState === 'submitter') {
-      // Name the bot run only when it differs from the penalty time itself.
-      const sameAsRun = t.nextLevelRun && new Date(t.nextLevelRun).getTime() === new Date(t.nextLevelAt).getTime();
-      const runNote = !t.nextLevelRun ? T.dueSubmitterNote : sameAsRun ? '' : T.dueRun(dayTimeText(t.nextLevelRun));
+      // REQUIREMENTS §3.6: always name the bot run that applies the penalty.
+      const runNote = t.nextLevelRun ? T.dueRun(dayTimeText(t.nextLevelRun)) : T.dueSubmitterNote;
       due = `<p class="todo-due">${t.nextLevelAt ? `${esc(T.dueSubmitter(t.nextLevel))}${timeEl(t.nextLevelAt)}${runNote ? ` <span class="meta">(${esc(runNote)})</span>` : ''}` : esc(T.dueMax)}${f.replyOverdue ? badge('replyOverdue') : ''}</p>`;
       miss = T.missSubmitter; how = T.howSubmitter;
     } else {
@@ -339,11 +339,10 @@ export function renderConversation(r, ui, ctx) {
       t.endedBy === 'reply' ? `<span class="meta">${esc(T.endedByReply(days1(t.responseDays)))}</span>` : '',
       t.missed ? `<span class="nbadge">${esc(T.missed)}</span>` : '',
       t.stopped ? `<span class="meta">${esc(T.stopped)}</span>` : '',
-      t.open && t.responseEnd == null ? `<span class="meta">· ${esc(T.noReplyYet)}</span>` : '',
     ].join(' ');
     const first = !idDone.has(t); idDone.add(t);
     return `<section class="band band-${t.kind}"${first ? ` id="turn-${turns.indexOf(t)}" tabindex="-1"` : ''} aria-label="${esc(T.bandTitle(who, days1(t.labelDays), t.open))}">
-      <h4 class="band-title">${icon(t.kind === 'submitter' ? 'user' : 'eye')}${esc(T.bandTitle(who, days1(t.labelDays), t.open))} ${tags}</h4>
+      <h4 class="band-title">${icon(t.kind === 'submitter' ? 'user' : 'eye')}<span>${esc(T.bandTitle(who, days1(t.labelDays), t.open))}${t.open && t.responseEnd == null ? `<span class="nowrap">\u00a0· ${esc(T.noReplyYet)}</span>` : ''}</span> ${tags}</h4>
       ${items ? `<ol class="timeline">${items}</ol>` : ''}</section>`;
   }).join('');
   return `<div class="convo-head">

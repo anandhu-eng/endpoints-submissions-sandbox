@@ -235,8 +235,8 @@ export function renderChips(state) {
     const removed = STAGES.filter((s) => def.has(s.code) && !state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
     const added = STAGES.filter((s) => !def.has(s.code) && state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
     // Stage names can contain commas, so separate them with semicolons.
-  const vsDefault = [removed.length ? COPY.filters.defaultExcept(removed.join('; ')) : '', added.length ? COPY.filters.defaultPlus(added.join('; ')) : ''].filter(Boolean).join(' · ');
-    const plain = off.length < on.length ? COPY.filters.allExcept(off.join(', ')) : on.join(', ');
+    const vsDefault = [removed.length ? COPY.filters.defaultExcept(removed.join('; ')) : '', added.length ? COPY.filters.defaultPlus(added.join('; ')) : ''].filter(Boolean).join(' · ');
+    const plain = off.length < on.length ? COPY.filters.allExcept(off.join('; ')) : on.join('; ');
     const text = !state.stage.size || !off.length ? COPY.filters.allStages : (removed.length + added.length < Math.min(on.length, off.length) ? vsDefault : plain);
     add('stage', '', `${COPY.filters.stage}: ${text}`);
   }

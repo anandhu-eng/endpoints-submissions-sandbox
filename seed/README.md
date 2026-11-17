@@ -2,7 +2,7 @@
 
 Synthetic data for the Endpoints submission tracker prototype. It mirrors how the real review repo works (review PR per submission, tracking issue, findings as native sub-issues, turn labels, bot markers) with invented content. Every org, person, model, system and number is made up.
 
-Binding format: `REQUIREMENTS.md` §7.3 (sandbox stand-ins). Conventions come from `INFRA_FINDINGS.md`.
+Binding format: the sandbox stand-ins in the requirements doc (§7.3), kept outside this repo. Conventions come from the infrastructure findings, also kept outside.
 
 ## Files
 

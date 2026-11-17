@@ -152,13 +152,11 @@ export function dayTimeText(msOrIso) {
   const d = new Date(typeof msOrIso === 'number' ? msOrIso : Date.parse(msOrIso));
   return `${fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(d)} ${COPY.tz}`;
 }
-// "Nov 12, 8:00" for narrow tables (S14).
+// "Nov 12, 8:00 AM" for narrow tables (S14): same 12-hour clock as the rest of the page.
 export function shortDateTimeText(msOrIso) {
   if (msOrIso == null) return COPY.missing;
   const d = new Date(typeof msOrIso === 'number' ? msOrIso : Date.parse(msOrIso));
-  const p = {};
-  for (const x of fmt({ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d)) p[x.type] = x.value;
-  return `${p.month} ${p.day}, ${Number(p.hour)}:${p.minute}`;
+  return fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(d);
 }
 // <time> that shows the long form, and the short form on phones.
 export function timeElShort(msOrIso) {
