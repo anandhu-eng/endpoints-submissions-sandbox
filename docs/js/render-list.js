@@ -27,8 +27,9 @@ export const TILE_FILTERS = {
   M15: { stage: ['FIN_RDI', 'FIN_WAITING', 'PUBLISHED'] },
   M16: { queue: ['ready'] },
   M17: { queue: ['needschair'] },
+  RP_EARLY: { stage: ['RP_SETUP', 'RP_PEER'] },
 };
-const PRIMARY = ['M1', 'M2', 'M4', 'M5', 'M6', 'M8'];
+// M6 (past Week 6) and M8 (Weeks 4–6) live inside the "Under review" card as its phases.
 const SECONDARY = ['M3', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17'];
 
 export function tileActive(state, id) {
@@ -41,50 +42,80 @@ export function tileActive(state, id) {
   });
 }
 
-function respStat(m, extra) {
+// A response-time figure: the median is the value; mean, n and caveats go to the tooltip.
+function respStat(m, line, extra, calendar = false) {
   const v = m.stats.median;
   return {
-    pre: v == null ? '' : COPY.metrics.median,
     value: v == null ? COPY.metrics.none : days1(v),
-    unit: v == null ? '' : COPY.metrics.days,
-    sub: [
-      COPY.metrics.meanN(days1(m.stats.mean), m.stats.n),
-      COPY.metrics.openTurns(m.open, days1(m.longestOpen)),
-      ...extra,
-    ],
+    unit: v == null ? '' : COPY.metrics.daysShort,
+    caption: v == null ? '' : calendar ? COPY.metrics.medianCaptionCal : COPY.metrics.medianCaption,
+    line,
+    detail: [COPY.metrics.meanN(days1(m.stats.mean), m.stats.n), ...extra],
   };
 }
 
+const press = (state, id) => `data-metric="${id}" aria-pressed="${tileActive(state, id)}"`;
+const tipFor = (state, id, detail = []) => esc([COPY.metrics[id].help, ...detail.filter(Boolean), tileActive(state, id) ? COPY.metrics.active : COPY.metrics.applies].join(' '));
+
+// One metric card: a title, one large number and at most one supporting line (REQUIREMENTS §4).
+// `extra` is markup placed under the figure (a phase bar, a breakdown list).
+function card(state, id, t, extra = '') {
+  const on = tileActive(state, id);
+  return `<div class="mcard${on ? ' on' : ''}${t.warn ? ' warn' : ''}${t.wide ? ' wide' : ''}">
+    <button type="button" class="mcard-main" ${press(state, id)} title="${tipFor(state, id, t.detail)}">
+      <span class="mcard-title">${esc(COPY.metrics[id].name)}</span>
+      ${t.pill ? `<span class="period-pill">${esc(t.pill)}</span>` : ''}
+      <span class="mcard-value">${t.warn ? icon('alert', 'mcard-warn') : ''}<span class="num">${esc(t.value)}</span>${t.unit ? `<span class="unit">${esc(t.unit)}</span>` : ''}</span>
+      ${t.caption ? `<span class="mcard-caption">${esc(t.caption)}</span>` : ''}
+    </button>
+    ${[].concat(t.line || []).filter(Boolean).map((l) => `<p class="mcard-line">${esc(l)}</p>`).join('')}
+    ${extra}
+  </div>`;
+}
+
+// "Under review" phases as a thin bar plus a legend that doubles as filter buttons.
+function phaseBlock(m, state) {
+  const parts = [
+    { id: 'RP_EARLY', cls: 'p1', label: COPY.metrics.phases.early, n: m.M4 - m.M8.count - m.M6 },
+    { id: 'M8', cls: 'p2', label: COPY.metrics.phases.objection, n: m.M8.count, detail: [COPY.metrics.M8second(m.M8.withTurn)] },
+    { id: 'M6', cls: 'p3', label: COPY.metrics.phases.past, n: m.M6 },
+  ];
+  const alert = m.M6 > 0 ? `<button type="button" class="alert-chip" ${press(state, 'M6')} title="${tipFor(state, 'M6')}">${icon('alert')}${esc(COPY.metrics.pastAlert(m.M6))}</button>` : '';
+  const bar = m.M4 > 0
+    ? `<div class="phasebar" role="img" aria-label="${esc(COPY.metrics.phaseBar(parts[0].n, parts[1].n, parts[2].n))}">${parts.filter((p) => p.n > 0).map((p) => `<span class="seg ${p.cls}" style="flex-grow:${p.n}" title="${esc(`${p.label}: ${p.n}`)}"></span>`).join('')}</div>`
+    : '';
+  const legend = `<ul class="legend">${parts.map((p) => `<li><button type="button" class="legend-item" ${press(state, p.id)} title="${tipFor(state, p.id, p.detail)}"><i class="dot ${p.cls}" aria-hidden="true"></i><span>${esc(p.label)}</span><b>${p.n}</b></button></li>`).join('')}</ul>`;
+  return alert + bar + legend;
+}
+
+// "Waiting to publish" split by reason. Zero rows are left out.
+function publishBlock(m) {
+  const P = COPY.metrics.M5parts;
+  const rows = [[P.rdi, m.M5.rdi], [P.embargoed, m.M5.embargoed], [P.penalty, m.M5.penalty], [P.onSchedule, m.M5.onSchedule]].filter(([, n]) => n > 0);
+  if (!rows.length) return `<p class="mcard-line">${esc(COPY.metrics.noneToPublish)}</p>`;
+  return `<ul class="legend static">${rows.map(([label, n]) => `<li><span class="legend-item"><span>${esc(label)}</span><b>${n}</b></span></li>`).join('')}</ul>`;
+}
+
 export function renderMetrics(m, state, showMore) {
-  const tiles = {
-    M1: respStat(m.M1, [m.M1.labelOnly ? COPY.metrics.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? COPY.metrics.excluded(m.M1.excluded, COPY.metrics.noStart) : null]),
-    M2: respStat(m.M2, [m.M2.missed ? COPY.metrics.missedTurns(m.M2.missed) : null, m.M2.labelOnly ? COPY.metrics.labelOnlyTurns(m.M2.labelOnly) : null]),
-    M3: { ...respStat({ stats: m.M3.stats, open: m.M3.open, longestOpen: m.M3.longestOpen }, [m.M3.excluded ? COPY.metrics.excluded(m.M3.excluded, COPY.metrics.noStart) : null]) },
-    M4: { value: m.M4 },
-    M5: { value: m.M5.count, sub: [[`${m.M5.rdi} ${COPY.metrics.M5parts.rdi}`, `${m.M5.embargoed} ${COPY.metrics.M5parts.embargoed}`, `${m.M5.penalty} ${COPY.metrics.M5parts.penalty}`, `${m.M5.onSchedule} ${COPY.metrics.M5parts.onSchedule}`].join(' · ')] },
-    M6: { value: m.M6, warn: m.M6 > 0 },
-    M8: { value: m.M8.count, sub: [COPY.metrics.M8second(m.M8.withTurn)] },
-    M9: { value: m.M9.count, sub: [COPY.metrics.M9second(m.M9.findings)] },
-    M10: { value: m.M10.count, sub: [COPY.metrics.M10second(m.M10.submitter, m.M10.reviewer, m.M10.none), m.M10.waived ? COPY.metrics.M10waived(m.M10.waived) : null] },
+  const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
+  const M = COPY.metrics;
+  const primary = [
+    card(state, 'M4', { value: m.M4, wide: true }, phaseBlock(m, state)),
+    card(state, 'M5', { value: m.M5.count, wide: true }, publishBlock(m)),
+    card(state, 'M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null]), pill }),
+    card(state, 'M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null]), pill }),
+  ];
+  const secondary = {
+    M3: respStat({ stats: m.M3.stats }, M.openTurns(m.M3.open, days1(m.M3.longestOpen)), [m.M3.excluded ? M.excluded(m.M3.excluded, M.noStart) : null]),
+    M9: { value: m.M9.count, line: M.M9second(m.M9.findings) },
+    M10: { value: m.M10.count, line: M.M10second(m.M10.submitter, m.M10.reviewer, m.M10.none), detail: [m.M10.waived ? M.M10waived(m.M10.waived) : null] },
     M11: { value: m.M11, warn: m.M11 > 0 },
     M12: { value: m.M12, warn: m.M12 > 0 },
-    M13: { value: m.M13.count, warn: m.M13.count > 0, sub: [COPY.metrics.M13parts(m.M13.overdue, m.M13.openLong)] },
+    M13: { value: m.M13.count, warn: m.M13.count > 0, line: M.M13parts(m.M13.overdue, m.M13.openLong) },
     M14: { value: m.M14 },
-    M15: { pre: m.M15.stats.median == null ? '' : COPY.metrics.median, value: m.M15.stats.median == null ? COPY.metrics.none : days1(m.M15.stats.median), unit: m.M15.stats.median == null ? '' : COPY.metrics.calDays, sub: [COPY.metrics.meanN(days1(m.M15.stats.mean), m.M15.stats.n), m.M15.excluded ? COPY.metrics.excluded(m.M15.excluded, COPY.metrics.noStart) : null] },
+    M15: respStat(m.M15, '', [m.M15.excluded ? M.excluded(m.M15.excluded, M.noStart) : null], true),
     M16: { value: m.M16 },
     M17: { value: m.M17, warn: m.M17 > 0 },
-  };
-  const tile = (id) => {
-    const t = tiles[id];
-    const on = tileActive(state, id);
-    const name = COPY.metrics[id].name;
-    const sub = (t.sub || []).filter(Boolean);
-    return `<button type="button" class="tile${on ? ' on' : ''}${t.warn ? ' warn' : ''}" data-metric="${id}" aria-pressed="${on}"
-      title="${esc(COPY.metrics[id].help + ' ' + (on ? COPY.metrics.active : COPY.metrics.applies))}">
-      <span class="tile-name">${esc(name)}</span>
-      <span class="tile-value">${t.warn ? icon('alert', 'tile-warn') : ''}${t.pre ? `<span class="unit pre">${esc(t.pre)}</span>` : ''}<span class="num">${esc(t.value)}</span>${t.unit ? `<span class="unit">${esc(t.unit)}</span>` : ''}</span>
-      ${sub.map((x) => `<span class="tile-sub">${esc(x)}</span>`).join('')}
-    </button>`;
   };
   return `
   <section class="metrics" aria-labelledby="metrics-h">
@@ -96,8 +127,8 @@ export function renderMetrics(m, state, showMore) {
         ${PERIODS.map((p) => `<button type="button" class="seg-btn" id="period-${p}" data-period="${p}" aria-pressed="${state.period === p}">${esc(COPY.metrics.periods[p])}</button>`).join('')}
       </div>
     </div>
-    <div class="tiles">${PRIMARY.map(tile).join('')}</div>
-    <div class="tiles tiles-more" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map(tile).join('')}</div>
+    <div class="mcards">${primary.join('')}</div>
+    <div class="mcards cards-more" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => card(state, id, secondary[id])).join('')}</div>
     <div class="metrics-foot">
       <button type="button" class="btn-link" id="more-metrics" aria-expanded="${showMore}" aria-controls="tiles-more">${esc(showMore ? COPY.metrics.fewer : COPY.metrics.more)}</button>
       <details class="caveats" id="caveats"><summary>${icon('info')}${esc(COPY.metrics.caveatsTitle)}</summary><ul>${COPY.metrics.caveats.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>
