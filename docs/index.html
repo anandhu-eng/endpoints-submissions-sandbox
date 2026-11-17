@@ -28,10 +28,14 @@
       if (n) n.hidden = false;
     });
   </script>
-  <link rel="stylesheet" href="v/61b855708f/styles.css">
-  <script type="module" src="v/61b855708f/js/app.js"></script>
+  <link rel="stylesheet" href="v/ed829e1ea5/styles.css">
+  <script type="module" src="v/ed829e1ea5/js/app.js"></script>
 </head>
 <body>
+  <script>
+    // Apply the remembered "filters hidden" choice before first paint (app.js stores it).
+    try { if (localStorage.getItem('reviewStatus.filtersHidden') === '1') document.body.classList.add('filters-hidden'); } catch (e) { /* show by default */ }
+  </script>
   <p id="load-error" class="load-error" role="alert" hidden>The page did not load. Reload it (Ctrl+Shift+R, or Cmd+Shift+R on a Mac). If it still fails, tell the page owner.</p>
   <a class="skip" href="#main" data-copy="app.skipToList">Skip to submissions</a>
 

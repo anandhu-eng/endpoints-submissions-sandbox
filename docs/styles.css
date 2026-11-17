@@ -604,6 +604,10 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
    on phones and on mid-width screens with the filters open. Keyed to the list's own width. */
 #list { container: list / inline-size; }
 @container list (max-width: 919px) {
+  /* One hover colour for the whole card, not per cell; flags in a row, as on phones. */
+  table.data tr.row:hover td { background: transparent; }
+  table.data tr.row:hover { background: var(--bg-hover); }
+  table.data td[data-col="flags"] .flags { flex-direction: row; flex-wrap: wrap; }
   .table-wrap { overflow: visible; border: 0; }
   table.data, table.data tbody { display: block; }
   table.data thead { display: none; }

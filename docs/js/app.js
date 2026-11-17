@@ -337,7 +337,7 @@ function bind() {
     try { localStorage.setItem(HIDDEN_KEY, show ? '0' : '1'); } catch (e) { /* storage blocked: not remembered */ }
     syncFiltersButton();
   };
-  try { document.body.classList.toggle('filters-hidden', localStorage.getItem(HIDDEN_KEY) === '1'); } catch (e) { /* show by default */ }
+  // index.html applies the stored choice before first paint.
   syncFiltersButton();
   // Widening past 1024px with the drawer open: close it, so its backdrop does not cover the page.
   narrow.addEventListener('change', () => {
