@@ -411,7 +411,9 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 
 /* ---------------------------------------------------------------- toolbar */
 .toolbar { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--bg-status); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--radius-card) var(--radius-card) 0 0; }
-.groupbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.groupbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.gb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.gb-sort { margin-left: auto; }
 .gchips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .gchip { display: inline-flex; align-items: center; gap: 2px; height: 32px; padding: 0 2px 0 4px; border: 1px solid var(--line-control); border-radius: 999px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--text-strong); }
 .gchip-n { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; background: var(--navy-ui); color: var(--bg); font-size: 11px; margin-right: 4px; }
@@ -597,12 +599,22 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .detail-title { font-size: 22px; line-height: 28px; }
   .kbd-hint { display: none; }
 
-  /* list becomes cards */
+  .list-head, .toolbar { border-radius: 0; }
+  .groupbar .spacer { display: none; }
+}
+/* The list becomes cards when it is too narrow for the table (about 905px of columns),
+   on phones and on mid-width screens with the filters open. Keyed to the list's own width. */
+#list { container: list / inline-size; }
+@container list (max-width: 919px) {
+  /* One hover colour for the whole card, not per cell; flags in a row, as on phones. */
+  table.data tr.row:hover td { background: transparent; }
+  table.data tr.row:hover { background: var(--bg-hover); }
+  table.data td[data-col="flags"] .flags { flex-direction: row; flex-wrap: wrap; }
   .table-wrap { overflow: visible; border: 0; }
   table.data, table.data tbody { display: block; }
   table.data thead { display: none; }
   table.data tr.row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 12px; margin: 8px 0; border: 1px solid var(--line-table); border-radius: var(--radius-card); background: var(--bg-card); }
-  table.data tr.row td { display: block; padding: 0; border: 0; min-width: 0; }
+  table.data tr.row td { display: block; padding: 0; border: 0; min-width: 0; max-width: none; }
   table.data tr.row td[data-label]::before { content: attr(data-label); display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-th); }
   table.data td[data-col="id"], table.data td[data-col="stage"], table.data td[data-col="flags"], table.data td[data-col="links"] { grid-column: 1 / -1; }
   tr.row[data-depth] td:first-child { padding-left: 0 !important; }
@@ -611,30 +623,28 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   table.data tbody > tr:not(.row):not(.group-row) { display: block; }
   table.data tbody > tr:not(.row):not(.group-row) td { display: block; }
   .group-row[data-depth="1"] .group-btn, .group-row[data-depth="2"] .group-btn { padding-left: 16px; }
-  .list-head, .toolbar { border-radius: 0; }
-  .groupbar .spacer { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* column sizing for the list at desktop widths */
 @media (min-width: 761px) {
   table.data td, table.data thead th { padding-left: 10px; padding-right: 10px; }
-  td[data-col="findings"] > span:first-child, td[data-col="wait"] .wait { white-space: nowrap; }
+  td[data-col="findings"] > span:first-child { white-space: nowrap; }
   td[data-col="findings"] .meta { white-space: nowrap; font-size: 11.5px; }
-  td[data-col="id"] { min-width: 200px; }
-  td[data-col="due"] { min-width: 150px; }
+  td[data-col="id"] { min-width: 170px; }
+  td[data-col="due"] { min-width: 130px; }
   td[data-col="stage"] .pill { white-space: normal; }
-  td[data-col="stage"] { min-width: 180px; max-width: 220px; }
+  td[data-col="stage"] { min-width: 160px; max-width: 220px; }
   td[data-col="flags"] .flags { flex-direction: column; align-items: flex-start; }
   td[data-col="links"] { white-space: nowrap; }
 }
 .wait-line { display: block; margin-bottom: 4px; }
 .wait-line:last-child { margin-bottom: 0; }
 .wait-why { font-size: 11.5px; line-height: 15px; }
-@media (min-width: 761px) { td[data-col="wait"] { min-width: 120px; max-width: 200px; } }
+@media (min-width: 761px) { td[data-col="wait"] { min-width: 110px; max-width: 200px; } td[data-col="wait"] .wait { white-space: normal; } }
 td[data-col="stage"] .pill { border-radius: 10px; }
 @media (min-width: 761px) {
-  td[data-col="flags"] { min-width: 175px; max-width: 210px; }
+  td[data-col="flags"] { min-width: 150px; max-width: 210px; }
   td[data-col="flags"] .flag { white-space: normal; }
   td[data-col="rev"] { min-width: 90px; }
 }
@@ -715,7 +725,7 @@ a.flag:hover { text-decoration: underline; }
   table.data thead th { white-space: normal; vertical-align: bottom; }
   td[data-col="findings"] { max-width: 140px; }
   td[data-col="findings"] .meta { white-space: normal; }
-  td[data-col="wait"] { min-width: 120px; }
+  td[data-col="wait"] { min-width: 110px; }
 }
 
 /* ---- Round 2 ---- */
@@ -733,3 +743,105 @@ a.flag:hover { text-decoration: underline; }
   .turn-table .t-short { display: inline; white-space: nowrap; }
 }
 .nowrap { white-space: nowrap; }
+
+/* Sticky bars. Narrow screens: the Group by / Sort toolbar stays above the list while it scrolls.
+   Detail view: the PR / Issues tabs and each panel's title stay while the panel scrolls. */
+:root { --tabs-h: 52px; }
+.panel-title { position: sticky; top: var(--header-h); z-index: 5; }
+@media (max-width: 1023px) {
+  .toolbar { position: sticky; top: var(--header-h); z-index: 20; box-shadow: 0 1px 0 var(--line); }
+}
+@media (max-width: 959px) {
+  .panel-tabs-bar { position: sticky; top: var(--header-h); z-index: 6; height: var(--tabs-h); display: flex; align-items: center; background: var(--bg); }
+  .panel-tabs { margin: 0; }
+  .panel-title { top: calc(var(--header-h) + var(--tabs-h)); }
+}
+@media (max-width: 760px) {
+  /* The site header scrolls away on phones, so the sticky bars sit at the top of the screen. */
+  .toolbar { top: 0; margin: 0 -16px; padding: 8px 16px; border-left: 0; border-right: 0; }
+  .panel-tabs-bar { top: 0; }
+  .panel-title { top: var(--tabs-h); }
+  .groupbar { flex-direction: column; align-items: stretch; gap: 6px; }
+  .gb-row { flex-wrap: wrap; gap: 6px 8px; }
+  .gb-row > .field-label { flex: 0 0 60px; }
+  .gb-sort { margin-left: 0; flex-wrap: nowrap; }
+  .gchips { flex: 1 1 calc(100% - 68px); min-width: 0; gap: 6px; }
+  .gchip { white-space: nowrap; }
+  .gchips select { flex: 1 1 110px; min-width: 110px; }
+  .gb-sort > select { flex: 1 1 0; min-width: 0; }
+  /* Reordering levels needs the arrows; on phones, remove and re-add a level instead. */
+  .gchip [data-gmove] { display: none; }
+  .gchip { padding-right: 2px; }
+  /* Group order and expand/collapse share one short row under the chips. */
+  #g-sort { flex: 1 1 0; min-width: 0; }
+  #expand-all, #collapse-all { padding: 4px 8px; white-space: nowrap; }
+  /* Header: brand and icons on one line, the prototype note below. */
+  .site-header { flex-wrap: wrap; }
+  .proto { order: 3; flex-basis: 100%; }
+  /* Title row: the header already names the page; Filters and Copy link share a row, search below. */
+  .view-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .title-row { gap: 8px; }
+  #open-filters, .copy-link { flex: 1 1 auto; justify-content: center; }
+}
+
+/* Sizes of the sticky bars. They set the sticky offsets and the scroll padding, so jumps,
+   scrollIntoView and keyboard focus land below the bars instead of under them.
+   --toolbar-h is measured by app.js (the list toolbar's height varies with grouping and filters). */
+:root { --stick-header: var(--header-h); --stick-tabs: 0px; --ptitle-h: 34px; --convo-h: 0px; }
+@media (max-width: 959px) { :root { --stick-tabs: var(--tabs-h); } }
+@media (max-width: 760px) { :root { --stick-header: 0px; } }
+html { scroll-padding-top: calc(var(--stick-header) + 8px); }
+@media (max-width: 1023px) { html { scroll-padding-top: calc(var(--stick-header) + var(--toolbar-h, 0px) + 8px); } }
+html:has(body.in-detail) { scroll-padding-top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h) + var(--convo-h) + 8px); }
+.panel-title { min-height: var(--ptitle-h); box-sizing: border-box; }
+.panels { scroll-margin-top: calc(var(--stick-header) + var(--stick-tabs)); }
+
+/* Grouping tools sit in the list head once a grouping is set. */
+.gb-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+
+@media (max-width: 1023px) {
+  /* Filter chips in the sticky toolbar: one line that scrolls sideways, so the bar keeps its height. */
+  .toolbar .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px 2px; }
+  .toolbar .chips::-webkit-scrollbar { display: none; }
+  .toolbar .chip { flex: none; }
+  .list-head { flex-wrap: wrap; row-gap: 8px; }
+  .gb-tools { width: 100%; margin-left: 0; }
+  .gb-tools #g-sort, .gb-tools #g-add { flex: 1 1 140px; min-width: 140px; }
+  .gb-tools .btn-quiet { flex: 1 1 auto; }
+}
+
+@media (max-width: 959px) {
+  /* In a finding's conversation, its heading and the way back stay under the tabs and panel title. */
+  html:has(#panel-issues[data-convo="1"]) { --convo-h: 52px; }
+  #panel-issues[data-convo="1"] .convo-head {
+    position: sticky; top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h)); z-index: 4;
+    min-height: 52px; box-sizing: border-box; margin: -12px -12px 8px; padding: 4px 12px;
+    background: var(--bg-card); border-bottom: 1px solid var(--line);
+  }
+  #back-to-tree { order: -1; display: inline-flex; align-items: center; gap: 2px; min-height: 44px; }
+  #back-to-tree .icon { width: 16px; height: 16px; }
+  .panel-tabs-bar .panel-tabs { display: flex; flex: 1; }
+  .panel-tabs .seg-btn { flex: 1; }
+}
+
+@media (max-width: 760px) {
+  /* Turn table: keep who, start and business days; "Ended" is the next row's start. */
+  .turn-table th:nth-child(3), .turn-table td:nth-child(3), .turn-table th:nth-child(5), .turn-table td:nth-child(5) { display: none; }
+  /* Tap targets about 44px; 16px text in fields stops iOS zooming on focus. */
+  .seg-btn, .btn-back, #open-filters, .copy-link { min-height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn.xs { width: 32px; height: 32px; }
+  .gchip [data-gremove] { width: 36px; height: 36px; }
+  .gchip { height: 40px; }
+  .field-control, .field-control.sm { height: 40px; font-size: 16px; }
+  /* Finding rows: the GitHub link goes under the title instead of taking a column. */
+  .tnode-row { flex-wrap: wrap; }
+  .tnode-row .node-link { flex-basis: 100%; padding-left: 22px; min-height: 32px; display: inline-flex; align-items: center; }
+}
+
+/* Cards: a tap anywhere on the card opens the submission. Other links stay on top. */
+@container list (max-width: 919px) {
+  table.data tr.row { position: relative; }
+  table.data .sub-link::after { content: ''; position: absolute; inset: 0; }
+  table.data tr.row a:not(.sub-link), table.data tr.row button { position: relative; z-index: 1; }
+}

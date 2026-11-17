@@ -9,7 +9,7 @@ import { esc, setTimeZone, dateTimeText, isoText } from './format.js';
 import { icon } from './icons.js';
 import { setPeople, personName } from './ui.js';
 import {
-  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList,
+  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderGroupTools, renderList,
 } from './render-list.js';
 import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
 
@@ -209,7 +209,7 @@ function renderListView() {
       if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
     }
     $('#list').innerHTML = renderList(rows, scope, state, {
-      hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''),
+      hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''), groupTools: renderGroupTools(state),
     });
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
@@ -319,23 +319,42 @@ function bind() {
     if (first) first.focus();
   });
 
-  // Filters drawer
+  // The list toolbar is sticky below 1024px and its height varies; CSS uses it as scroll padding
+  // so focus and jumps land below it.
+  const toolbar = $('.toolbar');
+  if (toolbar && 'ResizeObserver' in window) {
+    new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-h', `${Math.ceil(toolbar.getBoundingClientRect().height)}px`)).observe(toolbar);
+  }
+
+  // Filters: a drawer below 1024px; beside the list from 1024px, where « or the Filters
+  // button hides it. The hidden choice is remembered in this browser.
   const drawer = $('#filters');
+  const narrow = window.matchMedia('(max-width: 1023px)');
+  const HIDDEN_KEY = 'reviewStatus.filtersHidden';
+  const syncFiltersButton = () => $('#open-filters').setAttribute('aria-expanded',
+    String(narrow.matches ? drawer.classList.contains('open') : !document.body.classList.contains('filters-hidden')));
   const openDrawer = (open) => {
     drawer.classList.toggle('open', open);
     $('#backdrop').hidden = !open;
-    $('#open-filters').setAttribute('aria-expanded', String(open));
+    syncFiltersButton();
     if (open) { const b = $('#close-filters'); if (b) b.focus(); } else $('#open-filters').focus();
   };
-  $('#open-filters').addEventListener('click', () => {
-    if (window.matchMedia('(max-width: 1023px)').matches) openDrawer(!drawer.classList.contains('open'));
-    else showSidebar(document.body.classList.contains('filters-hidden'));
-  });
-  // Wide screens: the sidebar sits beside the list; « in its header or the Filters button hides it.
   const showSidebar = (show) => {
     document.body.classList.toggle('filters-hidden', !show);
-    $('#open-filters').setAttribute('aria-expanded', String(show));
+    try { localStorage.setItem(HIDDEN_KEY, show ? '0' : '1'); } catch (e) { /* storage blocked: not remembered */ }
+    syncFiltersButton();
   };
+  // index.html applies the stored choice before first paint.
+  syncFiltersButton();
+  // Widening past 1024px with the drawer open: close it, so its backdrop does not cover the page.
+  narrow.addEventListener('change', () => {
+    if (!narrow.matches && drawer.classList.contains('open')) { drawer.classList.remove('open'); $('#backdrop').hidden = true; }
+    syncFiltersButton();
+  });
+  $('#open-filters').addEventListener('click', () => {
+    if (narrow.matches) openDrawer(!drawer.classList.contains('open'));
+    else showSidebar(document.body.classList.contains('filters-hidden'));
+  });
   $('#backdrop').addEventListener('click', () => openDrawer(false));
 
   drawer.addEventListener('click', (e) => {
@@ -443,7 +462,11 @@ function bind() {
     if (tgt.closest('#tl-order')) { ui.detail.newest = !ui.detail.newest; return rerenderTimeline(); }
     const tab = tgt.closest('[role="tab"]');
     if (tab) return selectTab(tab.id === 'tab-issues' ? 'issues' : 'pr', true);
-    if (tgt.closest('#back-to-tree')) { ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0'; const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return; }
+    if (tgt.closest('#back-to-tree')) {
+      // Opening a finding on a narrow screen pushed a history entry; going back pops it (popstate re-renders).
+      if (ui.detail.pushedNode) { history.back(); return; }
+      ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0'; const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return;
+    }
     const tw = tgt.closest('[data-twisty]');
     if (tw) return toggleNode(tw.closest('[role="treeitem"]'));
     if (tgt.closest('a')) return;
@@ -472,7 +495,7 @@ function bind() {
     else if (e.key === 'Escape') closeDetail();
   });
 
-  window.addEventListener('popstate', () => { readUrl(); render(); });
+  window.addEventListener('popstate', () => { readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render(); });
 }
 
 // D20: copy the current URL (all state lives in it).
@@ -484,6 +507,9 @@ function copyLink() {
 function selectTab(tab, focus) {
   ui.detail.tab = tab;
   $('.panels').dataset.tab = tab;
+  // With the tab bar stuck mid-panel, start the new panel at its top (scroll-margin clears the bars).
+  const bar = $('.panel-tabs-bar');
+  if (bar && $('.panels').getBoundingClientRect().top < bar.getBoundingClientRect().bottom) $('.panels').scrollIntoView({ block: 'start' });
   for (const b of $$('.panel-tabs [role="tab"]')) {
     const on = b.id === `tab-${tab}`;
     b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
@@ -515,10 +541,14 @@ function toggleNode(item, force) {
   const n = item.dataset.node;
   open ? ui.detail.collapsed.delete(n) : ui.detail.collapsed.add(n);
 }
+const tabsNarrow = window.matchMedia('(max-width: 959px)');
 function selectNode(item) {
   const n = item.dataset.node;
   state.node = n; ui.detail.node = n; ui.detail.showConvo = true;
-  writeUrl();
+  // Narrow screens replace the tree with the conversation, so the phone's Back gesture should return to the tree.
+  const push = tabsNarrow.matches && !ui.detail.pushedNode;
+  writeUrl(push);
+  if (push) ui.detail.pushedNode = true;
   for (const x of $$('#issue-tree [role="treeitem"]')) {
     const on = x === item;
     x.setAttribute('aria-selected', String(on)); x.classList.toggle('selected', on);
@@ -527,6 +557,10 @@ function selectNode(item) {
   const r = D.rows.find((x) => x.shortId === state.id);
   $('#convo').innerHTML = renderConversation(r, ui.detail, detailCtx());
   $('#panel-issues').dataset.convo = '1';
+  if (tabsNarrow.matches) {
+    const h = $('#convo .convo-head h3'); if (h) h.focus({ preventScroll: true });
+    $('#convo').scrollIntoView({ block: 'start' });
+  }
 }
 function treeKey(e, item) {
   const items = visibleItems();

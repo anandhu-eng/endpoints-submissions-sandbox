@@ -465,7 +465,7 @@ export const COPY = {
       },
       select: 'Select an issue to read its conversation.',
       conversation: (n) => `Conversation on #${n}`,
-      backToTree: 'Back to tree',
+      backToTree: 'All findings',
       noFindings: 'No findings filed yet.',
     },
   },

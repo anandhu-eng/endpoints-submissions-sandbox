@@ -783,3 +783,65 @@ a.flag:hover { text-decoration: underline; }
   .title-row { gap: 8px; }
   #open-filters, .copy-link { flex: 1 1 auto; justify-content: center; }
 }
+
+/* Sizes of the sticky bars. They set the sticky offsets and the scroll padding, so jumps,
+   scrollIntoView and keyboard focus land below the bars instead of under them.
+   --toolbar-h is measured by app.js (the list toolbar's height varies with grouping and filters). */
+:root { --stick-header: var(--header-h); --stick-tabs: 0px; --ptitle-h: 34px; --convo-h: 0px; }
+@media (max-width: 959px) { :root { --stick-tabs: var(--tabs-h); } }
+@media (max-width: 760px) { :root { --stick-header: 0px; } }
+html { scroll-padding-top: calc(var(--stick-header) + 8px); }
+@media (max-width: 1023px) { html { scroll-padding-top: calc(var(--stick-header) + var(--toolbar-h, 0px) + 8px); } }
+html:has(body.in-detail) { scroll-padding-top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h) + var(--convo-h) + 8px); }
+.panel-title { min-height: var(--ptitle-h); box-sizing: border-box; }
+.panels { scroll-margin-top: calc(var(--stick-header) + var(--stick-tabs)); }
+
+/* Grouping tools sit in the list head once a grouping is set. */
+.gb-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+
+@media (max-width: 1023px) {
+  /* Filter chips in the sticky toolbar: one line that scrolls sideways, so the bar keeps its height. */
+  .toolbar .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px 2px; }
+  .toolbar .chips::-webkit-scrollbar { display: none; }
+  .toolbar .chip { flex: none; }
+  .list-head { flex-wrap: wrap; row-gap: 8px; }
+  .gb-tools { width: 100%; margin-left: 0; }
+  .gb-tools #g-sort, .gb-tools #g-add { flex: 1 1 140px; min-width: 140px; }
+  .gb-tools .btn-quiet { flex: 1 1 auto; }
+}
+
+@media (max-width: 959px) {
+  /* In a finding's conversation, its heading and the way back stay under the tabs and panel title. */
+  html:has(#panel-issues[data-convo="1"]) { --convo-h: 52px; }
+  #panel-issues[data-convo="1"] .convo-head {
+    position: sticky; top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h)); z-index: 4;
+    min-height: 52px; box-sizing: border-box; margin: -12px -12px 8px; padding: 4px 12px;
+    background: var(--bg-card); border-bottom: 1px solid var(--line);
+  }
+  #back-to-tree { order: -1; display: inline-flex; align-items: center; gap: 2px; min-height: 44px; }
+  #back-to-tree .icon { width: 16px; height: 16px; }
+  .panel-tabs-bar .panel-tabs { display: flex; flex: 1; }
+  .panel-tabs .seg-btn { flex: 1; }
+}
+
+@media (max-width: 760px) {
+  /* Turn table: keep who, start and business days; "Ended" is the next row's start. */
+  .turn-table th:nth-child(3), .turn-table td:nth-child(3), .turn-table th:nth-child(5), .turn-table td:nth-child(5) { display: none; }
+  /* Tap targets about 44px; 16px text in fields stops iOS zooming on focus. */
+  .seg-btn, .btn-back, #open-filters, .copy-link { min-height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn.xs { width: 32px; height: 32px; }
+  .gchip [data-gremove] { width: 36px; height: 36px; }
+  .gchip { height: 40px; }
+  .field-control, .field-control.sm { height: 40px; font-size: 16px; }
+  /* Finding rows: the GitHub link goes under the title instead of taking a column. */
+  .tnode-row { flex-wrap: wrap; }
+  .tnode-row .node-link { flex-basis: 100%; padding-left: 22px; min-height: 32px; display: inline-flex; align-items: center; }
+}
+
+/* Cards: a tap anywhere on the card opens the submission. Other links stay on top. */
+@container list (max-width: 919px) {
+  table.data tr.row { position: relative; }
+  table.data .sub-link::after { content: ''; position: absolute; inset: 0; }
+  table.data tr.row a:not(.sub-link), table.data tr.row button { position: relative; z-index: 1; }
+}
