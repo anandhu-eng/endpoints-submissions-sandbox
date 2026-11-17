@@ -1,0 +1,4400 @@
+{
+ "schema": 1,
+ "as_of": "2026-11-17T10:00:00-08:00",
+ "as_of_utc": "2026-11-17T18:00:00Z",
+ "repo": "anandhu-eng/endpoints-submissions-sandbox",
+ "notes": [
+  "Single source of truth for the sandbox. seed.py renders it to GitHub; validate.py checks it.",
+  "Times are ISO 8601 UTC. Pacific dates drive review windows; business days exclude weekends and calendar.holidays.",
+  "{{num:<key>}} is replaced with the GitHub number of the item with that sim-key; {{sha:<scenario>/pr/<i>}} with commit i of that PR's branch.",
+  "Timeline entries with 'text' become visible comments; 'labels', 'state', 'assign' and 'check' become a hidden event comment."
+ ],
+ "calendar": {
+  "timezone": "America/Los_Angeles",
+  "holidays": [
+   "2026-01-01",
+   "2026-01-19",
+   "2026-02-16",
+   "2026-05-25",
+   "2026-06-19",
+   "2026-07-03",
+   "2026-09-07",
+   "2026-10-12",
+   "2026-11-11",
+   "2026-11-26",
+   "2026-12-25",
+   "2027-01-01",
+   "2027-01-18",
+   "2027-02-15",
+   "2027-05-31",
+   "2027-06-18"
+  ],
+  "cohorts": [
+   {
+    "id": "2026-01-C0",
+    "date": "2026-01-07"
+   },
+   {
+    "id": "2026-01-C1",
+    "date": "2026-01-21"
+   },
+   {
+    "id": "2026-02-C0",
+    "date": "2026-02-04"
+   },
+   {
+    "id": "2026-02-C1",
+    "date": "2026-02-18"
+   },
+   {
+    "id": "2026-03-C0",
+    "date": "2026-03-04"
+   },
+   {
+    "id": "2026-03-C1",
+    "date": "2026-03-18"
+   },
+   {
+    "id": "2026-04-C0",
+    "date": "2026-04-01"
+   },
+   {
+    "id": "2026-04-C1",
+    "date": "2026-04-15"
+   },
+   {
+    "id": "2026-05-C0",
+    "date": "2026-05-06"
+   },
+   {
+    "id": "2026-05-C1",
+    "date": "2026-05-20"
+   },
+   {
+    "id": "2026-06-C0",
+    "date": "2026-06-03"
+   },
+   {
+    "id": "2026-06-C1",
+    "date": "2026-06-17"
+   },
+   {
+    "id": "2026-07-C0",
+    "date": "2026-07-01"
+   },
+   {
+    "id": "2026-07-C1",
+    "date": "2026-07-15"
+   },
+   {
+    "id": "2026-08-C0",
+    "date": "2026-08-05"
+   },
+   {
+    "id": "2026-08-C1",
+    "date": "2026-08-19"
+   },
+   {
+    "id": "2026-09-C0",
+    "date": "2026-09-02"
+   },
+   {
+    "id": "2026-09-C1",
+    "date": "2026-09-16"
+   },
+   {
+    "id": "2026-10-C0",
+    "date": "2026-10-07"
+   },
+   {
+    "id": "2026-10-C1",
+    "date": "2026-10-21"
+   },
+   {
+    "id": "2026-11-C0",
+    "date": "2026-11-04"
+   },
+   {
+    "id": "2026-11-C1",
+    "date": "2026-11-18"
+   },
+   {
+    "id": "2026-12-C0",
+    "date": "2026-12-02"
+   },
+   {
+    "id": "2026-12-C1",
+    "date": "2026-12-16"
+   },
+   {
+    "id": "2027-01-C0",
+    "date": "2027-01-06"
+   },
+   {
+    "id": "2027-01-C1",
+    "date": "2027-01-20"
+   },
+   {
+    "id": "2027-02-C0",
+    "date": "2027-02-03"
+   },
+   {
+    "id": "2027-02-C1",
+    "date": "2027-02-17"
+   },
+   {
+    "id": "2027-03-C0",
+    "date": "2027-03-03"
+   },
+   {
+    "id": "2027-03-C1",
+    "date": "2027-03-17"
+   },
+   {
+    "id": "2027-04-C0",
+    "date": "2027-04-07"
+   },
+   {
+    "id": "2027-04-C1",
+    "date": "2027-04-21"
+   },
+   {
+    "id": "2027-05-C0",
+    "date": "2027-05-05"
+   },
+   {
+    "id": "2027-05-C1",
+    "date": "2027-05-19"
+   },
+   {
+    "id": "2027-06-C0",
+    "date": "2027-06-02"
+   },
+   {
+    "id": "2027-06-C1",
+    "date": "2027-06-16"
+   }
+  ]
+ },
+ "personas": [
+  {
+   "login": "warty-warthog-sub1",
+   "display_name": "S1 · Warty Warthog",
+   "role": "submitter",
+   "org": "Warty Warthog",
+   "prefix": "Submitter: S1 · Warty Warthog"
+  },
+  {
+   "login": "hoary-hedgehog-sub1",
+   "display_name": "S1 · Hoary Hedgehog",
+   "role": "submitter",
+   "org": "Hoary Hedgehog",
+   "prefix": "Submitter: S1 · Hoary Hedgehog"
+  },
+  {
+   "login": "breezy-badger-sub1",
+   "display_name": "S1 · Breezy Badger",
+   "role": "submitter",
+   "org": "Breezy Badger",
+   "prefix": "Submitter: S1 · Breezy Badger"
+  },
+  {
+   "login": "dapper-drake-sub1",
+   "display_name": "S1 · Dapper Drake",
+   "role": "submitter",
+   "org": "Dapper Drake",
+   "prefix": "Submitter: S1 · Dapper Drake"
+  },
+  {
+   "login": "edgy-eft-sub1",
+   "display_name": "S1 · Edgy Eft",
+   "role": "submitter",
+   "org": "Edgy Eft",
+   "prefix": "Submitter: S1 · Edgy Eft"
+  },
+  {
+   "login": "feisty-fawn-sub1",
+   "display_name": "S1 · Feisty Fawn",
+   "role": "submitter",
+   "org": "Feisty Fawn",
+   "prefix": "Submitter: S1 · Feisty Fawn"
+  },
+  {
+   "login": "gutsy-gibbon-sub1",
+   "display_name": "S1 · Gutsy Gibbon",
+   "role": "submitter",
+   "org": "Gutsy Gibbon",
+   "prefix": "Submitter: S1 · Gutsy Gibbon"
+  },
+  {
+   "login": "hardy-heron-sub1",
+   "display_name": "S1 · Hardy Heron",
+   "role": "submitter",
+   "org": "Hardy Heron",
+   "prefix": "Submitter: S1 · Hardy Heron"
+  },
+  {
+   "login": "intrepid-ibex-sub1",
+   "display_name": "S1 · Intrepid Ibex",
+   "role": "submitter",
+   "org": "Intrepid Ibex",
+   "prefix": "Submitter: S1 · Intrepid Ibex"
+  },
+  {
+   "login": "jaunty-jackalope-sub1",
+   "display_name": "S1 · Jaunty Jackalope",
+   "role": "submitter",
+   "org": "Jaunty Jackalope",
+   "prefix": "Submitter: S1 · Jaunty Jackalope"
+  },
+  {
+   "login": "karmic-koala-sub1",
+   "display_name": "S1 · Karmic Koala",
+   "role": "submitter",
+   "org": "Karmic Koala",
+   "prefix": "Submitter: S1 · Karmic Koala"
+  },
+  {
+   "login": "lucid-lynx-sub1",
+   "display_name": "S1 · Lucid Lynx",
+   "role": "submitter",
+   "org": "Lucid Lynx",
+   "prefix": "Submitter: S1 · Lucid Lynx"
+  },
+  {
+   "login": "bionic-beaver-sub1",
+   "display_name": "S1 · Bionic Beaver",
+   "role": "submitter",
+   "org": "Bionic Beaver",
+   "prefix": "Submitter: S1 · Bionic Beaver"
+  },
+  {
+   "login": "focal-fossa-sub1",
+   "display_name": "S1 · Focal Fossa",
+   "role": "submitter",
+   "org": "Focal Fossa",
+   "prefix": "Submitter: S1 · Focal Fossa"
+  },
+  {
+   "login": "jammy-jellyfish-sub1",
+   "display_name": "S1 · Jammy Jellyfish",
+   "role": "submitter",
+   "org": "Jammy Jellyfish",
+   "prefix": "Submitter: S1 · Jammy Jellyfish"
+  },
+  {
+   "login": "noble-numbat-sub1",
+   "display_name": "S1 · Noble Numbat",
+   "role": "submitter",
+   "org": "Noble Numbat",
+   "prefix": "Submitter: S1 · Noble Numbat"
+  },
+  {
+   "login": "hardy-heron-r1",
+   "display_name": "R1 · Hardy Heron",
+   "role": "reviewer",
+   "org": "Hardy Heron",
+   "prefix": "Reviewer: R1 · Hardy Heron"
+  },
+  {
+   "login": "dapper-drake-r2",
+   "display_name": "R2 · Dapper Drake",
+   "role": "reviewer",
+   "org": "Dapper Drake",
+   "prefix": "Reviewer: R2 · Dapper Drake"
+  },
+  {
+   "login": "lucid-lynx-r3",
+   "display_name": "R3 · Lucid Lynx",
+   "role": "reviewer",
+   "org": "Lucid Lynx",
+   "prefix": "Reviewer: R3 · Lucid Lynx"
+  },
+  {
+   "login": "noble-numbat-r4",
+   "display_name": "R4 · Noble Numbat",
+   "role": "reviewer",
+   "org": "Noble Numbat",
+   "prefix": "Reviewer: R4 · Noble Numbat"
+  },
+  {
+   "login": "karmic-koala-r5",
+   "display_name": "R5 · Karmic Koala",
+   "role": "reviewer",
+   "org": "Karmic Koala",
+   "prefix": "Reviewer: R5 · Karmic Koala"
+  },
+  {
+   "login": "intrepid-ibex-r6",
+   "display_name": "R6 · Intrepid Ibex",
+   "role": "reviewer",
+   "org": "Intrepid Ibex",
+   "prefix": "Reviewer: R6 · Intrepid Ibex"
+  },
+  {
+   "login": "chair-a",
+   "display_name": "Chair A",
+   "role": "chair",
+   "org": null,
+   "prefix": "Review chair: Chair A"
+  },
+  {
+   "login": "chair-b",
+   "display_name": "Chair B",
+   "role": "chair",
+   "org": null,
+   "prefix": "Review chair: Chair B"
+  },
+  {
+   "login": "lm-bot",
+   "display_name": "lifecycle",
+   "role": "bot",
+   "org": null,
+   "prefix": "Bot: lifecycle"
+  },
+  {
+   "login": "label-objections-bot",
+   "display_name": "label-objections",
+   "role": "bot",
+   "org": null,
+   "prefix": "Bot: label-objections"
+  },
+  {
+   "login": "checker-bot",
+   "display_name": "check-submission",
+   "role": "bot",
+   "org": null,
+   "prefix": "Bot: check-submission"
+  }
+ ],
+ "labels": [
+  {
+   "name": "review",
+   "color": "0e8a16",
+   "description": "Part of the submission peer-review workflow"
+  },
+  {
+   "name": "tracking",
+   "color": "1d76db",
+   "description": "Per-submission review tracking issue"
+  },
+  {
+   "name": "finalized",
+   "color": "0e8a16",
+   "description": "Chair sign-off: submission is finalized"
+  },
+  {
+   "name": "needs-submitter-attention",
+   "color": "d93f0b",
+   "description": "Waiting on the submitter"
+  },
+  {
+   "name": "needs-reviewer-attention",
+   "color": "fbca04",
+   "description": "Waiting on the reviewer"
+  },
+  {
+   "name": "resolved",
+   "color": "0e8a16",
+   "description": "Review finding is closed out"
+  },
+  {
+   "name": "waive-penalty-L1",
+   "color": "fbca04",
+   "description": "Penalty on this finding lowered one stage (review chairs and infra only)"
+  },
+  {
+   "name": "waive-penalty-all",
+   "color": "fbca04",
+   "description": "Penalty on this finding waived (review chairs and infra only)"
+  },
+  {
+   "name": "type: Availability",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Availability"
+  },
+  {
+   "name": "type: Compliance Failure",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Compliance Failure"
+  },
+  {
+   "name": "type: Cosmetic",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Cosmetic"
+  },
+  {
+   "name": "type: Division Rules",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Division Rules"
+  },
+  {
+   "name": "type: Methodology",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Methodology"
+  },
+  {
+   "name": "type: Reproducibility",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Reproducibility"
+  },
+  {
+   "name": "type: Suspect or Incomprehensible Results",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Suspect or Incomprehensible Results"
+  },
+  {
+   "name": "type: Validity of Results",
+   "color": "fbca04",
+   "description": "Objection type (Submission Rules §6.8): Validity of Results"
+  },
+  {
+   "name": "status: compliance_checking",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = COMPLIANCE_CHECKING (real status lives only in the DB)"
+  },
+  {
+   "name": "status: review_pending",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = REVIEW_PENDING (real status lives only in the DB)"
+  },
+  {
+   "name": "status: finalized",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = FINALIZED (real status lives only in the DB)"
+  },
+  {
+   "name": "status: published",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = PUBLISHED (real status lives only in the DB)"
+  },
+  {
+   "name": "status: superseded",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = SUPERSEDED (real status lives only in the DB)"
+  },
+  {
+   "name": "status: expired",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = EXPIRED (real status lives only in the DB)"
+  },
+  {
+   "name": "status: withdrawn",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = WITHDRAWN (real status lives only in the DB)"
+  },
+  {
+   "name": "status: withdrawn_incomplete",
+   "color": "ededed",
+   "description": "Sandbox stand-in for submissions.status = WITHDRAWN_INCOMPLETE (real status lives only in the DB)"
+  },
+  {
+   "name": "by Noble Numbat",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "against Feisty Fawn",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "by Hardy Heron",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "by Intrepid Ibex",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "against Dapper Drake",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "by Dapper Drake",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "against Hardy Heron",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "by dapper-drake",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "by Lucid Lynx",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "against Karmic Koala",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "by Karmic Koala",
+   "color": "c5def5",
+   "description": "Objection tag: objecting org (rules §6.7)"
+  },
+  {
+   "name": "against Jammy Jellyfish",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Lucid Lynx",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Intrepid Ibex",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Bionic Beaver",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Hoary Hedgehog",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Breezy Badger",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  },
+  {
+   "name": "against Jaunty Jackalope",
+   "color": "f9d0c4",
+   "description": "Objection tag: submitting org (rules §6.7)"
+  }
+ ],
+ "scenarios": [
+  {
+   "key": "cc-pending",
+   "tests": [
+    "CC_CHECKING: PR open today, checker still queued",
+    "Waiting on: LM"
+   ],
+   "home": "pr",
+   "sim_db": {
+    "id": "0cfe02a7-7a5d-458b-98ec-ac63ae152cf5",
+    "status": "COMPLIANCE_CHECKING",
+    "created_at": "2026-11-16T20:10:00Z",
+    "compliance_passed_at": null,
+    "peer_review_started_at": null,
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:cc-pending/pr}}",
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Noble Numbat",
+    "submitter": "noble-numbat-sub1"
+   },
+   "pr": {
+    "key": "cc-pending/pr",
+    "kind": "pr",
+    "at": "2026-11-17T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Noble Numbat · standardized · available · SimLM-8B · 0cfe02a7",
+    "branch": "submission/0cfe02a7",
+    "body": "## Review submission `0cfe02a7`\n\n| Field | Value |\n|---|---|\n| Organization | `Noble Numbat` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Submitted | `2026-11-16 20:10 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 0cfe02a7",
+      "at": "2026-11-17T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-8B, concurrency sweep 8-128",
+      "at": "2026-11-17T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: compliance_checking"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "cc-pending/pr/c1",
+      "at": "2026-11-17T14:36:00Z",
+      "by": "checker-bot",
+      "check": {
+       "conclusion": "pending",
+       "commit": 1
+      }
+     }
+    ],
+    "labels": [
+     "status: compliance_checking"
+    ]
+   },
+   "tracking": null,
+   "findings": []
+  },
+  {
+   "key": "cc-failed",
+   "tests": [
+    "CC_FAILED: two checker failures, fix pushed in between",
+    "Compliance overdue flag (PR > 7 days)",
+    "Submitter (compliance) waiting-on",
+    "Chair nudging about Week 0 rejection"
+   ],
+   "home": "pr",
+   "sim_db": {
+    "id": "b81a3379-280a-4fdb-ae01-a0f8598cdf6e",
+    "status": "COMPLIANCE_CHECKING",
+    "created_at": "2026-11-06T03:40:00Z",
+    "compliance_passed_at": null,
+    "peer_review_started_at": null,
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:cc-failed/pr}}",
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimVision-11B",
+    "benchmark_type": "single_turn",
+    "org": "Edgy Eft",
+    "submitter": "edgy-eft-sub1"
+   },
+   "pr": {
+    "key": "cc-failed/pr",
+    "kind": "pr",
+    "at": "2026-11-06T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Edgy Eft · standardized · available · SimVision-11B · b81a3379",
+    "branch": "submission/b81a3379",
+    "body": "## Review submission `b81a3379`\n\n| Field | Value |\n|---|---|\n| Organization | `Edgy Eft` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type M2 · 4x Accel-Y |\n| Model | `SimVision-11B` |\n| Submitted | `2026-11-06 03:40 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission b81a3379",
+      "at": "2026-11-06T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimVision-11B, concurrency sweep 4-64",
+      "at": "2026-11-06T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Fix accuracy log path after checker failure",
+      "at": "2026-11-09T02:10:00Z",
+      "by": "edgy-eft-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: compliance_checking"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "cc-failed/pr/c1",
+      "at": "2026-11-06T15:02:00Z",
+      "by": "checker-bot",
+      "check": {
+       "conclusion": "failure",
+       "commit": 1
+      }
+     },
+     {
+      "key": "cc-failed/pr/c2",
+      "at": "2026-11-07T01:30:00Z",
+      "by": "edgy-eft-sub1",
+      "text": "Checker failed on two things:\n\n- `results/accuracy/accuracy_log.json` not found\n- system description: `host_memory_gb` is empty (warning only)\n\nOur wrapper wrote the accuracy log under `results/run_2/` instead of `results/accuracy/`. Will move it and fill in host memory."
+     },
+     {
+      "key": "cc-failed/pr/c3",
+      "at": "2026-11-09T02:41:00Z",
+      "by": "checker-bot",
+      "check": {
+       "conclusion": "failure",
+       "commit": 2
+      }
+     },
+     {
+      "key": "cc-failed/pr/c4",
+      "at": "2026-11-09T03:05:00Z",
+      "by": "edgy-eft-sub1",
+      "text": "Pushed the path fix. Checker now finds the log but fails the score: accuracy 0.712, threshold 0.719 (99% of the 0.726 reference). The drop is from the int8 image encoder in this build. Rerunning with the fp16 encoder, new logs by the end of next week."
+     },
+     {
+      "key": "cc-failed/pr/c5",
+      "at": "2026-11-16T18:20:00Z",
+      "by": "chair-a",
+      "text": "This has been failing the checker for 10 days. The rules treat a Week 0 failure as rejected. If a passing run isn't pushed by 11-20, please withdraw and resubmit next cycle."
+     }
+    ],
+    "labels": [
+     "status: compliance_checking"
+    ]
+   },
+   "tracking": null,
+   "findings": []
+  },
+  {
+   "key": "rp-wk1-noreviewer",
+   "tests": [
+    "RP_PEER day 5",
+    "No assigned reviewer (no sim-assign)",
+    "Checker success event on the PR",
+    "No findings yet"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "f484e18d-d7ea-46a3-b1d7-8f6d8c769a99",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-11-10T16:20:00Z",
+    "compliance_passed_at": "2026-11-12T15:10:00Z",
+    "peer_review_started_at": "2026-11-12T15:10:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk1-noreviewer/pr}}",
+    "tracking_issue_number": "{{num:rp-wk1-noreviewer/tracking}}",
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Gutsy Gibbon",
+    "submitter": "gutsy-gibbon-sub1"
+   },
+   "pr": {
+    "key": "rp-wk1-noreviewer/pr",
+    "kind": "pr",
+    "at": "2026-11-11T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Gutsy Gibbon · standardized · available · SimLM-70B · f484e18d",
+    "branch": "submission/f484e18d",
+    "body": "## Review submission `f484e18d`\n\n| Field | Value |\n|---|---|\n| Organization | `Gutsy Gibbon` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Submitted | `2026-11-10 16:20 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission f484e18d",
+      "at": "2026-11-11T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-256",
+      "at": "2026-11-11T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk1-noreviewer/pr/c1",
+      "at": "2026-11-12T15:10:00Z",
+      "by": "checker-bot",
+      "check": {
+       "conclusion": "success",
+       "commit": 1
+      }
+     }
+    ],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk1-noreviewer/tracking",
+    "kind": "tracking",
+    "at": "2026-11-13T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission f484e18d — Gutsy Gibbon — SimLM-70B",
+    "body": "## Review tracking — submission `f484e18d`\n\nReview PR: #{{num:rp-wk1-noreviewer/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `f484e18d-d7ea-46a3-b1d7-8f6d8c769a99` |\n| Submitting org | Gutsy Gibbon |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-12-03 11:59 PM PT` |\n| Objection resolution closes | `2026-12-24 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: f484e18d-d7ea-46a3-b1d7-8f6d8c769a99 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk1-noreviewer/tracking/c1",
+      "at": "2026-11-16T17:00:00Z",
+      "by": "chair-b",
+      "text": "No reviewer assigned yet. R1 and R3 each have three open reviews; asking the pool for someone with time this week."
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": []
+  },
+  {
+   "key": "rp-wk2",
+   "tests": [
+    "RP_PEER day 15, provisional (early_publish, embargo passed)",
+    "Two assignees",
+    "'No findings' sub-issue (no type label, workflow complaint)",
+    "Open submitter turn at stage 0 after a full round trip"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "47226eb7-20e0-4ebf-886e-d259d4765746",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-30T20:00:00Z",
+    "compliance_passed_at": "2026-11-02T16:45:00Z",
+    "peer_review_started_at": "2026-11-02T16:45:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": "2026-11-05T16:00:00Z",
+    "early_publish": true,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 1,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk2/pr}}",
+    "tracking_issue_number": "{{num:rp-wk2/tracking}}",
+    "is_test": false,
+    "model": "SimMoE-120B",
+    "benchmark_type": "agentic",
+    "org": "Feisty Fawn",
+    "submitter": "feisty-fawn-sub1"
+   },
+   "pr": {
+    "key": "rp-wk2/pr",
+    "kind": "pr",
+    "at": "2026-10-31T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Feisty Fawn · standardized · available · SimMoE-120B · 47226eb7",
+    "branch": "submission/47226eb7",
+    "body": "## Review submission `47226eb7`\n\n| Field | Value |\n|---|---|\n| Organization | `Feisty Fawn` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | provisional publication requested, and not before the embargo |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimMoE-120B` |\n| Submitted | `2026-10-30 20:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | held until 2026-11-05 (early publication requested) |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 47226eb7",
+      "at": "2026-10-31T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimMoE-120B",
+      "at": "2026-10-31T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Rescore agentic sessions with drop_unstarted off",
+      "at": "2026-11-16T21:50:00Z",
+      "by": "feisty-fawn-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk2/tracking",
+    "kind": "tracking",
+    "at": "2026-11-03T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 47226eb7 — Feisty Fawn — SimMoE-120B",
+    "body": "## Review tracking — submission `47226eb7`\n\nReview PR: #{{num:rp-wk2/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `47226eb7-20e0-4ebf-886e-d259d4765746` |\n| Submitting org | Feisty Fawn |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | provisional publication requested, and not before the embargo |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimMoE-120B` |\n| Embargo | held until 2026-11-05 (early publication requested) |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 1 business day(s) |\n| Peer review closes | `2026-11-23 11:59 PM PT` |\n| Objection resolution closes | `2026-12-14 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 47226eb7-20e0-4ebf-886e-d259d4765746 -->\n<!-- embargo: 2026-11-05 -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk2/tracking/c1",
+      "at": "2026-11-03T17:20:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "hardy-heron-r1",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-wk2/tracking/c2",
+      "at": "2026-11-03T17:20:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "noble-numbat-r4",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk2/f1",
+     "kind": "finding",
+     "parent": "rp-wk2/tracking",
+     "at": "2026-11-12T09:30:00Z",
+     "by": "noble-numbat-r4",
+     "title": "No findings from R4 (Noble Numbat)",
+     "body": "Reviewed the session traces (1,200 sessions), the accuracy summary and the system description. Spot-checked 30 sessions against the tool sandbox log. Nothing to raise.",
+     "initial_labels": [
+      "by Noble Numbat",
+      "against Feisty Fawn",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": true,
+     "timeline": [
+      {
+       "key": "rp-wk2/f1/c1",
+       "at": "2026-11-12T09:31:00Z",
+       "by": "label-objections-bot",
+       "text": "This sub-issue has no `type:` label. Add exactly one type from Submission Rules §6.8."
+      },
+      {
+       "key": "rp-wk2/f1/c2",
+       "at": "2026-11-12T09:34:00Z",
+       "by": "noble-numbat-r4",
+       "text": "No action needed from the submitter. Marking resolved and closing.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Feisty Fawn",
+      "by Noble Numbat",
+      "resolved"
+     ]
+    },
+    {
+     "key": "rp-wk2/f2",
+     "kind": "finding",
+     "parent": "rp-wk2/tracking",
+     "at": "2026-11-13T18:00:00Z",
+     "by": "hardy-heron-r1",
+     "title": "Tool-call success rate leaves out timed-out sessions",
+     "body": "The summary reports tool-call success 0.97 over 1,159 sessions. The trace file `traces/sessions.jsonl` has 1,200. The 41 missing ones all end in `status=timeout` before their first tool call. Counted as failures, the rate is 0.937. Which definition did the scorer use?",
+     "initial_labels": [
+      "type: Validity of Results",
+      "by Hardy Heron",
+      "against Feisty Fawn",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk2/f2/c1",
+       "at": "2026-11-16T22:00:00Z",
+       "by": "feisty-fawn-sub1",
+       "text": "Right, the scorer drops sessions that time out before the first tool call. That's our harness default `drop_unstarted: true`. Rescored with it off: 0.937 over 1,200. New summary is in the latest commit.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk2/f2/c2",
+       "at": "2026-11-17T16:10:00Z",
+       "by": "hardy-heron-r1",
+       "text": "Thanks, that matches my count. The latency summary still uses 1,159 sessions (p90 session time 48.2 s). Please regenerate it from the same 1,200 so both files agree.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      }
+     ],
+     "labels": [
+      "against Feisty Fawn",
+      "by Hardy Heron",
+      "needs-submitter-attention",
+      "type: Validity of Results"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-wk3-stage1",
+   "tests": [
+    "RP_PEER, Week 3 closes today",
+    "Reply without label swap (reply-not-swapped marker)",
+    "Submitter reminder L1, penalty level 1",
+    "Open submitter turn at stage 1 (second turn)",
+    "Resolved finding closed by reviewer straight from submitter turn"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "fa67893d-b3d0-4960-83ca-0f3dd1f0067e",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-26T15:00:00Z",
+    "compliance_passed_at": "2026-10-28T00:20:00Z",
+    "peer_review_started_at": "2026-10-28T00:20:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 1,
+    "business_days_since_response": 4,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk3-stage1/pr}}",
+    "tracking_issue_number": "{{num:rp-wk3-stage1/tracking}}",
+    "is_test": false,
+    "model": "SimCoder-32B",
+    "benchmark_type": "agentic",
+    "org": "Dapper Drake",
+    "submitter": "dapper-drake-sub1"
+   },
+   "pr": {
+    "key": "rp-wk3-stage1/pr",
+    "kind": "pr",
+    "at": "2026-10-27T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Dapper Drake · standardized · available · SimCoder-32B · fa67893d",
+    "branch": "submission/fa67893d",
+    "body": "## Review submission `fa67893d`\n\n| Field | Value |\n|---|---|\n| Organization | `Dapper Drake` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimCoder-32B` |\n| Submitted | `2026-10-26 15:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission fa67893d",
+      "at": "2026-10-27T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimCoder-32B",
+      "at": "2026-10-27T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Rename result folders to node-type-k4",
+      "at": "2026-11-06T08:55:00Z",
+      "by": "dapper-drake-sub1",
+      "after_open": true
+     },
+     {
+      "message": "Rescore agentic summary without warmup sessions",
+      "at": "2026-11-10T18:40:00Z",
+      "by": "dapper-drake-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk3-stage1/tracking",
+    "kind": "tracking",
+    "at": "2026-10-28T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission fa67893d — Dapper Drake — SimCoder-32B",
+    "body": "## Review tracking — submission `fa67893d`\n\nReview PR: #{{num:rp-wk3-stage1/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `fa67893d-b3d0-4960-83ca-0f3dd1f0067e` |\n| Submitting org | Dapper Drake |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization, then 1 more cycle for penalties |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimCoder-32B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | 1 — publication delayed 1 cycle |\n| Longest wait on submitter | 4 business day(s) |\n| Peer review closes | `2026-11-17 11:59 PM PT` |\n| Objection resolution closes | `2026-12-08 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: fa67893d-b3d0-4960-83ca-0f3dd1f0067e -->\n<!-- embargo: none -->\n<!-- penalties: 1 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk3-stage1/tracking/c1",
+      "at": "2026-10-29T16:00:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "intrepid-ibex-r6",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-wk3-stage1/tracking/c2",
+      "at": "2026-11-06T14:30:00Z",
+      "by": "lm-bot",
+      "text": "#{{num:rp-wk3-stage1/f1}}: Dapper Drake replied on 2026-11-06 but the finding still carries `needs-submitter-attention`, so the wait is still counting. If the reply is your answer, swap the label to `needs-reviewer-attention`.\n\n<!-- reply-not-swapped: #{{num:rp-wk3-stage1/f1}} 2026-11-04T17:00:00Z -->"
+     },
+     {
+      "key": "rp-wk3-stage1/tracking/c3",
+      "at": "2026-11-10T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **1 — publication delayed 1 cycle**.\n\nCaused by:\n- #{{num:rp-wk3-stage1/f1}}: waiting on the submitter for 3 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "rp-wk3-stage1/tracking/c4",
+      "at": "2026-11-13T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Peer review closes `2026-11-17 11:59 PM PT`.**\n\nNo new objections may be filed against this submission after that point. Reviewers: file any remaining findings as sub-issues of this issue before then, including a sub-issue saying you reviewed and found nothing.\n\n<!-- review-warning: wk3 -->"
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk3-stage1/f1",
+     "kind": "finding",
+     "parent": "rp-wk3-stage1/tracking",
+     "at": "2026-11-04T17:00:00Z",
+     "by": "intrepid-ibex-r6",
+     "title": "Warmup sessions included in the scored set",
+     "body": "`results/summary.json` lists 1,050 scored sessions. The run config has `warmup_sessions: 50`, and the first 50 session ids in `sessions.jsonl` all start before `measurement_start`. Excluding them, pass rate goes from 0.712 to 0.704. Was warmup meant to be scored? If not, please rescore.",
+     "initial_labels": [
+      "type: Methodology",
+      "by Intrepid Ibex",
+      "against Dapper Drake",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk3-stage1/f1/c1",
+       "at": "2026-11-06T08:30:00Z",
+       "by": "dapper-drake-sub1",
+       "text": "Warmup was excluded at run time, but our summary script reads the whole file. Rescoring now, will push the corrected summary today."
+      },
+      {
+       "key": "rp-wk3-stage1/f1/c2",
+       "at": "2026-11-06T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Dapper Drake (submitter), this finding has been waiting on the submitter since Wednesday 2026-11-04, 09:00 AM PST. Please respond before **Monday 2026-11-09, 09:00 AM PST**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).\n\n<!-- submitter-reminder: 2026-11-04T17:00:00Z L1 -->"
+      },
+      {
+       "key": "rp-wk3-stage1/f1/c3",
+       "at": "2026-11-10T19:00:00Z",
+       "by": "dapper-drake-sub1",
+       "text": "Swapped the label, sorry, didn't know it doesn't change on its own. Corrected summary is in 'Rescore agentic summary without warmup sessions': 1,000 scored sessions, pass rate 0.704.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk3-stage1/f1/c4",
+       "at": "2026-11-12T16:00:00Z",
+       "by": "intrepid-ibex-r6",
+       "text": "Summary is fixed. `summary_by_task.csv` still counts the warmup sessions (task 'refactor' shows 212, should be about 202). Please regenerate it from the same filtered set.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      }
+     ],
+     "labels": [
+      "against Dapper Drake",
+      "by Intrepid Ibex",
+      "needs-submitter-attention",
+      "type: Methodology"
+     ]
+    },
+    {
+     "key": "rp-wk3-stage1/f2",
+     "kind": "finding",
+     "parent": "rp-wk3-stage1/tracking",
+     "at": "2026-11-05T17:30:00Z",
+     "by": "intrepid-ibex-r6",
+     "title": "System name differs between system description and results folders",
+     "body": "System description says `Node type K4`, result folders are named `k4-ext`. Cosmetic, but the published table will show both names.",
+     "initial_labels": [
+      "type: Cosmetic",
+      "by Intrepid Ibex",
+      "against Dapper Drake",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk3-stage1/f2/c1",
+       "at": "2026-11-06T09:00:00Z",
+       "by": "dapper-drake-sub1",
+       "text": "Renamed the folders to `node-type-k4` in the latest commit."
+      },
+      {
+       "key": "rp-wk3-stage1/f2/c2",
+       "at": "2026-11-06T18:00:00Z",
+       "by": "intrepid-ibex-r6",
+       "text": "Looks good. Closing.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Dapper Drake",
+      "by Intrepid Ibex",
+      "resolved",
+      "type: Cosmetic"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-wk4-objres",
+   "tests": [
+    "RP_OBJECTION day 33",
+    "Reproducibility back-and-forth, now reviewer turn with objector reminder",
+    "Chair ruling on a division question",
+    "'by dapper-drake' spelling variant",
+    "Provisional with no embargo"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "dac3cb50-c9bf-4085-8338-0380fe4d1b0b",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-12T21:00:00Z",
+    "compliance_passed_at": "2026-10-15T18:00:00Z",
+    "peer_review_started_at": "2026-10-15T18:00:00Z",
+    "objection_resolution_started_at": "2026-11-06T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": true,
+    "availability": "available",
+    "division": "serviced",
+    "penalties_imposed": 0,
+    "business_days_since_response": 2,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk4-objres/pr}}",
+    "tracking_issue_number": "{{num:rp-wk4-objres/tracking}}",
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Hardy Heron",
+    "submitter": "hardy-heron-sub1"
+   },
+   "pr": {
+    "key": "rp-wk4-objres/pr",
+    "kind": "pr",
+    "at": "2026-10-13T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Hardy Heron · serviced · available · SimLM-70B · dac3cb50",
+    "branch": "submission/dac3cb50",
+    "body": "## Review submission `dac3cb50`\n\n| Field | Value |\n|---|---|\n| Organization | `Hardy Heron` |\n| Division | `serviced` |\n| Availability | `available` |\n| Publication | provisional publication requested |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Submitted | `2026-10-12 21:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission dac3cb50",
+      "at": "2026-10-13T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-256",
+      "at": "2026-10-13T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Rename result folders to concurrency_<n>",
+      "at": "2026-11-06T16:50:00Z",
+      "by": "hardy-heron-sub1",
+      "after_open": true
+     },
+     {
+      "message": "Document launcher batch setting in system description",
+      "at": "2026-11-17T04:55:00Z",
+      "by": "hardy-heron-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk4-objres/tracking",
+    "kind": "tracking",
+    "at": "2026-10-16T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission dac3cb50 — Hardy Heron — SimLM-70B",
+    "body": "## Review tracking — submission `dac3cb50`\n\nReview PR: #{{num:rp-wk4-objres/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `dac3cb50-c9bf-4085-8338-0380fe4d1b0b` |\n| Submitting org | Hardy Heron |\n| Division | serviced |\n| Scenario | con |\n| Availability | available |\n| Publication | provisional publication requested |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 2 business day(s) |\n| Peer review closes | `2026-11-05 11:59 PM PT` |\n| Objection resolution closes | `2026-11-26 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: dac3cb50-c9bf-4085-8338-0380fe4d1b0b -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk4-objres/tracking/c1",
+      "at": "2026-10-19T15:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "dapper-drake-r2",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk4-objres/f1",
+     "kind": "finding",
+     "parent": "rp-wk4-objres/tracking",
+     "at": "2026-11-03T16:00:00Z",
+     "by": "dapper-drake-r2",
+     "title": "Throughput at concurrency 64 not reproduced",
+     "body": "We reran the concurrency 64 point on our own Node type K4 (8x Accel-X, same serving stack version as your system description). Submission: 2,035 tok/s. Ours: 1,812 tok/s over 3 runs (1,797 / 1,812 / 1,826). That's 11% low, outside the 5% throughput margin. The only config difference we can find is `max_batch_tokens`: your config file doesn't set it, so we used the default 8192.",
+     "initial_labels": [
+      "type: Reproducibility",
+      "by Dapper Drake",
+      "against Hardy Heron",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk4-objres/f1/c1",
+       "at": "2026-11-05T20:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "Our build sets `max_batch_tokens=16384` in the launcher, not the config file (see `code/launch_server.sh`, line 40). Can you rerun with that?",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f1/c2",
+       "at": "2026-11-09T17:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "Reran with 16384: 1,968 tok/s (1,961 / 1,968 / 1,975). 3.3% low, inside the margin. Please put the launcher setting in the system description so the next reviewer doesn't hit this, then I'll resolve.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f1/c3",
+       "at": "2026-11-12T22:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "Added `max_batch_tokens: 16384` under serving config in the system description.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f1/c4",
+       "at": "2026-11-16T18:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "The system description on this PR still shows the old file. I think the commit went to your fork, not the PR branch. Can you push it here?",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f1/c5",
+       "at": "2026-11-17T05:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "Pushed to the PR branch. Head commit is 'Document launcher batch setting in system description'.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f1/c6",
+       "at": "2026-11-17T14:30:00Z",
+       "by": "lm-bot",
+       "text": "R2 · Dapper Drake, the submitter has responded and this objection is now waiting on you. Please respond by **Wednesday 2026-11-18, 11:59 PM PST** (2 business days) by doing one of:\n\n- acknowledging that the response resolves the objection;\n- retracting the objection;\n- explaining, with specifics, why the response is not sufficient; or\n- posting a schedule for testing and validating the proposed resolution.\n\nIf there is no response by then, this objection will be closed automatically as resolved.\n\n<!-- objector-reminder: 2026-11-17T05:00:00Z -->"
+      }
+     ],
+     "labels": [
+      "against Hardy Heron",
+      "by Dapper Drake",
+      "needs-reviewer-attention",
+      "type: Reproducibility"
+     ]
+    },
+    {
+     "key": "rp-wk4-objres/f2",
+     "kind": "finding",
+     "parent": "rp-wk4-objres/tracking",
+     "at": "2026-11-04T17:30:00Z",
+     "by": "dapper-drake-r2",
+     "title": "Serviced division: client and server look co-located",
+     "body": "The run log shows the load generator calling `http://127.0.0.1:8000`. Serviced division needs the endpoint reached over the network. If the client ran on the same host, this belongs in standardized.",
+     "initial_labels": [
+      "type: Division Rules",
+      "by Dapper Drake",
+      "against Hardy Heron",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk4-objres/f2/c1",
+       "at": "2026-11-06T19:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "The client ran on a separate node (client-03). 127.0.0.1 is the local end of an SSH tunnel on the client node, forwarding to the server node. Network setup is in `docs/network.md`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f2/c2",
+       "at": "2026-11-09T18:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "A tunnel is fine by me if the traffic crosses a real network link, but I'd like a chair's read before resolving. The rules say 'reached over a network', not how.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f2/c3",
+       "at": "2026-11-10T17:00:00Z",
+       "by": "chair-a",
+       "text": "Chair read: a tunnel across a real network link counts. Client and server are on separate nodes, so this meets the serviced requirement. R2, resolve if you agree."
+      },
+      {
+       "key": "rp-wk4-objres/f2/c4",
+       "at": "2026-11-10T20:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "Agreed. Resolving.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Hardy Heron",
+      "by Dapper Drake",
+      "resolved",
+      "type: Division Rules"
+     ]
+    },
+    {
+     "key": "rp-wk4-objres/f3",
+     "kind": "finding",
+     "parent": "rp-wk4-objres/tracking",
+     "at": "2026-11-05T23:00:00Z",
+     "by": "dapper-drake-r2",
+     "title": "Run folders mix 'conc' and 'concurrency'",
+     "body": "`results/conc_32/` next to `results/concurrency_64/`, and so on. Pick one; the publish step keys on folder names.",
+     "initial_labels": [
+      "type: Cosmetic",
+      "by dapper-drake",
+      "against Hardy Heron",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk4-objres/f3/c1",
+       "at": "2026-11-06T17:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "Renamed all of them to `concurrency_<n>`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk4-objres/f3/c2",
+       "at": "2026-11-10T19:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "Folders are fixed. Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Hardy Heron",
+      "by dapper-drake",
+      "resolved",
+      "type: Cosmetic"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-wk5-stage2",
+   "tests": [
+    "RP_OBJECTION, Week 6 closes in 2 days (wk6 warning)",
+    "Open submitter turn at stage 2 (8 business days)",
+    "Reminders L1 and L2, penalty notices L1 and L2",
+    "Submitter replies without swapping"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "8d36e796-3bb5-40b9-aa8f-bd7c93fdc0ea",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-05T18:00:00Z",
+    "compliance_passed_at": "2026-10-08T17:00:00Z",
+    "peer_review_started_at": "2026-10-08T17:00:00Z",
+    "objection_resolution_started_at": "2026-10-30T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 2,
+    "business_days_since_response": 8,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk5-stage2/pr}}",
+    "tracking_issue_number": "{{num:rp-wk5-stage2/tracking}}",
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Karmic Koala",
+    "submitter": "karmic-koala-sub1"
+   },
+   "pr": {
+    "key": "rp-wk5-stage2/pr",
+    "kind": "pr",
+    "at": "2026-10-06T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Karmic Koala · standardized · available · SimLM-8B · 8d36e796",
+    "branch": "submission/8d36e796",
+    "body": "## Review submission `8d36e796`\n\n| Field | Value |\n|---|---|\n| Organization | `Karmic Koala` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Submitted | `2026-10-05 18:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 8d36e796",
+      "at": "2026-10-06T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-8B, concurrency sweep 8-128",
+      "at": "2026-10-06T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add concurrency 128 rerun (run_3)",
+      "at": "2026-11-03T15:50:00Z",
+      "by": "karmic-koala-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk5-stage2/tracking",
+    "kind": "tracking",
+    "at": "2026-10-09T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 8d36e796 — Karmic Koala — SimLM-8B",
+    "body": "## Review tracking — submission `8d36e796`\n\nReview PR: #{{num:rp-wk5-stage2/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `8d36e796-3bb5-40b9-aa8f-bd7c93fdc0ea` |\n| Submitting org | Karmic Koala |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization, then 2 more cycles for penalties |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | 2 — publication delayed 2 cycles |\n| Longest wait on submitter | 8 business day(s) |\n| Peer review closes | `2026-10-29 11:59 PM PT` |\n| Objection resolution closes | `2026-11-19 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 8d36e796-3bb5-40b9-aa8f-bd7c93fdc0ea -->\n<!-- embargo: none -->\n<!-- penalties: 2 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk5-stage2/tracking/c1",
+      "at": "2026-10-12T18:00:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "lucid-lynx-r3",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-wk5-stage2/tracking/c2",
+      "at": "2026-11-10T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **1 — publication delayed 1 cycle**.\n\nCaused by:\n- #{{num:rp-wk5-stage2/f1}}: waiting on the submitter for 3 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "rp-wk5-stage2/tracking/c3",
+      "at": "2026-11-14T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **2 — publication delayed 2 cycles**.\n\nCaused by:\n- #{{num:rp-wk5-stage2/f1}}: waiting on the submitter for 6 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "rp-wk5-stage2/tracking/c4",
+      "at": "2026-11-17T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Objection resolution closes `2026-11-19 11:59 PM PT`.**\n\nIf the review PR has not been labelled `finalized` by then, the review chairs are asked on this issue to refer the open objections to dispute resolution (§9.2) or to close the submission out. Nothing is withdrawn automatically.\n\nSubmitters and objectors: reply on every open sub-issue now.\n\n<!-- review-warning: wk6 -->"
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk5-stage2/f1",
+     "kind": "finding",
+     "parent": "rp-wk5-stage2/tracking",
+     "at": "2026-10-27T16:00:00Z",
+     "by": "lucid-lynx-r3",
+     "title": "P99 TTFT at concurrency 128 lower than at 64",
+     "body": "Concurrency 64: P99 TTFT 248 ms. Concurrency 128: 212 ms. Latency shouldn't drop as load doubles. The 128 run log has 1,984 of 64,000 requests (3.1%) ending in HTTP 503, and they are left out of the latency stats. A run with that error rate shouldn't be submitted as is.",
+     "initial_labels": [
+      "type: Validity of Results",
+      "by Lucid Lynx",
+      "against Karmic Koala",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk5-stage2/f1/c1",
+       "at": "2026-10-29T15:00:00Z",
+       "by": "karmic-koala-sub1",
+       "text": "The 503s came from a health-check restart at minute 14. The rerun for that point is in `results/concurrency_128/run_2/`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c2",
+       "at": "2026-10-30T17:00:00Z",
+       "by": "lucid-lynx-r3",
+       "text": "`run_2` is the concurrency 96 run (`target_concurrency: 96` in its config). I don't see a rerun at 128.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c3",
+       "at": "2026-11-03T16:00:00Z",
+       "by": "karmic-koala-sub1",
+       "text": "Wrong folder, sorry. The right one is `run_3`, pushed just now.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c4",
+       "at": "2026-11-04T18:00:00Z",
+       "by": "lucid-lynx-r3",
+       "text": "`run_3` still has 1,792 of 64,000 requests (2.8%) ending in 503. Same problem. Please rerun with the health check fixed and post the error rate and P99 TTFT.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c5",
+       "at": "2026-11-06T09:00:00Z",
+       "by": "karmic-koala-sub1",
+       "text": "Rerunning on a fresh node. The node pool is booked until Tuesday, so expect results mid next week."
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c6",
+       "at": "2026-11-06T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Karmic Koala (submitter), this finding has been waiting on the submitter since Wednesday 2026-11-04, 10:00 AM PST. Please respond before **Monday 2026-11-09, 10:00 AM PST**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).\n\n<!-- submitter-reminder: 2026-11-04T18:00:00Z L1 -->"
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c7",
+       "at": "2026-11-12T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Karmic Koala (submitter), this finding has been waiting on the submitter since Wednesday 2026-11-04, 10:00 AM PST. Please respond before **Friday 2026-11-13, 10:00 AM PST**. If it is still waiting on you then, the penalty on this submission rises to **level 2**, delaying publication 2 cycles (rules §6.3).\n\n<!-- submitter-reminder: 2026-11-04T18:00:00Z L2 -->"
+      },
+      {
+       "key": "rp-wk5-stage2/f1/c8",
+       "at": "2026-11-16T23:00:00Z",
+       "by": "karmic-koala-sub1",
+       "text": "Rerun at 128 finished: 0 errors over 64,000 requests, P99 TTFT 301 ms. Uploading the logs tonight; will swap the label once they're on the branch."
+      }
+     ],
+     "labels": [
+      "against Karmic Koala",
+      "by Lucid Lynx",
+      "needs-submitter-attention",
+      "type: Validity of Results"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-wk5-waiver",
+   "tests": [
+    "RP_OBJECTION",
+    "waive-penalty-L1 by a chair lowers level 1 to 0 ('Penalty lowered')",
+    "Objector missed the 2-day deadline: closed by bot, label left as needs-reviewer-attention",
+    "Late objector comment on a closed finding",
+    "Provisional with a past embargo"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "aade31f5-2005-41e6-9ef6-821b5444430c",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-06T22:00:00Z",
+    "compliance_passed_at": "2026-10-09T16:00:00Z",
+    "peer_review_started_at": "2026-10-09T16:00:00Z",
+    "objection_resolution_started_at": "2026-10-31T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": "2026-10-20T16:00:00Z",
+    "early_publish": true,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 3,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk5-waiver/pr}}",
+    "tracking_issue_number": "{{num:rp-wk5-waiver/tracking}}",
+    "is_test": false,
+    "model": "SimMoE-120B",
+    "benchmark_type": "agentic",
+    "org": "Jammy Jellyfish",
+    "submitter": "jammy-jellyfish-sub1"
+   },
+   "pr": {
+    "key": "rp-wk5-waiver/pr",
+    "kind": "pr",
+    "at": "2026-10-07T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Jammy Jellyfish · standardized · available · SimMoE-120B · aade31f5",
+    "branch": "submission/aade31f5",
+    "body": "## Review submission `aade31f5`\n\n| Field | Value |\n|---|---|\n| Organization | `Jammy Jellyfish` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | provisional publication requested, and not before the embargo |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimMoE-120B` |\n| Submitted | `2026-10-06 22:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | held until 2026-10-20 (early publication requested) |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission aade31f5",
+      "at": "2026-10-07T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimMoE-120B",
+      "at": "2026-10-07T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Replace agentic run 3 after node preemption",
+      "at": "2026-10-19T22:40:00Z",
+      "by": "jammy-jellyfish-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk5-waiver/tracking",
+    "kind": "tracking",
+    "at": "2026-10-10T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission aade31f5 — Jammy Jellyfish — SimMoE-120B",
+    "body": "## Review tracking — submission `aade31f5`\n\nReview PR: #{{num:rp-wk5-waiver/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `aade31f5-2005-41e6-9ef6-821b5444430c` |\n| Submitting org | Jammy Jellyfish |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | provisional publication requested, and not before the embargo |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimMoE-120B` |\n| Embargo | held until 2026-10-20 (early publication requested) |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 3 business day(s) |\n| Peer review closes | `2026-10-30 11:59 PM PT` |\n| Objection resolution closes | `2026-11-20 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: aade31f5-2005-41e6-9ef6-821b5444430c -->\n<!-- embargo: 2026-10-20 -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk5-waiver/tracking/c1",
+      "at": "2026-10-12T16:30:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "karmic-koala-r5",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-wk5-waiver/tracking/c2",
+      "at": "2026-10-20T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **1 — publication delayed 1 cycle**.\n\nCaused by:\n- #{{num:rp-wk5-waiver/f1}}: waiting on the submitter for 3 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "rp-wk5-waiver/tracking/c3",
+      "at": "2026-10-20T17:00:00Z",
+      "by": "jammy-jellyfish-sub1",
+      "text": "Asking for a waiver on #{{num:rp-wk5-waiver/f1}}. Our on-call was at an offsite Thursday and Friday, and the first reply went out Monday afternoon, a few hours late. The rerun was already going over the weekend."
+     },
+     {
+      "key": "rp-wk5-waiver/tracking/c4",
+      "at": "2026-10-22T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Penalty lowered.** Penalties on this submission now stand at **none** (was 1 — publication delayed 1 cycle), after waivers on #{{num:rp-wk5-waiver/f1}} (`waive-penalty-L1` by Chair B)."
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk5-waiver/f1",
+     "kind": "finding",
+     "parent": "rp-wk5-waiver/tracking",
+     "at": "2026-10-14T16:00:00Z",
+     "by": "karmic-koala-r5",
+     "title": "Run 3 stopped short of the minimum session count",
+     "body": "Run 3 (`results/run_3/`) has 512 completed sessions. Each run needs at least 1,000. Runs 1 and 2 have 1,000 and 1,004. Either rerun 3 or drop it and say why.",
+     "initial_labels": [
+      "type: Compliance Failure",
+      "by Karmic Koala",
+      "against Jammy Jellyfish",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk5-waiver/f1/c1",
+       "at": "2026-10-16T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Jammy Jellyfish (submitter), this finding has been waiting on the submitter since Wednesday 2026-10-14, 09:00 AM PDT. Please respond before **Monday 2026-10-19, 09:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).\n\n<!-- submitter-reminder: 2026-10-14T16:00:00Z L1 -->"
+      },
+      {
+       "key": "rp-wk5-waiver/f1/c2",
+       "at": "2026-10-19T23:00:00Z",
+       "by": "jammy-jellyfish-sub1",
+       "text": "Run 3 hit a node preemption at session 512. Reran it: 1,000 sessions, pass rate 0.688 (runs 1 and 2: 0.691, 0.686). Replaced `run_3` on the branch.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-waiver/f1/c3",
+       "at": "2026-10-21T16:00:00Z",
+       "by": "karmic-koala-r5",
+       "text": "Rerun looks right: 1,000 sessions, pass rate in line with the other two runs. Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      },
+      {
+       "key": "rp-wk5-waiver/f1/c4",
+       "at": "2026-10-21T18:00:00Z",
+       "by": "chair-b",
+       "text": "Adding `waive-penalty-L1`. The reply was a few hours late and the fix was already running. Lowering this finding one stage.",
+       "labels": [
+        {
+         "label": "waive-penalty-L1",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-waiver/f1/c5",
+       "at": "2026-10-22T14:30:00Z",
+       "by": "lm-bot",
+       "text": "`waive-penalty-L1` accepted from Chair B. This finding now counts one stage lower. While this label is on, it can't on its own get the submission withdrawn.\n\n<!-- penalty-waiver: waive-penalty-L1 added 91000017 -->"
+      }
+     ],
+     "labels": [
+      "against Jammy Jellyfish",
+      "by Karmic Koala",
+      "resolved",
+      "type: Compliance Failure",
+      "waive-penalty-L1"
+     ]
+    },
+    {
+     "key": "rp-wk5-waiver/f2",
+     "kind": "finding",
+     "parent": "rp-wk5-waiver/tracking",
+     "at": "2026-10-28T17:00:00Z",
+     "by": "karmic-koala-r5",
+     "title": "Tool sandbox restores a cache between sessions",
+     "body": "Sandbox logs show `cache_restore` at the start of every session after the first 20. If tool results are cached across sessions, later sessions get faster tool calls than a cold start. Was this intended?",
+     "initial_labels": [
+      "type: Methodology",
+      "by Karmic Koala",
+      "against Jammy Jellyfish",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk5-waiver/f2/c1",
+       "at": "2026-10-29T21:00:00Z",
+       "by": "jammy-jellyfish-sub1",
+       "text": "The cache is the package index for the code tool, not tool results. Every session still runs its tools fresh. Config: `sandbox/config.yaml`, `cache_scope: package_index`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk5-waiver/f2/c2",
+       "at": "2026-10-30T14:30:00Z",
+       "by": "lm-bot",
+       "text": "R5 · Karmic Koala, the submitter has responded and this objection is now waiting on you. Please respond by **Monday 2026-11-02, 11:59 PM PST** (2 business days) by doing one of:\n\n- acknowledging that the response resolves the objection;\n- retracting the objection;\n- explaining, with specifics, why the response is not sufficient; or\n- posting a schedule for testing and validating the proposed resolution.\n\nIf there is no response by then, this objection will be closed automatically as resolved.\n\n<!-- objector-reminder: 2026-10-29T21:00:00Z -->"
+      },
+      {
+       "key": "rp-wk5-waiver/f2/c3",
+       "at": "2026-11-03T14:30:00Z",
+       "by": "lm-bot",
+       "text": "R5 · Karmic Koala did not respond within 2 business days of the submitter's response (deadline Monday 2026-11-02, 11:59 PM PST). Per the review rules, silence is treated as acknowledgment, so this objection is closed as resolved.\n\nClosed automatically by the lifecycle manager. A review chair may reopen it.",
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      },
+      {
+       "key": "rp-wk5-waiver/f2/c4",
+       "at": "2026-11-04T16:00:00Z",
+       "by": "karmic-koala-r5",
+       "text": "Missed this one, I was out. The explanation is fine, no need to reopen."
+      }
+     ],
+     "labels": [
+      "against Jammy Jellyfish",
+      "by Karmic Koala",
+      "needs-reviewer-attention",
+      "type: Methodology"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-wk6-meeting",
+   "tests": [
+    "RP_OBJECTION, Week 6 closes today (wk6 warning)",
+    "Meeting escalation at 12 business days",
+    "Chair meeting notes",
+    "Long turn history for response-time metrics",
+    "Now reviewer turn"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "48cc79ab-b8c8-462c-9ba8-e47b0d0903ee",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-10-02T19:00:00Z",
+    "compliance_passed_at": "2026-10-06T15:00:00Z",
+    "peer_review_started_at": "2026-10-06T15:00:00Z",
+    "objection_resolution_started_at": "2026-10-28T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "serviced",
+    "penalties_imposed": 0,
+    "business_days_since_response": 2,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-wk6-meeting/pr}}",
+    "tracking_issue_number": "{{num:rp-wk6-meeting/tracking}}",
+    "is_test": false,
+    "model": "SimCoder-32B",
+    "benchmark_type": "agentic",
+    "org": "Lucid Lynx",
+    "submitter": "lucid-lynx-sub1"
+   },
+   "pr": {
+    "key": "rp-wk6-meeting/pr",
+    "kind": "pr",
+    "at": "2026-10-03T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Lucid Lynx · serviced · available · SimCoder-32B · 48cc79ab",
+    "branch": "submission/48cc79ab",
+    "body": "## Review submission `48cc79ab`\n\n| Field | Value |\n|---|---|\n| Organization | `Lucid Lynx` |\n| Division | `serviced` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K7 · 4x Accel-Y |\n| Model | `SimCoder-32B` |\n| Submitted | `2026-10-02 19:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 48cc79ab",
+      "at": "2026-10-03T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimCoder-32B",
+      "at": "2026-10-03T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Rescore code tasks with harness 1.3.2",
+      "at": "2026-11-12T17:40:00Z",
+      "by": "lucid-lynx-sub1",
+      "after_open": true
+     },
+     {
+      "message": "Move prompt template to prompt_template field",
+      "at": "2026-11-16T19:50:00Z",
+      "by": "lucid-lynx-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-wk6-meeting/tracking",
+    "kind": "tracking",
+    "at": "2026-10-07T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 48cc79ab — Lucid Lynx — SimCoder-32B",
+    "body": "## Review tracking — submission `48cc79ab`\n\nReview PR: #{{num:rp-wk6-meeting/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `48cc79ab-b8c8-462c-9ba8-e47b0d0903ee` |\n| Submitting org | Lucid Lynx |\n| Division | serviced |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type K7 · 4x Accel-Y |\n| Model | `SimCoder-32B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 2 business day(s) |\n| Peer review closes | `2026-10-27 11:59 PM PT` |\n| Objection resolution closes | `2026-11-17 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 48cc79ab-b8c8-462c-9ba8-e47b0d0903ee -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-wk6-meeting/tracking/c1",
+      "at": "2026-10-08T17:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "hardy-heron-r1",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-wk6-meeting/tracking/c2",
+      "at": "2026-11-06T14:30:00Z",
+      "by": "lm-bot",
+      "text": "#{{num:rp-wk6-meeting/f1}} has been unresolved for 12 business days and may now go to a meeting (rules §6.4). Details are on the finding.\n\n<!-- meeting-escalation: #{{num:rp-wk6-meeting/f1}} -->"
+     },
+     {
+      "key": "rp-wk6-meeting/tracking/c3",
+      "at": "2026-11-06T19:00:00Z",
+      "by": "chair-a",
+      "text": "Setting up a call for Tue 11-10, 10:00 PT, with Lucid Lynx and R1. Agenda: (1) harness version, (2) whether the prompt template is within the rules, (3) what evidence would close #{{num:rp-wk6-meeting/f1}}."
+     },
+     {
+      "key": "rp-wk6-meeting/tracking/c4",
+      "at": "2026-11-13T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Objection resolution closes `2026-11-17 11:59 PM PT`.**\n\nIf the review PR has not been labelled `finalized` by then, the review chairs are asked on this issue to refer the open objections to dispute resolution (§9.2) or to close the submission out. Nothing is withdrawn automatically.\n\nSubmitters and objectors: reply on every open sub-issue now.\n\n<!-- review-warning: wk6 -->"
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-wk6-meeting/f1",
+     "kind": "finding",
+     "parent": "rp-wk6-meeting/tracking",
+     "at": "2026-10-20T16:00:00Z",
+     "by": "hardy-heron-r1",
+     "title": "Pass@1 much higher than other SimCoder-32B results",
+     "body": "Pass@1 on the code task set is 0.81. Two other submissions with SimCoder-32B at the same precision score 0.61 and 0.63, and our own run gets 0.62. Nothing in the logs looks wrong, but a 0.2 gap needs an explanation. Can you share the sampling settings and harness version?",
+     "initial_labels": [
+      "type: Suspect or Incomprehensible Results",
+      "by Hardy Heron",
+      "against Lucid Lynx",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-wk6-meeting/f1/c1",
+       "at": "2026-10-22T17:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "Sampling: temperature 0.0, top_p 1.0, max_new_tokens 2048. Harness 1.3.0. Logs in `results/run_1/harness.log`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c2",
+       "at": "2026-10-23T20:00:00Z",
+       "by": "hardy-heron-r1",
+       "text": "Same settings here, but harness 1.3.2. The 1.3.1 notes mention a fix to how partial test passes are scored. Any reason you're on 1.3.0?",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c3",
+       "at": "2026-10-27T21:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "1.3.0 was current when we started. We read the 1.3.1 note as a reporting change only.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c4",
+       "at": "2026-10-28T23:00:00Z",
+       "by": "hardy-heron-r1",
+       "text": "It changes scoring: before 1.3.1 a task with 3 of 5 tests passing counted as a pass. Please rescore the same traces with 1.3.2. No new inference needed.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c5",
+       "at": "2026-10-30T18:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "Rescored with 1.3.2: 0.78. Still above your number. We think the rest comes from our prompt template.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c6",
+       "at": "2026-11-03T19:00:00Z",
+       "by": "hardy-heron-r1",
+       "text": "0.78 vs 0.62 is a big gap for a template. Can you post the template and 10 traces where we fail and you pass?",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c7",
+       "at": "2026-11-05T21:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "Template is in `code/prompt_template.txt`, ten traces in `review/sample_traces/`. We'd rather settle this on a call than keep going back and forth.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c8",
+       "at": "2026-11-06T14:30:00Z",
+       "by": "lm-bot",
+       "text": "R1 · Hardy Heron, this issue was filed on 2026-10-20 and is still unresolved 12 business days later (as of 11:59 PM PT on 2026-11-05).\n\nUnder the review rules (§6.4, meeting escalation), the review chairs may now call a meeting with the relevant parties to expedite and close it. **Attendance is expected of both the objector and the submitter.**\n\n<!-- meeting-escalation: #{{num:rp-wk6-meeting/f1}} -->"
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c9",
+       "at": "2026-11-09T16:00:00Z",
+       "by": "hardy-heron-r1",
+       "text": "Looked at the 10 traces. Your template adds the function signature and two worked examples; ours has no examples. Taking the rest to tomorrow's call.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c10",
+       "at": "2026-11-10T20:00:00Z",
+       "by": "chair-a",
+       "text": "Notes from today's call: worked examples in the template are allowed if the template is published with the result. Lucid Lynx rescores all three runs with harness 1.3.2 and adds the template to the system description. R1 checks the numbers and resolves or not."
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c11",
+       "at": "2026-11-12T18:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "Rescored all three runs with 1.3.2: 0.78 / 0.79 / 0.78. Template added to the system description.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c12",
+       "at": "2026-11-13T17:00:00Z",
+       "by": "hardy-heron-r1",
+       "text": "Numbers check out. Last thing: the template is under 'notes' in the system description. Please move it to the `prompt_template` field so it shows in the published table.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c13",
+       "at": "2026-11-16T20:00:00Z",
+       "by": "lucid-lynx-sub1",
+       "text": "Moved to `prompt_template`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-wk6-meeting/f1/c14",
+       "at": "2026-11-17T14:30:00Z",
+       "by": "lm-bot",
+       "text": "R1 · Hardy Heron, the submitter has responded and this objection is now waiting on you. Please respond by **Wednesday 2026-11-18, 11:59 PM PST** (2 business days) by doing one of:\n\n- acknowledging that the response resolves the objection;\n- retracting the objection;\n- explaining, with specifics, why the response is not sufficient; or\n- posting a schedule for testing and validating the proposed resolution.\n\nIf there is no response by then, this objection will be closed automatically as resolved.\n\n<!-- objector-reminder: 2026-11-16T20:00:00Z -->"
+      }
+     ],
+     "labels": [
+      "against Lucid Lynx",
+      "by Hardy Heron",
+      "needs-reviewer-attention",
+      "type: Suspect or Incomprehensible Results"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rp-past-wk6",
+   "tests": [
+    "RP_PAST_WK6 with <!-- wk6-referral --> comment",
+    "Dispute referral by a chair",
+    "waive-penalty-all stops the clock while chairs decide (23-day submitter turn, penalty 0)",
+    "Non-chair finalize: reviewer adds `finalized`, bot warns, chair removes it"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "1c3b7660-ef12-4abf-83bd-76d6c7e167e5",
+    "status": "REVIEW_PENDING",
+    "created_at": "2026-09-18T17:00:00Z",
+    "compliance_passed_at": "2026-09-22T16:00:00Z",
+    "peer_review_started_at": "2026-09-22T16:00:00Z",
+    "objection_resolution_started_at": "2026-10-14T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:rp-past-wk6/pr}}",
+    "tracking_issue_number": "{{num:rp-past-wk6/tracking}}",
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Feisty Fawn",
+    "submitter": "feisty-fawn-sub1"
+   },
+   "pr": {
+    "key": "rp-past-wk6/pr",
+    "kind": "pr",
+    "at": "2026-09-19T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Feisty Fawn · standardized · available · SimLM-70B · 1c3b7660",
+    "branch": "submission/1c3b7660",
+    "body": "## Review submission `1c3b7660`\n\n| Field | Value |\n|---|---|\n| Organization | `Feisty Fawn` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K7 · 4x Accel-Y |\n| Model | `SimLM-70B` |\n| Submitted | `2026-09-18 17:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 1c3b7660",
+      "at": "2026-09-19T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-256",
+      "at": "2026-09-19T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add system description for Node type K7",
+      "at": "2026-09-19T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-past-wk6/pr/c1",
+      "at": "2026-11-09T17:00:00Z",
+      "by": "dapper-drake-r2",
+      "text": "Applying `finalized`. My understanding from the reviewers' channel is that the availability question was settled.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     },
+     {
+      "key": "rp-past-wk6/pr/c2",
+      "at": "2026-11-10T17:30:00Z",
+      "by": "chair-a",
+      "text": "Removing `finalized`. Nothing is settled yet; the dispute call is 11-19. Only chairs apply this label.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "removed"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "status: review_pending"
+    ]
+   },
+   "tracking": {
+    "key": "rp-past-wk6/tracking",
+    "kind": "tracking",
+    "at": "2026-09-23T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 1c3b7660 — Feisty Fawn — SimLM-70B",
+    "body": "## Review tracking — submission `1c3b7660`\n\nReview PR: #{{num:rp-past-wk6/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `1c3b7660-ef12-4abf-83bd-76d6c7e167e5` |\n| Submitting org | Feisty Fawn |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type K7 · 4x Accel-Y |\n| Model | `SimLM-70B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-10-13 11:59 PM PT` |\n| Objection resolution closes | `2026-11-03 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 1c3b7660-ef12-4abf-83bd-76d6c7e167e5 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: review_pending"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "rp-past-wk6/tracking/c1",
+      "at": "2026-09-24T17:00:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "karmic-koala-r5",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "rp-past-wk6/tracking/c2",
+      "at": "2026-11-04T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Objection resolution closed `2026-11-03 11:59 PM PT` and this submission is not finalized.**\n\n**1 finding(s) still open:** #{{num:rp-past-wk6/f1}}\n\nUnder the review rules (§6.4), objections still open at this point are escalated to the dispute resolution process (§9.2), and the submission does not finalize until that dispute concludes. The referral is the review chairs' to make.\n\n**Review chairs — one of:**\n\n- Refer the open objections to dispute resolution under §9.2.\n- Finalize the submission (label the review PR `finalized`) if the objections are in fact settled.\n- Withdraw it, if that is the right outcome.\n\nThe lifecycle manager takes no action of its own here, and will not post about this window again.\n\n<!-- wk6-referral -->"
+     },
+     {
+      "key": "rp-past-wk6/tracking/c3",
+      "at": "2026-11-05T17:00:00Z",
+      "by": "chair-a",
+      "text": "Referring #{{num:rp-past-wk6/f1}} to dispute resolution (§9.2). First call is Thu 11-19 with Feisty Fawn, Karmic Koala and both chairs. The submission stays in review until then."
+     },
+     {
+      "key": "rp-past-wk6/tracking/c4",
+      "at": "2026-11-10T14:30:00Z",
+      "by": "lm-bot",
+      "text": "`finalized` was applied to the review PR by dapper-drake-r2, who does not hold the review-chair role, so this submission has **not** been finalized.\n\nRules §6.4 puts certification with the review chairs. A chair applying the label (re-applying it if necessary) finalizes the submission on the next run.\n\n<!-- non-chair-finalize: dapper-drake-r2 -->"
+     }
+    ],
+    "labels": [
+     "review",
+     "status: review_pending",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "rp-past-wk6/f1",
+     "kind": "finding",
+     "parent": "rp-past-wk6/tracking",
+     "at": "2026-10-05T16:00:00Z",
+     "by": "karmic-koala-r5",
+     "title": "Node type K7 not available by the stated date",
+     "body": "The system description lists Node type K7 (4x Accel-Y) as Available from 2026-09-15. A single K7 node can't be ordered on its own; the public order page only lists the K7 rack bundle, shipping 2027-03. A node you can't buy by the stated date doesn't meet Available. Preview might fit.",
+     "initial_labels": [
+      "type: Availability",
+      "by Karmic Koala",
+      "against Feisty Fawn",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "rp-past-wk6/f1/c1",
+       "at": "2026-10-07T20:00:00Z",
+       "by": "feisty-fawn-sub1",
+       "text": "Single K7 nodes ship today to customers who ask; the bundle date is for the full rack. We can share a quote dated 2026-09-10 for a single node.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-past-wk6/f1/c2",
+       "at": "2026-10-08T18:00:00Z",
+       "by": "karmic-koala-r5",
+       "text": "A quote on request isn't general availability as I read the rules. Is there a public listing for a single node?",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-past-wk6/f1/c3",
+       "at": "2026-10-13T17:00:00Z",
+       "by": "feisty-fawn-sub1",
+       "text": "No public single-node listing. Our position is that 'available to order' covers quoted configurations. We'd like the chairs to decide.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-past-wk6/f1/c4",
+       "at": "2026-10-14T20:00:00Z",
+       "by": "karmic-koala-r5",
+       "text": "Agree it needs the chairs. Leaving my objection open.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-submitter-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-past-wk6/f1/c5",
+       "at": "2026-10-15T18:00:00Z",
+       "by": "chair-b",
+       "text": "This is a rules question for the chairs, not something another reply can fix. Adding `waive-penalty-all` so the wait on this finding doesn't count while we decide. Nobody needs to swap the label meanwhile.",
+       "labels": [
+        {
+         "label": "waive-penalty-all",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "rp-past-wk6/f1/c6",
+       "at": "2026-10-16T14:30:00Z",
+       "by": "lm-bot",
+       "text": "`waive-penalty-all` accepted from Chair B. No penalty was reduced, because this finding has no penalty yet. If it gets one while this label is on, it won't count.\n\n<!-- penalty-waiver: waive-penalty-all added 91000042 -->"
+      }
+     ],
+     "labels": [
+      "against Feisty Fawn",
+      "by Karmic Koala",
+      "needs-submitter-attention",
+      "type: Availability",
+      "waive-penalty-all"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "fin-embargo",
+   "tests": [
+    "FIN_WAITING with embargo 2026-12-10 (due cohort 2026-12-C1)",
+    "Two models in one submission",
+    "Finalized in Week 5 by a chair label"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "34f78c1e-352c-43c8-a250-1dc53bb2263a",
+    "status": "FINALIZED",
+    "created_at": "2026-10-01T15:00:00Z",
+    "compliance_passed_at": "2026-10-05T18:00:00Z",
+    "peer_review_started_at": "2026-10-05T18:00:00Z",
+    "objection_resolution_started_at": "2026-10-27T14:30:00Z",
+    "finalized_at": "2026-11-05T19:00:00Z",
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": "2026-12-10T08:00:00Z",
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:fin-embargo/pr}}",
+    "tracking_issue_number": "{{num:fin-embargo/tracking}}",
+    "is_test": false,
+    "model": [
+     "SimVision-11B",
+     "SimLM-8B"
+    ],
+    "benchmark_type": "single_turn",
+    "org": "Intrepid Ibex",
+    "submitter": "intrepid-ibex-sub1"
+   },
+   "pr": {
+    "key": "fin-embargo/pr",
+    "kind": "pr",
+    "at": "2026-10-02T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Intrepid Ibex · standardized · available · SimVision-11B +1 more · 34f78c1e",
+    "branch": "submission/34f78c1e",
+    "body": "## Review submission `34f78c1e`\n\n| Field | Value |\n|---|---|\n| Organization | `Intrepid Ibex` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization, and not before the embargo |\n| System | Node type M2 · 4x Accel-Y |\n| Model | `SimVision-11B`, `SimLM-8B` |\n| Submitted | `2026-10-01 15:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | held until 2026-12-10 |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 34f78c1e",
+      "at": "2026-10-02T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimVision-11B and SimLM-8B, concurrency sweep 4-64",
+      "at": "2026-10-02T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Fix image resize value in README",
+      "at": "2026-10-22T08:50:00Z",
+      "by": "intrepid-ibex-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-embargo/pr/c1",
+      "at": "2026-11-05T19:00:00Z",
+      "by": "chair-b",
+      "text": "All findings resolved. Finalizing. The embargo is 2026-12-10, so this publishes in the 12-16 cohort, not 11-18.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: finalized"
+    ]
+   },
+   "tracking": {
+    "key": "fin-embargo/tracking",
+    "kind": "tracking",
+    "at": "2026-10-06T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 34f78c1e — Intrepid Ibex — SimVision-11B +1 more",
+    "body": "## Review tracking — submission `34f78c1e`\n\nReview PR: #{{num:fin-embargo/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `34f78c1e-352c-43c8-a250-1dc53bb2263a` |\n| Submitting org | Intrepid Ibex |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization, and not before the embargo |\n| System | Node type M2 · 4x Accel-Y |\n| Model | `SimVision-11B`, `SimLM-8B` |\n| Embargo | held until 2026-12-10 |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-10-26 11:59 PM PT` |\n| Objection resolution closes | `2026-11-16 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 34f78c1e-352c-43c8-a250-1dc53bb2263a -->\n<!-- embargo: 2026-12-10 -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-embargo/tracking/c1",
+      "at": "2026-10-07T15:30:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "dapper-drake-r2",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: finalized",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "fin-embargo/f1",
+     "kind": "finding",
+     "parent": "fin-embargo/tracking",
+     "at": "2026-10-21T16:00:00Z",
+     "by": "dapper-drake-r2",
+     "title": "Image resize differs between README and config",
+     "body": "README says images are resized to 336, `config/preprocess.yaml` says 448. One of them is wrong.",
+     "initial_labels": [
+      "type: Cosmetic",
+      "by Dapper Drake",
+      "against Intrepid Ibex",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "fin-embargo/f1/c1",
+       "at": "2026-10-22T09:00:00Z",
+       "by": "intrepid-ibex-sub1",
+       "text": "Config is right (448). README fixed.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "fin-embargo/f1/c2",
+       "at": "2026-10-22T17:00:00Z",
+       "by": "dapper-drake-r2",
+       "text": "Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Intrepid Ibex",
+      "by Dapper Drake",
+      "resolved",
+      "type: Cosmetic"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "fin-rdi",
+   "tests": [
+    "FIN_RDI: never auto-published",
+    "benchmark_type mixed (agentic and single-turn runs)",
+    "division and availability both rdi"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "59f7e1b8-35f7-4f61-9027-be6196e1c91c",
+    "status": "FINALIZED",
+    "created_at": "2026-09-24T16:00:00Z",
+    "compliance_passed_at": "2026-09-28T17:00:00Z",
+    "peer_review_started_at": "2026-09-28T17:00:00Z",
+    "objection_resolution_started_at": "2026-10-20T14:30:00Z",
+    "finalized_at": "2026-10-28T18:00:00Z",
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "rdi",
+    "division": "rdi",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:fin-rdi/pr}}",
+    "tracking_issue_number": "{{num:fin-rdi/tracking}}",
+    "is_test": false,
+    "model": "SimMoE-120B",
+    "benchmark_type": "mixed",
+    "org": "Bionic Beaver",
+    "submitter": "bionic-beaver-sub1"
+   },
+   "pr": {
+    "key": "fin-rdi/pr",
+    "kind": "pr",
+    "at": "2026-09-25T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Bionic Beaver · rdi · rdi · SimMoE-120B · 59f7e1b8",
+    "branch": "submission/59f7e1b8",
+    "body": "## Review submission `59f7e1b8`\n\n| Field | Value |\n|---|---|\n| Organization | `Bionic Beaver` |\n| Division | `rdi` |\n| Availability | `rdi` |\n| Publication | first publication date after finalization |\n| System | Prototype rack P1 · 8x Accel-Z |\n| Model | `SimMoE-120B` |\n| Submitted | `2026-09-24 16:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 59f7e1b8",
+      "at": "2026-09-25T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimMoE-120B",
+      "at": "2026-09-25T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimMoE-120B, concurrency sweep 8-128",
+      "at": "2026-09-25T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Note draft-model devices in system description",
+      "at": "2026-10-09T14:50:00Z",
+      "by": "bionic-beaver-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-rdi/pr/c1",
+      "at": "2026-10-28T18:00:00Z",
+      "by": "chair-a",
+      "text": "Finalizing. RDI results don't go through the cohort publish; the chairs place them in the RDI section by hand.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: finalized"
+    ]
+   },
+   "tracking": {
+    "key": "fin-rdi/tracking",
+    "kind": "tracking",
+    "at": "2026-09-29T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 59f7e1b8 — Bionic Beaver — SimMoE-120B",
+    "body": "## Review tracking — submission `59f7e1b8`\n\nReview PR: #{{num:fin-rdi/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `59f7e1b8-35f7-4f61-9027-be6196e1c91c` |\n| Submitting org | Bionic Beaver |\n| Division | rdi |\n| Scenario | con |\n| Availability | rdi |\n| Publication | first publication date after finalization |\n| System | Prototype rack P1 · 8x Accel-Z |\n| Model | `SimMoE-120B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-10-19 11:59 PM PT` |\n| Objection resolution closes | `2026-11-09 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 59f7e1b8-35f7-4f61-9027-be6196e1c91c -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-rdi/tracking/c1",
+      "at": "2026-09-30T16:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "lucid-lynx-r3",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: finalized",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "fin-rdi/f1",
+     "kind": "finding",
+     "parent": "fin-rdi/tracking",
+     "at": "2026-10-08T16:00:00Z",
+     "by": "lucid-lynx-r3",
+     "title": "Device count in the log doesn't match the system description",
+     "body": "System description: 8x Accel-Z. The device init lines in `run_1/server.log` list 6 devices. If 2 were held back, the description should say 6.",
+     "initial_labels": [
+      "type: Division Rules",
+      "by Lucid Lynx",
+      "against Bionic Beaver",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "fin-rdi/f1/c1",
+       "at": "2026-10-09T15:00:00Z",
+       "by": "bionic-beaver-sub1",
+       "text": "Two devices run the draft model for speculative decoding, so all 8 are in use, 6 for the target model. Added a note to the system description.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "fin-rdi/f1/c2",
+       "at": "2026-10-12T17:00:00Z",
+       "by": "lucid-lynx-r3",
+       "text": "Makes sense with the note. Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Bionic Beaver",
+      "by Lucid Lynx",
+      "resolved",
+      "type: Division Rules"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "fin-penalty",
+   "tests": [
+    "FIN_WAITING, penalty-delayed (level 1: due 2026-12-C0 instead of 2026-11-C1)",
+    "Finding without the submission label",
+    "Penalty frozen at finalization"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "17200f4a-5fd3-48cd-a9fc-2a7003a3507d",
+    "status": "FINALIZED",
+    "created_at": "2026-10-07T16:00:00Z",
+    "compliance_passed_at": "2026-10-13T17:00:00Z",
+    "peer_review_started_at": "2026-10-13T17:00:00Z",
+    "objection_resolution_started_at": "2026-11-04T14:30:00Z",
+    "finalized_at": "2026-11-10T18:00:00Z",
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 1,
+    "business_days_since_response": 3,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:fin-penalty/pr}}",
+    "tracking_issue_number": "{{num:fin-penalty/tracking}}",
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Dapper Drake",
+    "submitter": "dapper-drake-sub1"
+   },
+   "pr": {
+    "key": "fin-penalty/pr",
+    "kind": "pr",
+    "at": "2026-10-08T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Dapper Drake · standardized · available · SimLM-8B · 17200f4a",
+    "branch": "submission/17200f4a",
+    "body": "## Review submission `17200f4a`\n\n| Field | Value |\n|---|---|\n| Organization | `Dapper Drake` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Submitted | `2026-10-07 16:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 17200f4a",
+      "at": "2026-10-08T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-8B, concurrency sweep 8-128",
+      "at": "2026-10-08T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add queue depth plot for concurrency 64",
+      "at": "2026-10-23T21:40:00Z",
+      "by": "dapper-drake-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-penalty/pr/c1",
+      "at": "2026-11-10T18:00:00Z",
+      "by": "chair-b",
+      "text": "Finalizing. The level 1 penalty from #{{num:fin-penalty/f1}} stands, so publication moves one cycle: 12-02 instead of 11-18.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: finalized"
+    ]
+   },
+   "tracking": {
+    "key": "fin-penalty/tracking",
+    "kind": "tracking",
+    "at": "2026-10-14T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 17200f4a — Dapper Drake — SimLM-8B",
+    "body": "## Review tracking — submission `17200f4a`\n\nReview PR: #{{num:fin-penalty/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `17200f4a-5fd3-48cd-a9fc-2a7003a3507d` |\n| Submitting org | Dapper Drake |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization, then 1 more cycle for penalties |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | 1 — publication delayed 1 cycle |\n| Longest wait on submitter | 3 business day(s) |\n| Peer review closes | `2026-11-03 11:59 PM PT` |\n| Objection resolution closes | `2026-11-24 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 17200f4a-5fd3-48cd-a9fc-2a7003a3507d -->\n<!-- embargo: none -->\n<!-- penalties: 1 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: finalized"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "fin-penalty/tracking/c1",
+      "at": "2026-10-15T16:00:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "intrepid-ibex-r6",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "fin-penalty/tracking/c2",
+      "at": "2026-10-24T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **1 — publication delayed 1 cycle**.\n\nCaused by:\n- #{{num:fin-penalty/f1}}: waiting on the submitter for 3 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     }
+    ],
+    "labels": [
+     "review",
+     "status: finalized",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "fin-penalty/f1",
+     "kind": "finding",
+     "parent": "fin-penalty/tracking",
+     "at": "2026-10-20T17:00:00Z",
+     "by": "intrepid-ibex-r6",
+     "title": "Throughput at concurrency 64 lower than at 32",
+     "body": "Concurrency 32: 4,410 tok/s. Concurrency 64: 4,180 tok/s. Every other point rises with load. Is 64 past saturation (then say so), or was something off in that run?",
+     "initial_labels": [
+      "type: Validity of Results",
+      "by Intrepid Ibex",
+      "against Dapper Drake",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "fin-penalty/f1/c1",
+       "at": "2026-10-22T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Dapper Drake (submitter), this finding has been waiting on the submitter since Tuesday 2026-10-20, 10:00 AM PDT. Please respond before **Friday 2026-10-23, 10:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).\n\n<!-- submitter-reminder: 2026-10-20T17:00:00Z L1 -->"
+      },
+      {
+       "key": "fin-penalty/f1/c2",
+       "at": "2026-10-23T22:00:00Z",
+       "by": "dapper-drake-sub1",
+       "text": "64 is past saturation on this node: the KV cache fills above about 48 concurrent requests and the server starts queueing. Queue depth plot is in `review/queue_depth_c64.png`.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "fin-penalty/f1/c3",
+       "at": "2026-10-26T16:00:00Z",
+       "by": "intrepid-ibex-r6",
+       "text": "The queue depth plot explains it. Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Dapper Drake",
+      "by Intrepid Ibex",
+      "resolved",
+      "type: Validity of Results"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "pub-normal",
+   "tests": [
+    "PUBLISHED in 2026-10-C0 after provisional publication",
+    "Full timestamp set"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "7dccdcd0-573a-4dd4-a15a-ad8f9e3c29f6",
+    "status": "PUBLISHED",
+    "created_at": "2026-09-08T16:00:00Z",
+    "compliance_passed_at": "2026-09-10T18:00:00Z",
+    "peer_review_started_at": "2026-09-10T18:00:00Z",
+    "objection_resolution_started_at": "2026-10-02T14:30:00Z",
+    "finalized_at": "2026-10-05T17:00:00Z",
+    "first_published_at": "2026-10-07T15:10:00Z",
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": true,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 1,
+    "publication_cycle": "2026-10-C0",
+    "supersedes": null,
+    "pr_number": "{{num:pub-normal/pr}}",
+    "tracking_issue_number": "{{num:pub-normal/tracking}}",
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Hoary Hedgehog",
+    "submitter": "hoary-hedgehog-sub1"
+   },
+   "pr": {
+    "key": "pub-normal/pr",
+    "kind": "pr",
+    "at": "2026-09-09T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Hoary Hedgehog · standardized · available · SimLM-8B · 7dccdcd0",
+    "branch": "submission/7dccdcd0",
+    "body": "## Review submission `7dccdcd0`\n\n| Field | Value |\n|---|---|\n| Organization | `Hoary Hedgehog` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | provisional publication requested |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Submitted | `2026-09-08 16:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 7dccdcd0",
+      "at": "2026-09-09T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-8B, concurrency sweep 8-128",
+      "at": "2026-09-09T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add units to latency summary header",
+      "at": "2026-09-25T15:40:00Z",
+      "by": "hoary-hedgehog-sub1",
+      "after_open": true
+     }
+    ],
+    "initial_labels": [
+     "status: published"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "pub-normal/pr/c1",
+      "at": "2026-10-05T17:00:00Z",
+      "by": "chair-a",
+      "text": "Finalizing. The provisional results have been public since review started; this moves them to final in the 10-07 cohort.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: published"
+    ]
+   },
+   "tracking": {
+    "key": "pub-normal/tracking",
+    "kind": "tracking",
+    "at": "2026-09-11T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 7dccdcd0 — Hoary Hedgehog — SimLM-8B",
+    "body": "## Review tracking — submission `7dccdcd0`\n\nReview PR: #{{num:pub-normal/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `7dccdcd0-573a-4dd4-a15a-ad8f9e3c29f6` |\n| Submitting org | Hoary Hedgehog |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | provisional publication requested |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 1 business day(s) |\n| Peer review closes | `2026-10-01 11:59 PM PT` |\n| Objection resolution closes | `2026-10-22 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 7dccdcd0-573a-4dd4-a15a-ad8f9e3c29f6 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: published"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "pub-normal/tracking/c1",
+      "at": "2026-09-14T16:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "noble-numbat-r4",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: published",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "pub-normal/f1",
+     "kind": "finding",
+     "parent": "pub-normal/tracking",
+     "at": "2026-09-24T16:00:00Z",
+     "by": "noble-numbat-r4",
+     "title": "Latency summary header has no units",
+     "body": "`summary.csv` columns `ttft_p50`, `ttft_p99`, `tpot_p50` have no units. Milliseconds, I assume? Please say so in the header.",
+     "initial_labels": [
+      "type: Cosmetic",
+      "by Noble Numbat",
+      "against Hoary Hedgehog",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "pub-normal/f1/c1",
+       "at": "2026-09-25T16:00:00Z",
+       "by": "hoary-hedgehog-sub1",
+       "text": "Yes, ms. Header now reads `ttft_p50_ms` etc.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "pub-normal/f1/c2",
+       "at": "2026-09-28T15:00:00Z",
+       "by": "noble-numbat-r4",
+       "text": "Resolving.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Hoary Hedgehog",
+      "by Noble Numbat",
+      "resolved",
+      "type: Cosmetic"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "sup-old",
+   "tests": [
+    "SUPERSEDED (no timestamp for the change)",
+    "Submitter announces resubmission on the tracking issue"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "9f75c479-703a-4327-a322-698abd4eb105",
+    "status": "SUPERSEDED",
+    "created_at": "2026-09-01T14:00:00Z",
+    "compliance_passed_at": "2026-09-03T17:00:00Z",
+    "peer_review_started_at": "2026-09-03T17:00:00Z",
+    "objection_resolution_started_at": "2026-09-25T14:30:00Z",
+    "finalized_at": "2026-09-25T16:00:00Z",
+    "first_published_at": "2026-10-07T15:10:00Z",
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": "2026-10-C0",
+    "supersedes": null,
+    "pr_number": "{{num:sup-old/pr}}",
+    "tracking_issue_number": "{{num:sup-old/tracking}}",
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Breezy Badger",
+    "submitter": "breezy-badger-sub1"
+   },
+   "pr": {
+    "key": "sup-old/pr",
+    "kind": "pr",
+    "at": "2026-09-02T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Breezy Badger · standardized · available · SimLM-70B · 9f75c479",
+    "branch": "submission/9f75c479",
+    "body": "## Review submission `9f75c479`\n\n| Field | Value |\n|---|---|\n| Organization | `Breezy Badger` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Submitted | `2026-09-01 14:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 9f75c479",
+      "at": "2026-09-02T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-256",
+      "at": "2026-09-02T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: superseded"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "sup-old/pr/c1",
+      "at": "2026-09-25T16:00:00Z",
+      "by": "chair-a",
+      "text": "Finalizing.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: superseded"
+    ]
+   },
+   "tracking": {
+    "key": "sup-old/tracking",
+    "kind": "tracking",
+    "at": "2026-09-04T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 9f75c479 — Breezy Badger — SimLM-70B",
+    "body": "## Review tracking — submission `9f75c479`\n\nReview PR: #{{num:sup-old/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `9f75c479-703a-4327-a322-698abd4eb105` |\n| Submitting org | Breezy Badger |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-09-24 11:59 PM PT` |\n| Objection resolution closes | `2026-10-15 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 9f75c479-703a-4327-a322-698abd4eb105 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: superseded"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "sup-old/tracking/c1",
+      "at": "2026-09-04T18:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "hardy-heron-r1",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "sup-old/tracking/c2",
+      "at": "2026-10-08T16:00:00Z",
+      "by": "breezy-badger-sub1",
+      "text": "Heads up: the online runs here used a stale tokenizer build, which understates throughput by about 4%. We're resubmitting with the fixed build; the new submission will supersede this one when it publishes."
+     },
+     {
+      "key": "sup-old/tracking/c3",
+      "at": "2026-11-04T17:00:00Z",
+      "by": "chair-b",
+      "text": "Superseded by `f4b8cb3a` (#{{num:sup-new/tracking}}), published in the 11-04 cohort."
+     }
+    ],
+    "labels": [
+     "review",
+     "status: superseded",
+     "tracking"
+    ]
+   },
+   "findings": []
+  },
+  {
+   "key": "sup-new",
+   "tests": [
+    "PUBLISHED with supersedes set",
+    "Early finalization before Week 3",
+    "'No findings' sub-issue on a resubmission",
+    "No objection_resolution_started_at (finalized before day 21)"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "f4b8cb3a-fb71-444e-a039-ae755ccbac13",
+    "status": "PUBLISHED",
+    "created_at": "2026-10-09T15:00:00Z",
+    "compliance_passed_at": "2026-10-12T18:00:00Z",
+    "peer_review_started_at": "2026-10-12T18:00:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": "2026-10-30T17:00:00Z",
+    "first_published_at": "2026-11-04T16:10:00Z",
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": "2026-11-C0",
+    "supersedes": "9f75c479-703a-4327-a322-698abd4eb105",
+    "pr_number": "{{num:sup-new/pr}}",
+    "tracking_issue_number": "{{num:sup-new/tracking}}",
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Breezy Badger",
+    "submitter": "breezy-badger-sub1"
+   },
+   "pr": {
+    "key": "sup-new/pr",
+    "kind": "pr",
+    "at": "2026-10-10T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Breezy Badger · standardized · available · SimLM-70B · f4b8cb3a",
+    "branch": "submission/f4b8cb3a",
+    "body": "## Review submission `f4b8cb3a`\n\n| Field | Value |\n|---|---|\n| Organization | `Breezy Badger` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Submitted | `2026-10-09 15:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission f4b8cb3a",
+      "at": "2026-10-10T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-256 (tokenizer fix)",
+      "at": "2026-10-10T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: published"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "sup-new/pr/c1",
+      "at": "2026-10-30T17:00:00Z",
+      "by": "chair-b",
+      "text": "Finalizing ahead of Week 3 (§6.3 allows it). One no-findings review, and the only change from `9f75c479` is the tokenizer fix.",
+      "labels": [
+       {
+        "label": "finalized",
+        "action": "added"
+       }
+      ]
+     }
+    ],
+    "labels": [
+     "finalized",
+     "status: published"
+    ]
+   },
+   "tracking": {
+    "key": "sup-new/tracking",
+    "kind": "tracking",
+    "at": "2026-10-13T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission f4b8cb3a — Breezy Badger — SimLM-70B",
+    "body": "## Review tracking — submission `f4b8cb3a`\n\nReview PR: #{{num:sup-new/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `f4b8cb3a-fb71-444e-a039-ae755ccbac13` |\n| Submitting org | Breezy Badger |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-11-02 11:59 PM PT` |\n| Objection resolution closes | `2026-11-23 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: f4b8cb3a-fb71-444e-a039-ae755ccbac13 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: published"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "sup-new/tracking/c1",
+      "at": "2026-10-13T17:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "hardy-heron-r1",
+       "action": "assigned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: published",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "sup-new/f1",
+     "kind": "finding",
+     "parent": "sup-new/tracking",
+     "at": "2026-10-20T16:00:00Z",
+     "by": "hardy-heron-r1",
+     "title": "No findings from R1 (Hardy Heron)",
+     "body": "Diffed this against `9f75c479`: only the tokenizer build and the online results changed. Throughput is up 3.8 to 4.3% across points, which matches the stated fix. Nothing to raise. (Using `type: Cosmetic` because the workflow wants a type.)",
+     "initial_labels": [
+      "type: Cosmetic",
+      "by Hardy Heron",
+      "against Breezy Badger",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": true,
+     "timeline": [
+      {
+       "key": "sup-new/f1/c1",
+       "at": "2026-10-20T16:05:00Z",
+       "by": "hardy-heron-r1",
+       "text": "Nothing for the submitter to do. Closing.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Breezy Badger",
+      "by Hardy Heron",
+      "resolved",
+      "type: Cosmetic"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "pub-legacy",
+   "tests": [
+    "Legacy PUBLISHED: PR but no tracking issue, sim-db in PR body",
+    "Missing timestamps",
+    "Empty issue panel"
+   ],
+   "home": "pr",
+   "sim_db": {
+    "id": "cd8905b7-7f5e-4a58-aa08-c11418a0d1ea",
+    "status": "PUBLISHED",
+    "created_at": "2026-09-01T10:00:00Z",
+    "compliance_passed_at": null,
+    "peer_review_started_at": null,
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": "2026-09-C1",
+    "supersedes": null,
+    "pr_number": "{{num:pub-legacy/pr}}",
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Warty Warthog",
+    "submitter": "warty-warthog-sub1"
+   },
+   "pr": {
+    "key": "pub-legacy/pr",
+    "kind": "pr",
+    "at": "2026-09-01T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Warty Warthog · standardized · available · SimLM-8B · cd8905b7",
+    "branch": "submission/cd8905b7",
+    "body": "## Review submission `cd8905b7`\n\n| Field | Value |\n|---|---|\n| Organization | `Warty Warthog` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-8B` |\n| Submitted | `2026-09-01 10:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission cd8905b7",
+      "at": "2026-09-01T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimLM-8B, concurrency sweep 8-64",
+      "at": "2026-09-01T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: published"
+    ],
+    "state": "open",
+    "state_reason": null,
+    "timeline": [],
+    "labels": [
+     "status: published"
+    ]
+   },
+   "tracking": null,
+   "findings": []
+  },
+  {
+   "key": "exp-preview",
+   "tests": [
+    "EXPIRED: Preview first published 2026-04-15, 180 days passed",
+    "No PR or tracking issue (sim/untracked.json)"
+   ],
+   "home": "untracked",
+   "sim_db": {
+    "id": "190b0ad0-19d4-44f6-86e1-672ac9a74c93",
+    "status": "EXPIRED",
+    "created_at": "2026-03-18T16:00:00Z",
+    "compliance_passed_at": "2026-03-20T17:00:00Z",
+    "peer_review_started_at": "2026-03-20T17:00:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": "2026-04-10T17:00:00Z",
+    "first_published_at": "2026-04-15T15:10:00Z",
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "preview",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": "2026-04-C1",
+    "supersedes": null,
+    "pr_number": null,
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimLM-70B",
+    "benchmark_type": "single_turn",
+    "org": "Focal Fossa",
+    "submitter": "focal-fossa-sub1"
+   },
+   "pr": null,
+   "tracking": null,
+   "findings": []
+  },
+  {
+   "key": "wd-submitter",
+   "tests": [
+    "WD by submitter during review",
+    "PR and tracking issue closed by LM",
+    "Reviewer closes the finding afterwards"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "9350ce95-1e11-41b7-a9f2-5a26cc7c16c2",
+    "status": "WITHDRAWN",
+    "created_at": "2026-09-29T17:00:00Z",
+    "compliance_passed_at": "2026-10-01T16:00:00Z",
+    "peer_review_started_at": "2026-10-01T16:00:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": "2026-10-16T18:00:00Z",
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:wd-submitter/pr}}",
+    "tracking_issue_number": "{{num:wd-submitter/tracking}}",
+    "is_test": false,
+    "model": "SimVision-11B",
+    "benchmark_type": "single_turn",
+    "org": "Hardy Heron",
+    "submitter": "hardy-heron-sub1"
+   },
+   "pr": {
+    "key": "wd-submitter/pr",
+    "kind": "pr",
+    "at": "2026-09-30T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Hardy Heron · standardized · available · SimVision-11B · 9350ce95",
+    "branch": "submission/9350ce95",
+    "body": "## Review submission `9350ce95`\n\n| Field | Value |\n|---|---|\n| Organization | `Hardy Heron` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | first publication date after finalization |\n| System | Node type M2 · 4x Accel-Y |\n| Model | `SimVision-11B` |\n| Submitted | `2026-09-29 17:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission 9350ce95",
+      "at": "2026-09-30T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add run results for SimVision-11B, concurrency sweep 4-64",
+      "at": "2026-09-30T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: withdrawn"
+    ],
+    "state": "closed",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "wd-submitter/pr/c1",
+      "at": "2026-10-17T14:30:00Z",
+      "by": "lm-bot",
+      "text": "Submission `9350ce95` was withdrawn by the submitter. Closing automatically. Reopen if this was not intended.",
+      "state": {
+       "action": "closed",
+       "reason": "completed"
+      }
+     }
+    ],
+    "labels": [
+     "status: withdrawn"
+    ]
+   },
+   "tracking": {
+    "key": "wd-submitter/tracking",
+    "kind": "tracking",
+    "at": "2026-10-02T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission 9350ce95 — Hardy Heron — SimVision-11B",
+    "body": "## Review tracking — submission `9350ce95`\n\nReview PR: #{{num:wd-submitter/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `9350ce95-1e11-41b7-a9f2-5a26cc7c16c2` |\n| Submitting org | Hardy Heron |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization |\n| System | Node type M2 · 4x Accel-Y |\n| Model | `SimVision-11B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 0 business day(s) |\n| Peer review closes | `2026-10-22 11:59 PM PT` |\n| Objection resolution closes | `2026-11-12 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: 9350ce95-1e11-41b7-a9f2-5a26cc7c16c2 -->\n<!-- embargo: none -->\n<!-- penalties: 0 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: withdrawn"
+    ],
+    "state": "closed",
+    "state_reason": "not_planned",
+    "timeline": [
+     {
+      "key": "wd-submitter/tracking/c1",
+      "at": "2026-10-05T16:00:00Z",
+      "by": "chair-b",
+      "assign": {
+       "login": "intrepid-ibex-r6",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "wd-submitter/tracking/c2",
+      "at": "2026-10-17T14:30:00Z",
+      "by": "lm-bot",
+      "text": "Submission `9350ce95` was withdrawn by the submitter. Closing automatically. Reopen if this was not intended.",
+      "state": {
+       "action": "closed",
+       "reason": "not_planned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: withdrawn",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "wd-submitter/f1",
+     "kind": "finding",
+     "parent": "wd-submitter/tracking",
+     "at": "2026-10-14T17:00:00Z",
+     "by": "intrepid-ibex-r6",
+     "title": "Accuracy run used 2,000 of 5,000 samples",
+     "body": "`accuracy/run.log` ends with `samples_processed=2000`. The accuracy set for SimVision-11B is 5,000 samples, so the reported score is over a partial set.",
+     "initial_labels": [
+      "type: Compliance Failure",
+      "by Intrepid Ibex",
+      "against Hardy Heron",
+      "needs-submitter-attention"
+     ],
+     "state": "closed",
+     "state_reason": "completed",
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "wd-submitter/f1/c1",
+       "at": "2026-10-15T16:00:00Z",
+       "by": "hardy-heron-sub1",
+       "text": "Confirmed. The accuracy job hit our storage quota at 2,000 and exited without an error. We'll withdraw this one and resubmit next cycle with a full run.",
+       "labels": [
+        {
+         "label": "needs-submitter-attention",
+         "action": "removed"
+        },
+        {
+         "label": "needs-reviewer-attention",
+         "action": "added"
+        }
+       ]
+      },
+      {
+       "key": "wd-submitter/f1/c2",
+       "at": "2026-10-19T16:00:00Z",
+       "by": "intrepid-ibex-r6",
+       "text": "Closing, the submission was withdrawn.",
+       "labels": [
+        {
+         "label": "needs-reviewer-attention",
+         "action": "removed"
+        },
+        {
+         "label": "resolved",
+         "action": "added"
+        }
+       ],
+       "state": {
+        "action": "closed",
+        "reason": "completed"
+       }
+      }
+     ],
+     "labels": [
+      "against Hardy Heron",
+      "by Intrepid Ibex",
+      "resolved",
+      "type: Compliance Failure"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "wd-penalty",
+   "tests": [
+    "WD_PENALTY: 10 business days on one finding",
+    "Reminders L1-L3 and penalty notices L1-L2",
+    "Late reply after the threshold, label never swapped",
+    "Finding left open with needs-submitter-attention"
+   ],
+   "home": "tracking",
+   "sim_db": {
+    "id": "b9aae866-d3da-42f8-a542-47f875bc7395",
+    "status": "WITHDRAWN",
+    "created_at": "2026-09-14T16:00:00Z",
+    "compliance_passed_at": "2026-09-16T17:00:00Z",
+    "peer_review_started_at": "2026-09-16T17:00:00Z",
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": "2026-10-15T14:30:00Z",
+    "embargo_date": null,
+    "early_publish": true,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 3,
+    "business_days_since_response": 10,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": "{{num:wd-penalty/pr}}",
+    "tracking_issue_number": "{{num:wd-penalty/tracking}}",
+    "is_test": false,
+    "model": "SimCoder-32B",
+    "benchmark_type": "agentic",
+    "org": "Jaunty Jackalope",
+    "submitter": "jaunty-jackalope-sub1"
+   },
+   "pr": {
+    "key": "wd-penalty/pr",
+    "kind": "pr",
+    "at": "2026-09-15T14:30:00Z",
+    "by": "lm-bot",
+    "title": "[Review] Jaunty Jackalope · standardized · available · SimCoder-32B · b9aae866",
+    "branch": "submission/b9aae866",
+    "body": "## Review submission `b9aae866`\n\n| Field | Value |\n|---|---|\n| Organization | `Jaunty Jackalope` |\n| Division | `standardized` |\n| Availability | `available` |\n| Publication | provisional publication requested |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimCoder-32B` |\n| Submitted | `2026-09-14 16:00 UTC` |\n| Checker version | `sim-2.4.1` |\n| Embargo | none |\n",
+    "commits": [
+     {
+      "message": "Add source archive for submission b9aae866",
+      "at": "2026-09-15T14:29:00Z",
+      "by": "lm-bot"
+     },
+     {
+      "message": "Add agentic session traces for SimCoder-32B",
+      "at": "2026-09-15T14:29:00Z",
+      "by": "lm-bot"
+     }
+    ],
+    "initial_labels": [
+     "status: withdrawn"
+    ],
+    "state": "closed",
+    "state_reason": null,
+    "timeline": [
+     {
+      "key": "wd-penalty/pr/c1",
+      "at": "2026-10-15T14:30:00Z",
+      "by": "lm-bot",
+      "text": "Submission `b9aae866` was withdrawn automatically for non-response: its submitter non-response penalties reached level 3 (rules §6.3: withdrawn at 10 business days waiting on a finding). Closing automatically. The submitter may correct the issues and resubmit as a new submission.",
+      "state": {
+       "action": "closed",
+       "reason": "completed"
+      }
+     }
+    ],
+    "labels": [
+     "status: withdrawn"
+    ]
+   },
+   "tracking": {
+    "key": "wd-penalty/tracking",
+    "kind": "tracking",
+    "at": "2026-09-17T14:30:00Z",
+    "by": "lm-bot",
+    "title": "Reviews for Submission b9aae866 — Jaunty Jackalope — SimCoder-32B",
+    "body": "## Review tracking — submission `b9aae866`\n\nReview PR: #{{num:wd-penalty/pr}}\n\n| Field | Value |\n|---|---|\n| Submission | `b9aae866-d3da-42f8-a542-47f875bc7395` |\n| Submitting org | Jaunty Jackalope |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | provisional publication requested, then 3 more cycles for penalties |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimCoder-32B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | 3 — submission withdrawn |\n| Longest wait on submitter | 10 business day(s) |\n| Peer review closes | `2026-10-07 11:59 PM PT` |\n| Objection resolution closes | `2026-10-28 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._\n\n<!-- submission-id: b9aae866-d3da-42f8-a542-47f875bc7395 -->\n<!-- embargo: none -->\n<!-- penalties: 3 -->",
+    "initial_labels": [
+     "review",
+     "tracking",
+     "status: withdrawn"
+    ],
+    "state": "closed",
+    "state_reason": "not_planned",
+    "timeline": [
+     {
+      "key": "wd-penalty/tracking/c1",
+      "at": "2026-09-18T16:00:00Z",
+      "by": "chair-a",
+      "assign": {
+       "login": "lucid-lynx-r3",
+       "action": "assigned"
+      }
+     },
+     {
+      "key": "wd-penalty/tracking/c2",
+      "at": "2026-10-03T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **1 — publication delayed 1 cycle**.\n\nCaused by:\n- #{{num:wd-penalty/f1}}: waiting on the submitter for 3 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "wd-penalty/tracking/c3",
+      "at": "2026-10-08T14:30:00Z",
+      "by": "lm-bot",
+      "text": "**Non-response penalty imposed.** Penalties on this submission now stand at **2 — publication delayed 2 cycles**.\n\nCaused by:\n- #{{num:wd-penalty/f1}}: waiting on the submitter for 6 business day(s)\n\nPenalties accrue per finding while it waits on the submitter (3, 6 and 10 business days), do not add up across findings, and are not reversed by a later reply. Responding now prevents further escalation."
+     },
+     {
+      "key": "wd-penalty/tracking/c4",
+      "at": "2026-10-15T14:30:00Z",
+      "by": "lm-bot",
+      "text": "Submission `b9aae866` was withdrawn automatically for non-response: its submitter non-response penalties reached level 3 (rules §6.3: withdrawn at 10 business days waiting on a finding). Closing automatically. The submitter may correct the issues and resubmit as a new submission.",
+      "state": {
+       "action": "closed",
+       "reason": "not_planned"
+      }
+     }
+    ],
+    "labels": [
+     "review",
+     "status: withdrawn",
+     "tracking"
+    ]
+   },
+   "findings": [
+    {
+     "key": "wd-penalty/f1",
+     "kind": "finding",
+     "parent": "wd-penalty/tracking",
+     "at": "2026-09-29T16:00:00Z",
+     "by": "lucid-lynx-r3",
+     "title": "Tool results cached across sessions",
+     "body": "The sandbox log shows a shared results cache: 38% of tool calls in sessions 200 and later return `cache_hit=true` for calls first made in an earlier session. Each session should start from a clean sandbox. This likely inflates both pass rate and session time.",
+     "initial_labels": [
+      "type: Compliance Failure",
+      "by Lucid Lynx",
+      "against Jaunty Jackalope",
+      "needs-submitter-attention"
+     ],
+     "state": "open",
+     "state_reason": null,
+     "no_findings": false,
+     "timeline": [
+      {
+       "key": "wd-penalty/f1/c1",
+       "at": "2026-10-01T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Jaunty Jackalope (submitter), this finding has been waiting on the submitter since Tuesday 2026-09-29, 09:00 AM PDT. Please respond before **Friday 2026-10-02, 09:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).\n\n<!-- submitter-reminder: 2026-09-29T16:00:00Z L1 -->"
+      },
+      {
+       "key": "wd-penalty/f1/c2",
+       "at": "2026-10-06T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Jaunty Jackalope (submitter), this finding has been waiting on the submitter since Tuesday 2026-09-29, 09:00 AM PDT. Please respond before **Wednesday 2026-10-07, 09:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 2**, delaying publication 2 cycles (rules §6.3).\n\n<!-- submitter-reminder: 2026-09-29T16:00:00Z L2 -->"
+      },
+      {
+       "key": "wd-penalty/f1/c3",
+       "at": "2026-10-13T14:30:00Z",
+       "by": "lm-bot",
+       "text": "S1 · Jaunty Jackalope (submitter), this finding has been waiting on the submitter since Tuesday 2026-09-29, 09:00 AM PDT. Please respond before **Wednesday 2026-10-14, 09:00 AM PDT**. If it is still waiting on you then, this submission is **withdrawn** (rules §6.3).\n\n<!-- submitter-reminder: 2026-09-29T16:00:00Z L3 -->"
+      },
+      {
+       "key": "wd-penalty/f1/c4",
+       "at": "2026-10-15T02:00:00Z",
+       "by": "jaunty-jackalope-sub1",
+       "text": "Sorry for the silence. Our review contact left and the notifications went to an inbox nobody reads. The cache is the sandbox result cache and should have been off. We have a clean rerun ready."
+      }
+     ],
+     "labels": [
+      "against Jaunty Jackalope",
+      "by Lucid Lynx",
+      "needs-submitter-attention",
+      "type: Compliance Failure"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "wi-legacy",
+   "tests": [
+    "Legacy WITHDRAWN_INCOMPLETE from the removed Week 6 step",
+    "No PR or tracking issue (sim/untracked.json)"
+   ],
+   "home": "untracked",
+   "sim_db": {
+    "id": "6215d0c4-8e25-41df-b537-1be1c2bd6658",
+    "status": "WITHDRAWN_INCOMPLETE",
+    "created_at": "2026-09-02T16:00:00Z",
+    "compliance_passed_at": null,
+    "peer_review_started_at": "2026-09-02T16:00:00Z",
+    "objection_resolution_started_at": "2026-09-24T14:30:00Z",
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": "2026-10-15T14:30:00Z",
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": null,
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimLM-8B",
+    "benchmark_type": "single_turn",
+    "org": "Gutsy Gibbon",
+    "submitter": "gutsy-gibbon-sub1"
+   },
+   "pr": null,
+   "tracking": null,
+   "findings": []
+  },
+  {
+   "key": "cc-held",
+   "tests": [
+    "CC_HELD: provisional with future embargo, no PR yet",
+    "No PR or tracking issue (sim/untracked.json)",
+    "Third submission from Feisty Fawn"
+   ],
+   "home": "untracked",
+   "sim_db": {
+    "id": "1eb827a2-32df-4887-86f5-f398e516fc08",
+    "status": "COMPLIANCE_CHECKING",
+    "created_at": "2026-11-13T19:00:00Z",
+    "compliance_passed_at": null,
+    "peer_review_started_at": null,
+    "objection_resolution_started_at": null,
+    "finalized_at": null,
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": "2026-11-25T16:00:00Z",
+    "early_publish": true,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 0,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": null,
+    "tracking_issue_number": null,
+    "is_test": false,
+    "model": "SimCoder-32B",
+    "benchmark_type": "agentic",
+    "org": "Feisty Fawn",
+    "submitter": "feisty-fawn-sub1"
+   },
+   "pr": null,
+   "tracking": null,
+   "findings": []
+  }
+ ]
+}

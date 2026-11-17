@@ -1,0 +1,164 @@
+[
+ {
+  "login": "warty-warthog-sub1",
+  "display_name": "S1 · Warty Warthog",
+  "role": "submitter",
+  "org": "Warty Warthog"
+ },
+ {
+  "login": "hoary-hedgehog-sub1",
+  "display_name": "S1 · Hoary Hedgehog",
+  "role": "submitter",
+  "org": "Hoary Hedgehog"
+ },
+ {
+  "login": "breezy-badger-sub1",
+  "display_name": "S1 · Breezy Badger",
+  "role": "submitter",
+  "org": "Breezy Badger"
+ },
+ {
+  "login": "dapper-drake-sub1",
+  "display_name": "S1 · Dapper Drake",
+  "role": "submitter",
+  "org": "Dapper Drake"
+ },
+ {
+  "login": "edgy-eft-sub1",
+  "display_name": "S1 · Edgy Eft",
+  "role": "submitter",
+  "org": "Edgy Eft"
+ },
+ {
+  "login": "feisty-fawn-sub1",
+  "display_name": "S1 · Feisty Fawn",
+  "role": "submitter",
+  "org": "Feisty Fawn"
+ },
+ {
+  "login": "gutsy-gibbon-sub1",
+  "display_name": "S1 · Gutsy Gibbon",
+  "role": "submitter",
+  "org": "Gutsy Gibbon"
+ },
+ {
+  "login": "hardy-heron-sub1",
+  "display_name": "S1 · Hardy Heron",
+  "role": "submitter",
+  "org": "Hardy Heron"
+ },
+ {
+  "login": "intrepid-ibex-sub1",
+  "display_name": "S1 · Intrepid Ibex",
+  "role": "submitter",
+  "org": "Intrepid Ibex"
+ },
+ {
+  "login": "jaunty-jackalope-sub1",
+  "display_name": "S1 · Jaunty Jackalope",
+  "role": "submitter",
+  "org": "Jaunty Jackalope"
+ },
+ {
+  "login": "karmic-koala-sub1",
+  "display_name": "S1 · Karmic Koala",
+  "role": "submitter",
+  "org": "Karmic Koala"
+ },
+ {
+  "login": "lucid-lynx-sub1",
+  "display_name": "S1 · Lucid Lynx",
+  "role": "submitter",
+  "org": "Lucid Lynx"
+ },
+ {
+  "login": "bionic-beaver-sub1",
+  "display_name": "S1 · Bionic Beaver",
+  "role": "submitter",
+  "org": "Bionic Beaver"
+ },
+ {
+  "login": "focal-fossa-sub1",
+  "display_name": "S1 · Focal Fossa",
+  "role": "submitter",
+  "org": "Focal Fossa"
+ },
+ {
+  "login": "jammy-jellyfish-sub1",
+  "display_name": "S1 · Jammy Jellyfish",
+  "role": "submitter",
+  "org": "Jammy Jellyfish"
+ },
+ {
+  "login": "noble-numbat-sub1",
+  "display_name": "S1 · Noble Numbat",
+  "role": "submitter",
+  "org": "Noble Numbat"
+ },
+ {
+  "login": "hardy-heron-r1",
+  "display_name": "R1 · Hardy Heron",
+  "role": "reviewer",
+  "org": "Hardy Heron"
+ },
+ {
+  "login": "dapper-drake-r2",
+  "display_name": "R2 · Dapper Drake",
+  "role": "reviewer",
+  "org": "Dapper Drake"
+ },
+ {
+  "login": "lucid-lynx-r3",
+  "display_name": "R3 · Lucid Lynx",
+  "role": "reviewer",
+  "org": "Lucid Lynx"
+ },
+ {
+  "login": "noble-numbat-r4",
+  "display_name": "R4 · Noble Numbat",
+  "role": "reviewer",
+  "org": "Noble Numbat"
+ },
+ {
+  "login": "karmic-koala-r5",
+  "display_name": "R5 · Karmic Koala",
+  "role": "reviewer",
+  "org": "Karmic Koala"
+ },
+ {
+  "login": "intrepid-ibex-r6",
+  "display_name": "R6 · Intrepid Ibex",
+  "role": "reviewer",
+  "org": "Intrepid Ibex"
+ },
+ {
+  "login": "chair-a",
+  "display_name": "Chair A",
+  "role": "chair",
+  "org": null
+ },
+ {
+  "login": "chair-b",
+  "display_name": "Chair B",
+  "role": "chair",
+  "org": null
+ },
+ {
+  "login": "lm-bot",
+  "display_name": "lifecycle",
+  "role": "bot",
+  "org": null
+ },
+ {
+  "login": "label-objections-bot",
+  "display_name": "label-objections",
+  "role": "bot",
+  "org": null
+ },
+ {
+  "login": "checker-bot",
+  "display_name": "check-submission",
+  "role": "bot",
+  "org": null
+ }
+]
