@@ -11,7 +11,8 @@ its own build. The newest KEEP builds stay; older folders are deleted.
 Run it after any change under docs/js or to docs/styles.css, before committing:
 
     python3 scripts/release_assets.py            # copy the build, point index.html at it
-    python3 scripts/release_assets.py --check    # exit 1 if index.html is not on the current build
+    python3 scripts/release_assets.py --check    # exit 1 unless index.html is on the current build, and
+                                                 # the build and index.html are committed or staged
 
 docs/js stays the source you edit. Only the copies under docs/v/ are served.
 """
@@ -21,17 +22,23 @@ import filecmp
 import hashlib
 import re
 import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent.parent / "docs"
 BUILDS = DOCS / "v"
 LIST = BUILDS / "builds.txt"
 KEEP = 4
+BUILD_ID = re.compile(r"^[0-9a-f]{10}$")
 # The two local assets index.html loads, with or without a build folder in front.
-REFS = re.compile(r"""((?:src|href)=")(?:v/\w+/)?((?:js/app\.js|styles\.css)")""")
+REFS = re.compile(r"""((?:src|href)=")(?:v/\w+/)?((js/app\.js|styles\.css)")""")
 # Any other local script or stylesheet in index.html would not be versioned.
-OTHER = re.compile(r"""(?:src|href)="(?!https?:|//|v/\w+/(?:js/app\.js|styles\.css)")[^"]+\.(?:js|css)\"""")
+OTHER = re.compile(
+    r"""(?:src|href)=["'](?!https?:|//|v/\w+/(?:js/app\.js|styles\.css)["'])[^"']+\.(?:m?js|css)(?:[?#][^"']*)?["']""",
+    re.I,
+)
 
 
 def source_files():
@@ -53,6 +60,26 @@ def same_as_source(build):
     ) and sorted(p.name for p in (build / "js").glob("*.js")) == sorted(p.name for p in (DOCS / "js").glob("*.js"))
 
 
+def untracked(build):
+    """Build files or index.html that git would not deploy as they are on disk."""
+    paths = [str(p.relative_to(DOCS.parent)) for p in sorted(build.rglob("*")) if p.is_file()] + ["docs/index.html"]
+    git = lambda *a: subprocess.run(["git", *a], cwd=DOCS.parent, capture_output=True, text=True)
+    missing = [p for p in paths if git("ls-files", "--error-unmatch", p).returncode != 0]
+    if git("diff", "--quiet", "--", *paths).returncode != 0:
+        missing.append("unstaged changes under docs/v or docs/index.html")
+    return missing
+
+
+def copy_build(build):
+    """Copy the source into a temp folder, then move it into place, so a crash leaves no half build."""
+    shutil.rmtree(build, ignore_errors=True)
+    tmp = Path(tempfile.mkdtemp(dir=BUILDS))
+    (tmp / "js").mkdir()
+    for f in source_files():
+        shutil.copy2(f, tmp / f.relative_to(DOCS))
+    tmp.rename(build)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--check", action="store_true", help="report problems, change nothing")
@@ -65,28 +92,34 @@ def main():
     new_html = REFS.sub(lambda m: f"{m.group(1)}v/{bid}/{m.group(2)}", html)
 
     problems = [f"index.html loads {m} without a build folder" for m in OTHER.findall(new_html)]
-    if len(REFS.findall(html)) != 2:
+    loads = [m[2] for m in REFS.findall(html)]
+    if sorted(loads) != ["js/app.js", "styles.css"]:
         problems.append("index.html must load js/app.js and styles.css exactly once each")
     if args.check:
         if new_html != html:
             problems.append(f"index.html does not point at the current build v/{bid}/")
         if not build.is_dir() or not same_as_source(build):
             problems.append(f"docs/v/{bid}/ is missing or differs from docs/js and docs/styles.css")
+        elif not problems:
+            missing = untracked(build)
+            if missing:
+                print("\n".join(f"not committed or staged: {p}" for p in missing) + "\nRun: git add docs/v docs/index.html")
+                sys.exit(1)
     if problems:
         print("\n".join(problems) + "\nRun: python3 scripts/release_assets.py")
         sys.exit(1)
     if args.check:
-        print(f"v/{bid}: current")
+        print(f"v/{bid}: current and staged for commit")
         return
 
-    if not build.is_dir():
-        (build / "js").mkdir(parents=True)
-        for f in source_files():
-            shutil.copy2(f, build / f.relative_to(DOCS))
+    BUILDS.mkdir(exist_ok=True)
+    if not build.is_dir() or not same_as_source(build):
+        copy_build(build)
     if new_html != html:
         index.write_text(new_html, encoding="utf-8")
 
-    order = [b for b in (LIST.read_text().split() if LIST.exists() else []) if b != bid] + [bid]
+    listed = LIST.read_text().split() if LIST.exists() else []
+    order = [b for b in listed if BUILD_ID.match(b) and b != bid] + [bid]
     for old in order[:-KEEP]:
         shutil.rmtree(BUILDS / old, ignore_errors=True)
     LIST.write_text("\n".join(order[-KEEP:]) + "\n")
