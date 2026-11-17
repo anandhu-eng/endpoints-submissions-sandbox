@@ -5,7 +5,7 @@ import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, i
 import { icon } from './icons.js';
 import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
 import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
-import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, stuckBadge, penaltyBadge, personName, valueLabel } from './ui.js';
 
 // ---------------------------------------------------------------------------
 // Metric cards. Display only: filtering happens in the sidebar.
@@ -14,12 +14,13 @@ import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel 
 const SECONDARY = ['M3', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17'];
 
 // A response-time figure: the median is the value; mean, n and caveats go to the tooltip.
-function respStat(m, line, extra, calendar = false) {
+// `turns`: the caption says how many turns the median covers, so a change of period shows.
+function respStat(m, line, extra, calendar = false, turns = false) {
   const v = m.stats.median;
   return {
     value: v == null ? COPY.metrics.none : days1(v),
     unit: v == null ? '' : COPY.metrics.daysShort,
-    caption: v == null ? '' : calendar ? COPY.metrics.medianCaptionCal : COPY.metrics.medianCaption,
+    caption: v == null ? '' : calendar ? COPY.metrics.medianCaptionCal : turns ? COPY.metrics.medianOfTurns(m.stats.n) : COPY.metrics.medianCaption,
     line,
     detail: [COPY.metrics.meanN(days1(m.stats.mean), m.stats.n), ...extra],
   };
@@ -84,11 +85,25 @@ function definitions() {
 export function renderMetrics(m, state, showMore) {
   const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
   const M = COPY.metrics;
+  const resp = [
+    card('M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null], false, true), pill }),
+    card('M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null], false, true), pill }),
+  ];
+  // The period control sits right above the two tiles it changes, so the change is on screen on phones too.
   const primary = [
     card('M4', { value: m.M4, wide: true }, phaseBlock(m)),
     card('M5', { value: m.M5.count, wide: true }, publishBlock(m)),
-    card('M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null]), pill }),
-    card('M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null]), pill }),
+    `<div class="mresp" role="group" aria-labelledby="resp-h">
+      <div class="mresp-head">
+        <span id="resp-h" class="micro">${esc(M.respTitle)}</span>
+        <div class="seg-group" role="group" aria-label="${esc(M.period)}" title="${esc(M.periodHelp)}">
+          <span class="seg-label micro">${esc(M.period)}</span>
+          ${PERIODS.map((p) => `<button type="button" class="seg-btn" id="period-${p}" data-period="${p}" aria-pressed="${state.period === p}">${esc(M.periods[p])}</button>`).join('')}
+        </div>
+        <span class="meta">${esc(M.periodNote)}</span>
+      </div>
+      ${resp.join('')}
+    </div>`,
   ];
   const secondary = {
     M3: respStat({ stats: m.M3.stats }, M.openTurns(m.M3.open, days1(m.M3.longestOpen)), [m.M3.excluded ? M.excluded(m.M3.excluded, M.noStart) : null]),
@@ -107,10 +122,6 @@ export function renderMetrics(m, state, showMore) {
     <div class="metrics-head">
       <h2 id="metrics-h" class="micro">${esc(COPY.metrics.heading)}</h2>
       <span class="meta">${esc(COPY.metrics.scope(m.total))}</span>
-      <div class="seg-group" role="group" aria-label="${esc(COPY.metrics.period)}" title="${esc(COPY.metrics.periodHelp)}">
-        <span class="seg-label micro">${esc(COPY.metrics.period)}</span>
-        ${PERIODS.map((p) => `<button type="button" class="seg-btn" id="period-${p}" data-period="${p}" aria-pressed="${state.period === p}">${esc(COPY.metrics.periods[p])}</button>`).join('')}
-      </div>
     </div>
     <div class="mcards">${primary.join('')}</div>
     <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(id, secondary[id])).join('')}</div>
@@ -348,12 +359,12 @@ function rowHtml(r, ctx) {
   const reviewers = r.assignees.length ? r.assignees.map((a) => esc(personName(a))).join(', ') : `<span class="muted">${esc(COPY.filters.unassigned)}</span>`;
   const mine = ctx.myWaits ? ctx.myWaits(r) : new Set();
   const supLinks = [
-    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}${esc(COPY.detail.supersedes(r.supersedes))}</a>` : '',
-    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}${esc(COPY.detail.supersededBy(r.supersededBy))}</a>` : '',
+    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}<span>${esc(COPY.detail.supersedes(r.supersedes))}</span></a>` : '',
+    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}<span>${esc(COPY.detail.supersededBy(r.supersededBy))}</span></a>` : '',
   ].join('');
-  const stuck = r.stuckReasons.length ? `<span class="flag flag-stuck" title="${esc(r.stuckReasons.map((x) => COPY.list.stuckReasons[x]).join(', '))}">${icon('alert')}<span>${esc(COPY.metrics.M12.name)}</span></span>` : '';
+  const stuck = stuckBadge(r);
   // The penalty level shows only when there is one (most rows have none).
-  const penalty = r.penalty ? `<span class="flag flag-penalty" title="${esc(COPY.list.penaltyHelp)}">${esc(COPY.list.penaltyBadge(r.penalty))}</span>` : '';
+  const penalty = penaltyBadge(r);
   const flagList = stuck + penalty + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + supLinks;
   const waits = r.waiting.map((w) => `<span class="wait-line" title="${esc(w.reason.map((x) => waitReasonText(x, mine.has(w.value))).join('; '))}">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}</span>`).join('');
   const findTip = c.total ? [COPY.list.findingsTurns(c.submitter, c.reviewer), c.waived ? COPY.list.findingsWaived(c.waived) : ''].filter(Boolean).join(' · ') : '';

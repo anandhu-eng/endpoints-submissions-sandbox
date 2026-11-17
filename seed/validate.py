@@ -263,7 +263,7 @@ def main() -> int:
         by_status.setdefault(sc["sim_db"]["status"], []).append(sc)
 
     # ---------------- structure ----------------
-    rep.check("submission count 18-22", 18 <= len(scs) <= 22, f"{len(scs)} submissions")
+    rep.check("submission count 18-24", 18 <= len(scs) <= 24, f"{len(scs)} submissions")
     keys: list[str] = []
     problems: list[str] = []
     for sc in scs:

@@ -36,7 +36,7 @@ python3 seed/seed.py --apply        # performs the writes (about 350, roughly 6 
 
 ## Simulation conventions
 
-- Simulated now: `as_of` = `2026-11-17T10:00:00-08:00` (18:00 UTC). Submissions run from 2026-09-01 to 2026-11-16, plus one Preview row first published in April so it can be 180 days old.
+- Simulated now: `as_of` = `2026-11-17T10:00:00-08:00` (18:00 UTC). Submissions run from 2026-09-01 to 2026-11-16, plus one Preview row first published in April so it can be 180 days old, and one RDI row reviewed in July so its turns fall outside the Last 90 days period.
 - All content is posted by one account. Every visible PR, issue and comment body starts with a persona prefix: `[Submitter: S1 · Feisty Fawn]`, `[Reviewer: R2 · Dapper Drake]`, `[Review chair: Chair A]`, `[Bot: lifecycle]`, `[Bot: label-objections]`, `[Bot: check-submission]`. Reviewers come from other submitting orgs.
 - Models are `SimLM-8B`, `SimLM-70B`, `SimMoE-120B`, `SimCoder-32B`, `SimVision-11B`. Systems are "Node type K4 · 8x Accel-X" and similar.
 - `benchmark_type` is `agentic`, `single_turn` or `mixed` (REQUIREMENTS §7.2). In production it is derived from `runs.point_config.runtime_settings.load_pattern` (`agentic_inference` / `concurrency`); the rules call the non-agentic kind "Legacy LLM" and VIZ calls it "Single-Turn".
@@ -107,6 +107,8 @@ Real LM markers are used as is: `submission-id`, `embargo`, `penalties`, `review
 | `wd-penalty` | Jaunty Jackalope | SimCoder-32B | agentic | WITHDRAWN | PR + tracking + 1 finding(s) | WD_PENALTY: 10 business days on one finding; Reminders L1-L3 and penalty notices L1-L2; Late reply after the threshold, label never swapped; Finding left open with needs-submitter-attention |
 | `wi-legacy` | Gutsy Gibbon | SimLM-8B | single_turn | WITHDRAWN_INCOMPLETE | none (`sim/untracked.json`) | Legacy WITHDRAWN_INCOMPLETE from the removed Week 6 step; No PR or tracking issue (sim/untracked.json) |
 | `cc-held` | Feisty Fawn | SimCoder-32B | agentic | COMPLIANCE_CHECKING | none (`sim/untracked.json`) | CC_HELD: provisional with future embargo, no PR yet; No PR or tracking issue (sim/untracked.json); Third submission from Feisty Fawn |
+| `fin-rdi-july` | Hoary Hedgehog | SimCoder-32B | agentic | FINALIZED | PR + tracking + 3 finding(s) | FIN_RDI reviewed in July: every turn ended more than 90 days before as_of; Slower replies than recent submissions, so the activity period changes the response-time medians; Reviewer missed the 2-day deadline more than 90 days ago |
+| `fin-embargo-sep` | Breezy Badger | SimLM-70B | single_turn | FINALIZED | PR + tracking + 3 finding(s) | FIN_WAITING with embargo 2027-01-14, reviewed in September: turns ended 31-90 days before as_of; Slower replies than recent submissions, so Last 90 days and Last 30 days differ |
 
 ## Known simplifications
 

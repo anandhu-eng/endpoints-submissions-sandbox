@@ -1,7 +1,7 @@
 {
  "schema_version": "1",
  "as_of": "2026-11-17T10:00:00-08:00",
- "generated_at": "2026-11-17T06:50:48.918027Z",
+ "generated_at": "2026-11-17T16:29:48.979632Z",
  "source": {
   "kind": "sandbox",
   "repo": "anandhu-eng/endpoints-submissions-sandbox",
@@ -376,6 +376,663 @@
    "findings": []
   },
   {
+   "id": "6e2d41a7-93c8-4b5e-a1f0-7c3e9d2b8a64",
+   "short_id": "6e2d41a7",
+   "is_test": false,
+   "db": {
+    "status": "FINALIZED",
+    "created_at": "2026-07-06T16:00:00Z",
+    "compliance_passed_at": "2026-07-08T17:00:00Z",
+    "peer_review_started_at": "2026-07-08T17:00:00Z",
+    "objection_resolution_started_at": "2026-07-30T14:30:00Z",
+    "finalized_at": "2026-08-11T18:00:00Z",
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": null,
+    "early_publish": false,
+    "availability": "rdi",
+    "division": "rdi",
+    "penalties_imposed": 0,
+    "business_days_since_response": 2,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": 55,
+    "tracking_issue_number": 56,
+    "pr_url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/55"
+   },
+   "org": "Hoary Hedgehog",
+   "submitter": "hoary-hedgehog-sub1",
+   "models": [
+    "SimCoder-32B"
+   ],
+   "benchmark_type": "agentic",
+   "assigned_reviewers": [],
+   "repo": "anandhu-eng/endpoints-submissions-sandbox",
+   "pr": {
+    "number": 55,
+    "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/55",
+    "title": "[Review] Hoary Hedgehog · rdi · rdi · SimCoder-32B · 6e2d41a7",
+    "state": "open",
+    "merged": false,
+    "created_at": "2026-07-07T14:30:00Z",
+    "author": "lm-bot",
+    "head_ref": "submission/6e2d41a7",
+    "head_sha": "8605773e90415688125a246b47607bde23662945",
+    "labels": [
+     "finalized"
+    ],
+    "events": [
+     {
+      "kind": "commit",
+      "sha": "7ed425cd7084e64cd90d90a5e9eb32ff2141289a",
+      "message": "Add source archive for submission 6e2d41a7",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/7ed425cd7084e64cd90d90a5e9eb32ff2141289a",
+      "at": "2026-07-07T14:29:00Z",
+      "actor": "lifecycle"
+     },
+     {
+      "kind": "commit",
+      "sha": "60e35187c7ba99cc00c46525382ae8c02b94dc73",
+      "message": "Add run results for SimCoder-32B, agentic sessions 1-1000",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/60e35187c7ba99cc00c46525382ae8c02b94dc73",
+      "at": "2026-07-07T14:29:00Z",
+      "actor": "lifecycle"
+     },
+     {
+      "kind": "state",
+      "action": "opened",
+      "at": "2026-07-07T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "commit",
+      "sha": "1e45c3e151083338cc30d241628490e8bf56ec59",
+      "message": "Rerun run 1 with 60 s tool-call timeout",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/1e45c3e151083338cc30d241628490e8bf56ec59",
+      "at": "2026-07-23T15:50:00Z",
+      "actor": "S1 · Hoary Hedgehog"
+     },
+     {
+      "kind": "commit",
+      "sha": "8605773e90415688125a246b47607bde23662945",
+      "message": "Add device roles and sandbox device log",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/8605773e90415688125a246b47607bde23662945",
+      "at": "2026-08-06T16:50:00Z",
+      "actor": "S1 · Hoary Hedgehog"
+     },
+     {
+      "kind": "comment",
+      "id": 6954093303,
+      "at": "2026-08-11T18:00:00Z",
+      "actor": "chair-a",
+      "body": "[Review chair: Chair A] All findings resolved. Finalizing. RDI results are not published automatically.",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/55#issuecomment-6954093303",
+      "markers": []
+     },
+     {
+      "kind": "label",
+      "label": "finalized",
+      "action": "added",
+      "at": "2026-08-11T18:00:00Z",
+      "actor": "chair-a"
+     }
+    ]
+   },
+   "tracking_issue": {
+    "number": 56,
+    "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/56",
+    "title": "Reviews for Submission 6e2d41a7 — Hoary Hedgehog — SimCoder-32B",
+    "body": "[Bot: lifecycle]\n\n## Review tracking — submission `6e2d41a7`\n\nReview PR: #55\n\n| Field | Value |\n|---|---|\n| Submission | `6e2d41a7-93c8-4b5e-a1f0-7c3e9d2b8a64` |\n| Submitting org | Hoary Hedgehog |\n| Division | rdi |\n| Scenario | con |\n| Availability | rdi |\n| Publication | first publication date after finalization |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimCoder-32B` |\n| Embargo | none |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 2 business day(s) |\n| Peer review closes | `2026-07-29 11:59 PM PT` |\n| Objection resolution closes | `2026-08-19 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._",
+    "state": "open",
+    "state_reason": null,
+    "created_at": "2026-07-09T14:30:00Z",
+    "closed_at": null,
+    "author": "lm-bot",
+    "assignees": [
+     "lucid-lynx-r3"
+    ],
+    "labels": [
+     "review",
+     "tracking"
+    ],
+    "parent": null,
+    "markers": [
+     {
+      "name": "submission-id",
+      "value": "6e2d41a7-93c8-4b5e-a1f0-7c3e9d2b8a64"
+     },
+     {
+      "name": "embargo",
+      "value": "none"
+     },
+     {
+      "name": "penalties",
+      "value": "0"
+     }
+    ],
+    "events": [
+     {
+      "kind": "state",
+      "action": "opened",
+      "at": "2026-07-09T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "label",
+      "label": "review",
+      "action": "added",
+      "at": "2026-07-09T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "label",
+      "label": "tracking",
+      "action": "added",
+      "at": "2026-07-09T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "assign",
+      "assignee": "lucid-lynx-r3",
+      "action": "assigned",
+      "at": "2026-07-09T16:00:00Z",
+      "actor": "chair-a"
+     }
+    ]
+   },
+   "findings": [
+    {
+     "number": 57,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57",
+     "title": "Tool-call timeout differs between runs",
+     "body": "[Reviewer: R3 · Lucid Lynx] Run 1 uses a 30 s tool-call timeout, runs 2 and 3 use 60 s (`runs/*/config.yaml`). Which one is the submitted setting, and do runs 2 and 3 need a rerun?",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-07-13T17:00:00Z",
+     "closed_at": "2026-07-27T17:00:00Z",
+     "author": "lucid-lynx-r3",
+     "assignees": [],
+     "labels": [
+      "against Hoary Hedgehog",
+      "by Lucid Lynx",
+      "resolved",
+      "type: Methodology"
+     ],
+     "parent": 56,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-07-13T17:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "type: Methodology",
+       "action": "added",
+       "at": "2026-07-13T17:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "by Lucid Lynx",
+       "action": "added",
+       "at": "2026-07-13T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Hoary Hedgehog",
+       "action": "added",
+       "at": "2026-07-13T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-07-13T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954079972,
+       "at": "2026-07-15T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Hoary Hedgehog (submitter), this finding has been waiting on the submitter since Monday 2026-07-13, 10:00 AM PDT. Please respond before **Thursday 2026-07-16, 10:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954079972",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-07-13T17:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954080413,
+       "at": "2026-07-16T15:00:00Z",
+       "actor": "hoary-hedgehog-sub1",
+       "body": "[Submitter: S1 · Hoary Hedgehog] 60 s is the submitted setting. Run 1 was started from an older config. Rerunning run 1 with 60 s.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954080413",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-07-16T15:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-07-16T15:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954081419,
+       "at": "2026-07-20T22:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "body": "[Reviewer: R3 · Lucid Lynx] Please post the rerun results before I resolve this. The pass rate on run 1 is the one that looked low.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954081419",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-07-20T22:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-07-20T22:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "comment",
+       "id": 6954082450,
+       "at": "2026-07-22T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Hoary Hedgehog (submitter), this finding has been waiting on the submitter since Monday 2026-07-20, 03:00 PM PDT. Please respond before **Thursday 2026-07-23, 03:00 PM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954082450",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-07-20T22:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954083519,
+       "at": "2026-07-23T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1",
+       "body": "[Submitter: S1 · Hoary Hedgehog] Rerun of run 1 with 60 s: pass rate 0.512 (runs 2 and 3: 0.509, 0.515). Replaced `run_1` on the branch.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954083519",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-07-23T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-07-23T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-07-27T17:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954086437,
+       "at": "2026-07-27T17:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "body": "[Reviewer: R3 · Lucid Lynx] All three runs now match. Resolving.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/57#issuecomment-6954086437",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-07-27T17:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "resolved",
+       "action": "added",
+       "at": "2026-07-27T17:00:00Z",
+       "actor": "lucid-lynx-r3"
+      }
+     ]
+    },
+    {
+     "number": 58,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/58",
+     "title": "Units missing on latency table",
+     "body": "[Reviewer: R3 · Lucid Lynx] The latency table in `README.md` has no units. Milliseconds or seconds?",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-07-21T18:00:00Z",
+     "closed_at": "2026-07-29T14:30:00Z",
+     "author": "lucid-lynx-r3",
+     "assignees": [],
+     "labels": [
+      "against Hoary Hedgehog",
+      "by Lucid Lynx",
+      "needs-reviewer-attention",
+      "type: Cosmetic"
+     ],
+     "parent": 56,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-07-21T18:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "type: Cosmetic",
+       "action": "added",
+       "at": "2026-07-21T18:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "by Lucid Lynx",
+       "action": "added",
+       "at": "2026-07-21T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Hoary Hedgehog",
+       "action": "added",
+       "at": "2026-07-21T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-07-21T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954082958,
+       "at": "2026-07-23T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Hoary Hedgehog (submitter), this finding has been waiting on the submitter since Tuesday 2026-07-21, 11:00 AM PDT. Please respond before **Friday 2026-07-24, 11:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/58#issuecomment-6954082958",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-07-21T18:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954084628,
+       "at": "2026-07-24T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1",
+       "body": "[Submitter: S1 · Hoary Hedgehog] Milliseconds. Added the unit to every column header.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/58#issuecomment-6954084628",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-07-24T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-07-24T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954085966,
+       "at": "2026-07-25T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] R3 · Lucid Lynx, the submitter has responded and this objection is now waiting on you. Please respond by **Tuesday 2026-07-28, 11:59 PM PDT** (2 business days) by doing one of:\n\n- acknowledging that the response resolves the objection;\n- retracting the objection;\n- explaining, with specifics, why the response is not sufficient; or\n- posting a schedule for testing and validating the proposed resolution.\n\nIf there is no response by then, this objection will be closed automatically as resolved.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/58#issuecomment-6954085966",
+       "markers": [
+        {
+         "name": "objector-reminder",
+         "value": "2026-07-24T16:00:00Z"
+        }
+       ]
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-07-29T14:30:00Z",
+       "actor": "lm-bot",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954087494,
+       "at": "2026-07-29T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] R3 · Lucid Lynx did not respond within 2 business days of the submitter's response (deadline Tuesday 2026-07-28, 11:59 PM PDT). Per the review rules, silence is treated as acknowledgment, so this objection is closed as resolved.\n\nClosed automatically by the lifecycle manager. A review chair may reopen it.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/58#issuecomment-6954087494",
+       "markers": []
+      }
+     ]
+    },
+    {
+     "number": 59,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59",
+     "title": "Accelerator count differs between system file and logs",
+     "body": "[Reviewer: R3 · Lucid Lynx]\n\n`systems/k4.json` lists 8 accelerators, but `logs/run_2.jsonl` shows 6 devices in use. Which is right for the submitted result?",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-07-27T18:00:00Z",
+     "closed_at": "2026-08-10T19:00:00Z",
+     "author": "lucid-lynx-r3",
+     "assignees": [],
+     "labels": [
+      "against Hoary Hedgehog",
+      "by Lucid Lynx",
+      "resolved",
+      "type: Division Rules"
+     ],
+     "parent": 56,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-07-27T18:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "type: Division Rules",
+       "action": "added",
+       "at": "2026-07-27T18:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "by Lucid Lynx",
+       "action": "added",
+       "at": "2026-07-27T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Hoary Hedgehog",
+       "action": "added",
+       "at": "2026-07-27T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-07-27T18:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954087911,
+       "at": "2026-07-29T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Hoary Hedgehog (submitter), this finding has been waiting on the submitter since Monday 2026-07-27, 11:00 AM PDT. Please respond before **Thursday 2026-07-30, 11:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954087911",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-07-27T18:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954088983,
+       "at": "2026-07-30T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1",
+       "body": "[Submitter: S1 · Hoary Hedgehog] 8 is right. Two devices ran the tool sandbox, so they do not show in the model server log.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954088983",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-07-30T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-07-30T16:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954089982,
+       "at": "2026-08-03T20:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "body": "[Reviewer: R3 · Lucid Lynx] Please show that in the logs or the system file. As it stands a reader cannot check it.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954089982",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-08-03T20:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-08-03T20:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "comment",
+       "id": 6954090925,
+       "at": "2026-08-05T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Hoary Hedgehog (submitter), this finding has been waiting on the submitter since Monday 2026-08-03, 01:00 PM PDT. Please respond before **Thursday 2026-08-06, 01:00 PM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954090925",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-08-03T20:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954091404,
+       "at": "2026-08-06T17:00:00Z",
+       "actor": "hoary-hedgehog-sub1",
+       "body": "[Submitter: S1 · Hoary Hedgehog] Added `roles` to `systems/k4.json`: 6 model server, 2 tool sandbox. Added the sandbox device log as `logs/run_2_sandbox.jsonl`.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954091404",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-08-06T17:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-08-06T17:00:00Z",
+       "actor": "hoary-hedgehog-sub1"
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-08-10T19:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954092335,
+       "at": "2026-08-10T19:00:00Z",
+       "actor": "lucid-lynx-r3",
+       "body": "[Reviewer: R3 · Lucid Lynx] Device counts add up now. Resolving.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/59#issuecomment-6954092335",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-08-10T19:00:00Z",
+       "actor": "lucid-lynx-r3"
+      },
+      {
+       "kind": "label",
+       "label": "resolved",
+       "action": "added",
+       "at": "2026-08-10T19:00:00Z",
+       "actor": "lucid-lynx-r3"
+      }
+     ]
+    }
+   ]
+  },
+  {
    "id": "cd8905b7-7f5e-4a58-aa08-c11418a0d1ea",
    "short_id": "cd8905b7",
    "is_test": false,
@@ -651,6 +1308,883 @@
    "pr": null,
    "tracking_issue": null,
    "findings": []
+  },
+  {
+   "id": "b47f0c92-5d1e-4a83-9e6b-2f8a1c7d3e05",
+   "short_id": "b47f0c92",
+   "is_test": false,
+   "db": {
+    "status": "FINALIZED",
+    "created_at": "2026-09-08T16:00:00Z",
+    "compliance_passed_at": "2026-09-10T17:00:00Z",
+    "peer_review_started_at": "2026-09-10T17:00:00Z",
+    "objection_resolution_started_at": "2026-10-02T14:30:00Z",
+    "finalized_at": "2026-10-19T18:00:00Z",
+    "first_published_at": null,
+    "withdrawn_at": null,
+    "embargo_date": "2027-01-14T08:00:00Z",
+    "early_publish": false,
+    "availability": "available",
+    "division": "standardized",
+    "penalties_imposed": 0,
+    "business_days_since_response": 2,
+    "publication_cycle": null,
+    "supersedes": null,
+    "pr_number": 60,
+    "tracking_issue_number": 61,
+    "pr_url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/60"
+   },
+   "org": "Breezy Badger",
+   "submitter": "breezy-badger-sub1",
+   "models": [
+    "SimLM-70B"
+   ],
+   "benchmark_type": "single_turn",
+   "assigned_reviewers": [],
+   "repo": "anandhu-eng/endpoints-submissions-sandbox",
+   "pr": {
+    "number": 60,
+    "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/60",
+    "title": "[Review] Breezy Badger · standardized · available · SimLM-70B · b47f0c92",
+    "state": "open",
+    "merged": false,
+    "created_at": "2026-09-09T14:30:00Z",
+    "author": "lm-bot",
+    "head_ref": "submission/b47f0c92",
+    "head_sha": "46bc9903b4f32e3e9ec585c1a4a344e7084a845d",
+    "labels": [
+     "finalized"
+    ],
+    "events": [
+     {
+      "kind": "commit",
+      "sha": "fd1063546da4b0a9705ef244113ca23e3f4de3d1",
+      "message": "Add source archive for submission b47f0c92",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/fd1063546da4b0a9705ef244113ca23e3f4de3d1",
+      "at": "2026-09-09T14:29:00Z",
+      "actor": "lifecycle"
+     },
+     {
+      "kind": "commit",
+      "sha": "964f3b0248f91b2f9a26976c44b9c81310f11142",
+      "message": "Add run results for SimLM-70B, concurrency sweep 8-128",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/964f3b0248f91b2f9a26976c44b9c81310f11142",
+      "at": "2026-09-09T14:29:00Z",
+      "actor": "lifecycle"
+     },
+     {
+      "kind": "state",
+      "action": "opened",
+      "at": "2026-09-09T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "commit",
+      "sha": "3458d770c263a748d10653ebd61838d8ec5a0f38",
+      "message": "Mark warm-up requests in run logs",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/3458d770c263a748d10653ebd61838d8ec5a0f38",
+      "at": "2026-10-01T16:50:00Z",
+      "actor": "S1 · Breezy Badger"
+     },
+     {
+      "kind": "commit",
+      "sha": "88989dc0425545c29bd8c73b497e0c5fc24dd6e8",
+      "message": "Fix swapped TTFT percentile columns in summary",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/88989dc0425545c29bd8c73b497e0c5fc24dd6e8",
+      "at": "2026-10-02T14:50:00Z",
+      "actor": "S1 · Breezy Badger"
+     },
+     {
+      "kind": "commit",
+      "sha": "46bc9903b4f32e3e9ec585c1a4a344e7084a845d",
+      "message": "Describe the load pattern in README",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/commit/46bc9903b4f32e3e9ec585c1a4a344e7084a845d",
+      "at": "2026-10-13T15:50:00Z",
+      "actor": "S1 · Breezy Badger"
+     },
+     {
+      "kind": "comment",
+      "id": 6954116465,
+      "at": "2026-10-19T18:00:00Z",
+      "actor": "chair-a",
+      "body": "[Review chair: Chair A] All findings resolved. Finalizing. The embargo is 2027-01-14, so this publishes in the first cohort after that date.",
+      "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/pull/60#issuecomment-6954116465",
+      "markers": []
+     },
+     {
+      "kind": "label",
+      "label": "finalized",
+      "action": "added",
+      "at": "2026-10-19T18:00:00Z",
+      "actor": "chair-a"
+     }
+    ]
+   },
+   "tracking_issue": {
+    "number": 61,
+    "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/61",
+    "title": "Reviews for Submission b47f0c92 — Breezy Badger — SimLM-70B",
+    "body": "[Bot: lifecycle]\n\n## Review tracking — submission `b47f0c92`\n\nReview PR: #60\n\n| Field | Value |\n|---|---|\n| Submission | `b47f0c92-5d1e-4a83-9e6b-2f8a1c7d3e05` |\n| Submitting org | Breezy Badger |\n| Division | standardized |\n| Scenario | con |\n| Availability | available |\n| Publication | first publication date after finalization, and not before the embargo |\n| System | Node type K4 · 8x Accel-X |\n| Model | `SimLM-70B` |\n| Embargo | 2027-01-14 |\n| Checker version | `sim-2.4.1` |\n| Penalties imposed | none |\n| Longest wait on submitter | 2 business day(s) |\n| Peer review closes | `2026-10-01 11:59 PM PT` |\n| Objection resolution closes | `2026-10-22 11:59 PM PT` |\n\n### Filing a review\n\nOpen **one sub-issue of this issue per finding** and give it exactly one `type: <type>` label (rules §6.8).\n\nEach sub-issue carries one of three labels saying whose turn it is. Nothing changes them automatically, so whoever takes their turn swaps the label:\n\n- `needs-submitter-attention`: waiting on the submitter. Every new sub-issue starts here. Time under this label counts toward penalties. **Submitters:** after you respond, change it to `needs-reviewer-attention`.\n- `needs-reviewer-attention`: waiting on the reviewer who filed it, who has 2 business days to answer or the finding is closed.\n- `resolved`: the finding is settled.\n\nIf you reviewed and found nothing, still open a sub-issue saying so.\n\n### Response timeline\n\nWeekends and US federal holidays do not count. Submitters respond within 3 business days. A finding waiting on the submitter for 3, 6 or 10 business days incurs a stage 1, 2 or 3 penalty; the submission's penalty is the highest stage of any one finding. Stage 1 delays publication one cycle, stage 2 two cycles, stage 3 withdraws. Objectors answer within 2 business days. A finding unresolved 12 business days after filing may go to a meeting.\n\nChairs finalize by applying the `finalized` label to the review PR above.\n\n_This issue body is maintained automatically by the lifecycle manager. Put discussion in comments._",
+    "state": "open",
+    "state_reason": null,
+    "created_at": "2026-09-11T14:30:00Z",
+    "closed_at": null,
+    "author": "lm-bot",
+    "assignees": [
+     "noble-numbat-r4"
+    ],
+    "labels": [
+     "review",
+     "tracking"
+    ],
+    "parent": null,
+    "markers": [
+     {
+      "name": "submission-id",
+      "value": "b47f0c92-5d1e-4a83-9e6b-2f8a1c7d3e05"
+     },
+     {
+      "name": "embargo",
+      "value": "2027-01-14"
+     },
+     {
+      "name": "penalties",
+      "value": "0"
+     }
+    ],
+    "events": [
+     {
+      "kind": "state",
+      "action": "opened",
+      "at": "2026-09-11T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "label",
+      "label": "review",
+      "action": "added",
+      "at": "2026-09-11T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "label",
+      "label": "tracking",
+      "action": "added",
+      "at": "2026-09-11T14:30:00Z",
+      "actor": "lm-bot"
+     },
+     {
+      "kind": "assign",
+      "assignee": "noble-numbat-r4",
+      "action": "assigned",
+      "at": "2026-09-11T16:00:00Z",
+      "actor": "chair-b"
+     }
+    ]
+   },
+   "findings": [
+    {
+     "number": 62,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62",
+     "title": "Warm-up requests counted in throughput",
+     "body": "[Reviewer: R4 · Noble Numbat] The first 200 requests of each run fall inside the measured window (`logs/run_2.jsonl`, lines 1-200). Were warm-up requests excluded?",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-09-21T16:00:00Z",
+     "closed_at": "2026-10-08T21:00:00Z",
+     "author": "noble-numbat-r4",
+     "assignees": [],
+     "labels": [
+      "against Breezy Badger",
+      "by Noble Numbat",
+      "resolved",
+      "type: Reproducibility"
+     ],
+     "parent": 61,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-09-21T16:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "type: Reproducibility",
+       "action": "added",
+       "at": "2026-09-21T16:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "by Noble Numbat",
+       "action": "added",
+       "at": "2026-09-21T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Breezy Badger",
+       "action": "added",
+       "at": "2026-09-21T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-09-21T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954094902,
+       "at": "2026-09-23T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Monday 2026-09-21, 09:00 AM PDT. Please respond before **Thursday 2026-09-24, 09:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954094902",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-09-21T16:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954095393,
+       "at": "2026-09-24T14:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] They were excluded from the result, but the log does not mark them. Lines 1-200 are warm-up; the summary starts at line 201.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954095393",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-09-24T14:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-09-24T14:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954096428,
+       "at": "2026-09-28T19:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Please add a marker or a note to the log so a reader can tell. Otherwise fine.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954096428",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-09-28T19:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-09-28T19:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954097349,
+       "at": "2026-09-30T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Monday 2026-09-28, 12:00 PM PDT. Please respond before **Thursday 2026-10-01, 12:00 PM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954097349",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-09-28T19:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954098453,
+       "at": "2026-10-01T17:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] Added `warmup: true` to lines 1-200 of every run log.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954098453",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-01T17:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-01T17:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954102522,
+       "at": "2026-10-05T20:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Logs are clear now. One more: the summary says 1,000 requests per run, but with warm-up left out it should be 800. Which is right?",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954102522",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-05T20:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-10-05T20:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954103546,
+       "at": "2026-10-06T18:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] 800. The summary header was written before warm-up was left out. The numbers in the table are for 800 requests.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954103546",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-06T18:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-06T18:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-10-08T21:00:00Z",
+       "actor": "noble-numbat-r4",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954106937,
+       "at": "2026-10-08T21:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Fine. Please correct the header in your next submission. Resolving.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/62#issuecomment-6954106937",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-08T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "resolved",
+       "action": "added",
+       "at": "2026-10-08T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      }
+     ]
+    },
+    {
+     "number": 63,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63",
+     "title": "TTFT p99 higher than p99.9 in run 3",
+     "body": "[Reviewer: R4 · Noble Numbat] Run 3 reports TTFT p99 of 912 ms and p99.9 of 884 ms. p99.9 cannot be lower than p99.",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-09-29T17:00:00Z",
+     "closed_at": "2026-10-16T22:00:00Z",
+     "author": "noble-numbat-r4",
+     "assignees": [],
+     "labels": [
+      "against Breezy Badger",
+      "by Noble Numbat",
+      "resolved",
+      "type: Validity of Results"
+     ],
+     "parent": 61,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-09-29T17:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "type: Validity of Results",
+       "action": "added",
+       "at": "2026-09-29T17:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "by Noble Numbat",
+       "action": "added",
+       "at": "2026-09-29T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Breezy Badger",
+       "action": "added",
+       "at": "2026-09-29T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-09-29T17:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954097887,
+       "at": "2026-10-01T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Tuesday 2026-09-29, 10:00 AM PDT. Please respond before **Friday 2026-10-02, 10:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954097887",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-09-29T17:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954099930,
+       "at": "2026-10-02T15:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] The two columns were swapped in the summary script. Fixed: p99 884 ms, p99.9 912 ms. Raw logs unchanged.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954099930",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-02T15:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-02T15:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954100966,
+       "at": "2026-10-03T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] R4 · Noble Numbat, the submitter has responded and this objection is now waiting on you. Please respond by **Tuesday 2026-10-06, 11:59 PM PDT** (2 business days) by doing one of:\n\n- acknowledging that the response resolves the objection;\n- retracting the objection;\n- explaining, with specifics, why the response is not sufficient; or\n- posting a schedule for testing and validating the proposed resolution.\n\nIf there is no response by then, this objection will be closed automatically as resolved.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954100966",
+       "markers": [
+        {
+         "name": "objector-reminder",
+         "value": "2026-10-02T15:00:00Z"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954104426,
+       "at": "2026-10-06T21:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Run 3 is fixed. Runs 1 and 2 use the same script. Are their summaries affected?",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954104426",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-06T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-10-06T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954106434,
+       "at": "2026-10-08T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Tuesday 2026-10-06, 02:00 PM PDT. Please respond before **Friday 2026-10-09, 02:00 PM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954106434",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-10-06T21:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954108567,
+       "at": "2026-10-09T16:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] No. The columns only swap when p99.9 comes from fewer than 1,000 samples, which happened only in run 3. Runs 1 and 2 are unchanged.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954108567",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-09T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-09T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954110593,
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Checked against the raw logs. Please add the sample count next to each percentile so this shows next time.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954110593",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954112515,
+       "at": "2026-10-15T16:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] Run 3 had 640 samples above p99; runs 1 and 2 had over 1,000. We will add a samples column from the next submission.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954112515",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-15T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-15T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-10-16T22:00:00Z",
+       "actor": "noble-numbat-r4",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954114495,
+       "at": "2026-10-16T22:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] That explains run 3. Resolving.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/63#issuecomment-6954114495",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-16T22:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "resolved",
+       "action": "added",
+       "at": "2026-10-16T22:00:00Z",
+       "actor": "noble-numbat-r4"
+      }
+     ]
+    },
+    {
+     "number": 64,
+     "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64",
+     "title": "Request rate ramp not described",
+     "body": "[Reviewer: R4 · Noble Numbat] Each run ramps from 8 to 128 concurrent requests, but the README does not say how long each step lasts.",
+     "state": "closed",
+     "state_reason": "completed",
+     "created_at": "2026-09-30T16:00:00Z",
+     "closed_at": "2026-10-16T23:00:00Z",
+     "author": "noble-numbat-r4",
+     "assignees": [],
+     "labels": [
+      "against Breezy Badger",
+      "by Noble Numbat",
+      "resolved",
+      "type: Methodology"
+     ],
+     "parent": 61,
+     "markers": [],
+     "events": [
+      {
+       "kind": "state",
+       "action": "opened",
+       "at": "2026-09-30T16:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "type: Methodology",
+       "action": "added",
+       "at": "2026-09-30T16:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "by Noble Numbat",
+       "action": "added",
+       "at": "2026-09-30T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "against Breezy Badger",
+       "action": "added",
+       "at": "2026-09-30T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-09-30T16:00:00Z",
+       "actor": "label-objections-bot"
+      },
+      {
+       "kind": "comment",
+       "id": 6954099444,
+       "at": "2026-10-02T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Wednesday 2026-09-30, 09:00 AM PDT. Please respond before **Monday 2026-10-05, 09:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954099444",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-09-30T16:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954101487,
+       "at": "2026-10-05T14:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] Each step runs 10 minutes after a 2-minute warm-up.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954101487",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-05T14:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-05T14:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954105433,
+       "at": "2026-10-07T18:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Please put that in the README, not only here.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954105433",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-07T18:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-10-07T18:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954108007,
+       "at": "2026-10-09T14:30:00Z",
+       "actor": "lm-bot",
+       "body": "[Bot: lifecycle] S1 · Breezy Badger (submitter), this finding has been waiting on the submitter since Wednesday 2026-10-07, 11:00 AM PDT. Please respond before **Tuesday 2026-10-13, 11:00 AM PDT**. If it is still waiting on you then, the penalty on this submission rises to **level 1**, delaying publication 1 cycle (rules §6.3).",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954108007",
+       "markers": [
+        {
+         "name": "submitter-reminder",
+         "value": "2026-10-07T18:00:00Z L1"
+        }
+       ]
+      },
+      {
+       "kind": "comment",
+       "id": 6954109534,
+       "at": "2026-10-13T16:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] Added a Load pattern section to the README.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954109534",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-13T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-13T16:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "comment",
+       "id": 6954111054,
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] README covers it now. Please also give the total run length, so readers can check the log timestamps.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954111054",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "added",
+       "at": "2026-10-14T21:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "comment",
+       "id": 6954113538,
+       "at": "2026-10-15T17:00:00Z",
+       "actor": "breezy-badger-sub1",
+       "body": "[Submitter: S1 · Breezy Badger] 13 steps of 12 minutes, so 156 minutes per run. That matches the first and last timestamps in each log.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954113538",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-submitter-attention",
+       "action": "removed",
+       "at": "2026-10-15T17:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "added",
+       "at": "2026-10-15T17:00:00Z",
+       "actor": "breezy-badger-sub1"
+      },
+      {
+       "kind": "state",
+       "action": "closed",
+       "at": "2026-10-16T23:00:00Z",
+       "actor": "noble-numbat-r4",
+       "reason": "completed"
+      },
+      {
+       "kind": "comment",
+       "id": 6954115489,
+       "at": "2026-10-16T23:00:00Z",
+       "actor": "noble-numbat-r4",
+       "body": "[Reviewer: R4 · Noble Numbat] Run length matches the timestamps. Resolving.",
+       "url": "https://github.com/anandhu-eng/endpoints-submissions-sandbox/issues/64#issuecomment-6954115489",
+       "markers": []
+      },
+      {
+       "kind": "label",
+       "label": "needs-reviewer-attention",
+       "action": "removed",
+       "at": "2026-10-16T23:00:00Z",
+       "actor": "noble-numbat-r4"
+      },
+      {
+       "kind": "label",
+       "label": "resolved",
+       "action": "added",
+       "at": "2026-10-16T23:00:00Z",
+       "actor": "noble-numbat-r4"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "7dccdcd0-573a-4dd4-a15a-ad8f9e3c29f6",
