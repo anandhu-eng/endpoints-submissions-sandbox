@@ -6,7 +6,8 @@ minutes. After a deploy a visitor can still hold the old index.html, some old
 modules, or both; if old and new modules meet, an import fails and the page is
 blank. So each build gets its own folder that never changes, and index.html
 points at the newest one. A cached old index.html still finds every file of
-its own build. The newest KEEP builds stay; older folders are deleted.
+its own build. The newest KEEP committed builds stay; older folders, and builds
+that were replaced before being committed, are deleted.
 
 Run it after any change under docs/js or to docs/styles.css, before committing:
 
@@ -70,6 +71,18 @@ def untracked(build):
     return missing
 
 
+def in_head(b):
+    """True if build b is in the last commit (so it may be deployed)."""
+    return subprocess.run(["git", "cat-file", "-e", f"HEAD:docs/v/{b}/js/app.js"], cwd=DOCS.parent, capture_output=True).returncode == 0
+
+
+def added_at(b):
+    """Commit time when build b first appeared, to order builds missing from builds.txt."""
+    out = subprocess.run(["git", "log", "--diff-filter=A", "--format=%ct", "--", f"docs/v/{b}/js/app.js"],
+                         cwd=DOCS.parent, capture_output=True, text=True).stdout.split()
+    return int(out[-1]) if out else 0
+
+
 def copy_build(build):
     """Copy the source into a temp folder, then move it into place, so a crash leaves no half build."""
     shutil.rmtree(build, ignore_errors=True)
@@ -118,9 +131,14 @@ def main():
     if new_html != html:
         index.write_text(new_html, encoding="utf-8")
 
-    listed = LIST.read_text().split() if LIST.exists() else []
-    order = [b for b in listed if BUILD_ID.match(b) and b != bid] + [bid]
-    for old in order[:-KEEP]:
+    # Only committed builds can be live or cached by a visitor, so only they count toward KEEP.
+    # A build made while iterating and never committed is deleted as soon as it is replaced.
+    listed = [b for b in (LIST.read_text().split() if LIST.exists() else []) if BUILD_ID.match(b)]
+    on_disk = sorted(p.name for p in BUILDS.iterdir() if p.is_dir() and BUILD_ID.match(p.name))
+    committed = [b for b in on_disk if b != bid and in_head(b)]
+    unlisted = sorted((b for b in committed if b not in listed), key=added_at)
+    order = unlisted + [b for b in listed if b in committed] + [bid]
+    for old in [b for b in on_disk if b not in order[-KEEP:]]:
         shutil.rmtree(BUILDS / old, ignore_errors=True)
     LIST.write_text("\n".join(order[-KEEP:]) + "\n")
     print(f"v/{bid}: index.html points here; kept {', '.join(order[-KEEP:])}")

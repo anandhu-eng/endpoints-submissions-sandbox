@@ -319,23 +319,35 @@ function bind() {
     if (first) first.focus();
   });
 
-  // Filters drawer
+  // Filters: a drawer below 1024px; beside the list from 1024px, where « or the Filters
+  // button hides it. The hidden choice is remembered in this browser.
   const drawer = $('#filters');
+  const narrow = window.matchMedia('(max-width: 1023px)');
+  const HIDDEN_KEY = 'reviewStatus.filtersHidden';
+  const syncFiltersButton = () => $('#open-filters').setAttribute('aria-expanded',
+    String(narrow.matches ? drawer.classList.contains('open') : !document.body.classList.contains('filters-hidden')));
   const openDrawer = (open) => {
     drawer.classList.toggle('open', open);
     $('#backdrop').hidden = !open;
-    $('#open-filters').setAttribute('aria-expanded', String(open));
+    syncFiltersButton();
     if (open) { const b = $('#close-filters'); if (b) b.focus(); } else $('#open-filters').focus();
   };
-  $('#open-filters').addEventListener('click', () => {
-    if (window.matchMedia('(max-width: 1023px)').matches) openDrawer(!drawer.classList.contains('open'));
-    else showSidebar(document.body.classList.contains('filters-hidden'));
-  });
-  // Wide screens: the sidebar sits beside the list; « in its header or the Filters button hides it.
   const showSidebar = (show) => {
     document.body.classList.toggle('filters-hidden', !show);
-    $('#open-filters').setAttribute('aria-expanded', String(show));
+    try { localStorage.setItem(HIDDEN_KEY, show ? '0' : '1'); } catch (e) { /* storage blocked: not remembered */ }
+    syncFiltersButton();
   };
+  try { document.body.classList.toggle('filters-hidden', localStorage.getItem(HIDDEN_KEY) === '1'); } catch (e) { /* show by default */ }
+  syncFiltersButton();
+  // Widening past 1024px with the drawer open: close it, so its backdrop does not cover the page.
+  narrow.addEventListener('change', () => {
+    if (!narrow.matches && drawer.classList.contains('open')) { drawer.classList.remove('open'); $('#backdrop').hidden = true; }
+    syncFiltersButton();
+  });
+  $('#open-filters').addEventListener('click', () => {
+    if (narrow.matches) openDrawer(!drawer.classList.contains('open'));
+    else showSidebar(document.body.classList.contains('filters-hidden'));
+  });
   $('#backdrop').addEventListener('click', () => openDrawer(false));
 
   drawer.addEventListener('click', (e) => {

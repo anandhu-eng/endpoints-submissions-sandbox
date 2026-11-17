@@ -597,12 +597,18 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .detail-title { font-size: 22px; line-height: 28px; }
   .kbd-hint { display: none; }
 
-  /* list becomes cards */
+  .list-head, .toolbar { border-radius: 0; }
+  .groupbar .spacer { display: none; }
+}
+/* The list becomes cards when it is too narrow for the table (about 905px of columns),
+   on phones and on mid-width screens with the filters open. Keyed to the list's own width. */
+#list { container: list / inline-size; }
+@container list (max-width: 919px) {
   .table-wrap { overflow: visible; border: 0; }
   table.data, table.data tbody { display: block; }
   table.data thead { display: none; }
   table.data tr.row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; padding: 12px; margin: 8px 0; border: 1px solid var(--line-table); border-radius: var(--radius-card); background: var(--bg-card); }
-  table.data tr.row td { display: block; padding: 0; border: 0; min-width: 0; }
+  table.data tr.row td { display: block; padding: 0; border: 0; min-width: 0; max-width: none; }
   table.data tr.row td[data-label]::before { content: attr(data-label); display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-th); }
   table.data td[data-col="id"], table.data td[data-col="stage"], table.data td[data-col="flags"], table.data td[data-col="links"] { grid-column: 1 / -1; }
   tr.row[data-depth] td:first-child { padding-left: 0 !important; }
@@ -611,30 +617,28 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   table.data tbody > tr:not(.row):not(.group-row) { display: block; }
   table.data tbody > tr:not(.row):not(.group-row) td { display: block; }
   .group-row[data-depth="1"] .group-btn, .group-row[data-depth="2"] .group-btn { padding-left: 16px; }
-  .list-head, .toolbar { border-radius: 0; }
-  .groupbar .spacer { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 /* column sizing for the list at desktop widths */
 @media (min-width: 761px) {
   table.data td, table.data thead th { padding-left: 10px; padding-right: 10px; }
-  td[data-col="findings"] > span:first-child, td[data-col="wait"] .wait { white-space: nowrap; }
+  td[data-col="findings"] > span:first-child { white-space: nowrap; }
   td[data-col="findings"] .meta { white-space: nowrap; font-size: 11.5px; }
-  td[data-col="id"] { min-width: 200px; }
-  td[data-col="due"] { min-width: 150px; }
+  td[data-col="id"] { min-width: 170px; }
+  td[data-col="due"] { min-width: 130px; }
   td[data-col="stage"] .pill { white-space: normal; }
-  td[data-col="stage"] { min-width: 180px; max-width: 220px; }
+  td[data-col="stage"] { min-width: 160px; max-width: 220px; }
   td[data-col="flags"] .flags { flex-direction: column; align-items: flex-start; }
   td[data-col="links"] { white-space: nowrap; }
 }
 .wait-line { display: block; margin-bottom: 4px; }
 .wait-line:last-child { margin-bottom: 0; }
 .wait-why { font-size: 11.5px; line-height: 15px; }
-@media (min-width: 761px) { td[data-col="wait"] { min-width: 120px; max-width: 200px; } }
+@media (min-width: 761px) { td[data-col="wait"] { min-width: 110px; max-width: 200px; } td[data-col="wait"] .wait { white-space: normal; } }
 td[data-col="stage"] .pill { border-radius: 10px; }
 @media (min-width: 761px) {
-  td[data-col="flags"] { min-width: 175px; max-width: 210px; }
+  td[data-col="flags"] { min-width: 150px; max-width: 210px; }
   td[data-col="flags"] .flag { white-space: normal; }
   td[data-col="rev"] { min-width: 90px; }
 }
@@ -715,7 +719,7 @@ a.flag:hover { text-decoration: underline; }
   table.data thead th { white-space: normal; vertical-align: bottom; }
   td[data-col="findings"] { max-width: 140px; }
   td[data-col="findings"] .meta { white-space: normal; }
-  td[data-col="wait"] { min-width: 120px; }
+  td[data-col="wait"] { min-width: 110px; }
 }
 
 /* ---- Round 2 ---- */
