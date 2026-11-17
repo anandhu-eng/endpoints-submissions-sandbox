@@ -845,3 +845,20 @@ html:has(body.in-detail) { scroll-padding-top: calc(var(--stick-header) + var(--
   table.data .sub-link::after { content: ''; position: absolute; inset: 0; }
   table.data tr.row a:not(.sub-link), table.data tr.row button { position: relative; z-index: 1; }
 }
+
+/* Narrow-screen polish from the UX review. */
+@media (max-width: 1023px) {
+  /* Fade at the right edge: more filter chips are a swipe away. */
+  .toolbar .chips { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); }
+}
+@media (min-width: 761px) and (max-width: 1023px) { .gb-sort { margin-left: 0; } }
+@media (max-width: 959px) {
+  /* The panel title already links the tracking issue; the conversation's own link shows as an icon. */
+  .convo-head .ev-link { font-size: 0; min-width: 44px; min-height: 44px; justify-content: center; }
+  .convo-head .ev-link .ext-icon { width: 16px; height: 16px; }
+}
+@media (max-width: 380px) { .gchip-n { display: none; } }
+@media (max-width: 760px) {
+  .date-pair .field-control { font-size: 16px; }
+  #toggle-overview { min-height: 44px; display: inline-flex; align-items: center; }
+}

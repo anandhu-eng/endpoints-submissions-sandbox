@@ -249,7 +249,11 @@ function renderDetailView(r) {
   keepFocus(() => {
     $('#detail-view').innerHTML = renderDetail(r, detailCtx(), ui.detail);
   });
-  if (opening) { const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  if (opening) {
+    const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
+    // A link to a finding on a narrow screen: show its conversation, not the top of the page.
+    if (state.node && tabsNarrow.matches) { const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' }); }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -271,14 +275,15 @@ function setStages(set) {
   state.stage = set.size === def.size && [...set].every((c) => def.has(c)) ? null : set;
 }
 
+// Every change of submission starts without a pushed finding entry (see selectNode).
 function openDetail(shortId) {
-  state.id = shortId; state.node = '';
+  state.id = shortId; state.node = ''; ui.detail.pushedNode = false;
   writeUrl(true);
   render();
 }
 function closeDetail() {
   const id = state.id;
-  state.id = ''; state.node = '';
+  state.id = ''; state.node = ''; ui.detail.pushedNode = false;
   writeUrl(true);
   render();
   const link = document.querySelector(`[data-open="${CSS.escape(id)}"]`);
@@ -288,7 +293,7 @@ function step(delta) {
   const rows = visibleRows();
   const i = rows.findIndex((r) => r.shortId === state.id);
   const next = rows[i + delta];
-  if (next) { state.id = next.shortId; state.node = ''; writeUrl(true); render(); }
+  if (next) { state.id = next.shortId; state.node = ''; ui.detail.pushedNode = false; writeUrl(true); render(); }
 }
 
 function bind() {
@@ -465,7 +470,9 @@ function bind() {
     if (tgt.closest('#back-to-tree')) {
       // Opening a finding on a narrow screen pushed a history entry; going back pops it (popstate re-renders).
       if (ui.detail.pushedNode) { history.back(); return; }
-      ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0'; const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return;
+      ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0';
+      state.node = ''; writeUrl();
+      const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return;
     }
     const tw = tgt.closest('[data-twisty]');
     if (tw) return toggleNode(tw.closest('[role="treeitem"]'));
@@ -495,7 +502,15 @@ function bind() {
     else if (e.key === 'Escape') closeDetail();
   });
 
-  window.addEventListener('popstate', () => { readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render(); });
+  window.addEventListener('popstate', () => {
+    const fromNode = state.node;
+    readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render();
+    // Back from a finding's conversation: focus that finding in the tree (scroll is already restored).
+    if (fromNode && !state.node && state.id) {
+      const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(fromNode)}"]`);
+      if (item) { for (const x of $$('#issue-tree [role="treeitem"]')) x.tabIndex = -1; item.tabIndex = 0; item.focus({ preventScroll: true }); }
+    }
+  });
 }
 
 // D20: copy the current URL (all state lives in it).
