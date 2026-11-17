@@ -411,7 +411,9 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 
 /* ---------------------------------------------------------------- toolbar */
 .toolbar { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; background: var(--bg-status); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--radius-card) var(--radius-card) 0 0; }
-.groupbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.groupbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.gb-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.gb-sort { margin-left: auto; }
 .gchips { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .gchip { display: inline-flex; align-items: center; gap: 2px; height: 32px; padding: 0 2px 0 4px; border: 1px solid var(--line-control); border-radius: 999px; background: var(--bg); font-size: 13px; font-weight: 600; color: var(--text-strong); }
 .gchip-n { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; border-radius: 50%; background: var(--navy-ui); color: var(--bg); font-size: 11px; margin-right: 4px; }
@@ -741,3 +743,43 @@ a.flag:hover { text-decoration: underline; }
   .turn-table .t-short { display: inline; white-space: nowrap; }
 }
 .nowrap { white-space: nowrap; }
+
+/* Sticky bars. Narrow screens: the Group by / Sort toolbar stays above the list while it scrolls.
+   Detail view: the PR / Issues tabs and each panel's title stay while the panel scrolls. */
+:root { --tabs-h: 52px; }
+.panel-title { position: sticky; top: var(--header-h); z-index: 5; }
+@media (max-width: 1023px) {
+  .toolbar { position: sticky; top: var(--header-h); z-index: 20; box-shadow: 0 1px 0 var(--line); }
+}
+@media (max-width: 959px) {
+  .panel-tabs-bar { position: sticky; top: var(--header-h); z-index: 6; height: var(--tabs-h); display: flex; align-items: center; background: var(--bg); }
+  .panel-tabs { margin: 0; }
+  .panel-title { top: calc(var(--header-h) + var(--tabs-h)); }
+}
+@media (max-width: 760px) {
+  /* The site header scrolls away on phones, so the sticky bars sit at the top of the screen. */
+  .toolbar { top: 0; margin: 0 -16px; padding: 8px 16px; border-left: 0; border-right: 0; }
+  .panel-tabs-bar { top: 0; }
+  .panel-title { top: var(--tabs-h); }
+  .groupbar { flex-direction: column; align-items: stretch; gap: 6px; }
+  .gb-row { flex-wrap: wrap; gap: 6px 8px; }
+  .gb-row > .field-label { flex: 0 0 60px; }
+  .gb-sort { margin-left: 0; flex-wrap: nowrap; }
+  .gchips { flex: 1 1 calc(100% - 68px); min-width: 0; gap: 6px; }
+  .gchip { white-space: nowrap; }
+  .gchips select { flex: 1 1 110px; min-width: 110px; }
+  .gb-sort > select { flex: 1 1 0; min-width: 0; }
+  /* Reordering levels needs the arrows; on phones, remove and re-add a level instead. */
+  .gchip [data-gmove] { display: none; }
+  .gchip { padding-right: 2px; }
+  /* Group order and expand/collapse share one short row under the chips. */
+  #g-sort { flex: 1 1 0; min-width: 0; }
+  #expand-all, #collapse-all { padding: 4px 8px; white-space: nowrap; }
+  /* Header: brand and icons on one line, the prototype note below. */
+  .site-header { flex-wrap: wrap; }
+  .proto { order: 3; flex-basis: 100%; }
+  /* Title row: the header already names the page; Filters and Copy link share a row, search below. */
+  .view-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .title-row { gap: 8px; }
+  #open-filters, .copy-link { flex: 1 1 auto; justify-content: center; }
+}

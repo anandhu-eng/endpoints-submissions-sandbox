@@ -362,10 +362,10 @@ export function renderConversation(r, ui, ctx) {
 export function renderDetail(r, ctx, ui) {
   const tab = ui.tab || 'pr';
   return `${header(r, ctx)}
-  <div class="panel-tabs seg-group" role="tablist" aria-label="${esc(COPY.detail.tabs.pr)} / ${esc(COPY.detail.tabs.issues)}">
+  <div class="panel-tabs-bar"><div class="panel-tabs seg-group" role="tablist" aria-label="${esc(COPY.detail.tabs.pr)} / ${esc(COPY.detail.tabs.issues)}">
     <button type="button" role="tab" class="seg-btn" id="tab-pr" aria-controls="panel-pr" aria-selected="${tab === 'pr'}" tabindex="${tab === 'pr' ? 0 : -1}">${esc(COPY.detail.tabs.pr)}</button>
     <button type="button" role="tab" class="seg-btn" id="tab-issues" aria-controls="panel-issues" aria-selected="${tab === 'issues'}" tabindex="${tab === 'issues' ? 0 : -1}">${esc(COPY.detail.tabs.issues)}</button>
-  </div>
+  </div></div>
   <div class="panels" data-tab="${tab}">
     <section class="panel" id="panel-pr" role="tabpanel" aria-labelledby="tab-pr">
       <h3 class="panel-title">${icon('pr')}${r.pr ? esc(COPY.detail.prTitle(r.pr.number, COPY.prStates[r.pr.merged ? 'merged' : r.pr.state] || r.pr.state)) : esc(COPY.detail.tabs.pr)}${r.pr ? extLink(r.pr.url, COPY.detail.timeline.view, 'panel-link') : ''}</h3>

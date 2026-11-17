@@ -269,17 +269,21 @@ export function renderGroupBar(state) {
     <select id="g-add" class="field-control sm"><option value="">${esc(state.group.length ? COPY.grouping.add : COPY.grouping.none)}</option>${left.map((k) => `<option value="${k}">${esc(COPY.grouping.keys[k])}</option>`).join('')}</select>` : `<span class="meta muted">${esc(COPY.grouping.max)}</span>`;
   const sortKey = state.sort.replace(/^-/, '');
   const desc = state.sort.startsWith('-');
+  // Two rows: "Group by" and "Sort". Side by side on wide screens, stacked on phones.
   return `<div class="groupbar">
+    <div class="gb-row gb-group">
     <span class="field-label inline">${esc(COPY.grouping.title)}</span>
     <div class="gchips">${chips}${addSel}</div>
     ${state.group.length ? `<label class="sr-only" for="g-sort">${esc(COPY.grouping.sort)}</label>
       <select id="g-sort" class="field-control sm" title="${esc(COPY.grouping.sort)}">${GSORTS.map((g) => `<option value="${g}" ${state.gsort === g ? 'selected' : ''}>${esc({ count: COPY.grouping.sortCount, az: COPY.grouping.sortAz, m1: COPY.grouping.sortM1, m2: COPY.grouping.sortM2 }[g])}</option>`).join('')}</select>
       <button type="button" class="btn-quiet" id="expand-all">${esc(COPY.grouping.expandAll)}</button>
       <button type="button" class="btn-quiet" id="collapse-all">${esc(COPY.grouping.collapseAll)}</button>` : ''}
-    <span class="spacer"></span>
+    </div>
+    <div class="gb-row gb-sort">
     <label class="field-label inline" for="sort-key">${esc(COPY.list.sortLabel)}</label>
     <select id="sort-key" class="field-control sm">${SORT_KEYS.map((k) => `<option value="${k}" ${k === sortKey ? 'selected' : ''}>${esc(COPY.list.sorts[k])}</option>`).join('')}</select>
     <button type="button" class="icon-btn" id="sort-dir" aria-label="${esc(COPY.list.reverse)} (${esc(desc ? COPY.list.descending : COPY.list.ascending)})" title="${esc(COPY.list.reverse)}">${icon(desc ? 'down' : 'up')}</button>
+    </div>
   </div>`;
 }
 
