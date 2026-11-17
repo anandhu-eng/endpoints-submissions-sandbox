@@ -61,25 +61,61 @@ def same_as_source(build):
     ) and sorted(p.name for p in (build / "js").glob("*.js")) == sorted(p.name for p in (DOCS / "js").glob("*.js"))
 
 
+def git(*args):
+    """Run git in the repo. None when git is not installed or this is not a git work tree."""
+    try:
+        r = subprocess.run(["git", *args], cwd=DOCS.parent, capture_output=True, text=True)
+    except FileNotFoundError:
+        return None
+    inside = subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], cwd=DOCS.parent, capture_output=True, text=True)
+    return r if inside.stdout.strip() == "true" else None
+
+
+def ok(r):
+    return r is not None and r.returncode == 0
+
+
 def untracked(build):
     """Build files or index.html that git would not deploy as they are on disk."""
     paths = [str(p.relative_to(DOCS.parent)) for p in sorted(build.rglob("*")) if p.is_file()] + ["docs/index.html"]
-    git = lambda *a: subprocess.run(["git", *a], cwd=DOCS.parent, capture_output=True, text=True)
-    missing = [p for p in paths if git("ls-files", "--error-unmatch", p).returncode != 0]
-    if git("diff", "--quiet", "--", *paths).returncode != 0:
+    if git("status") is None:
+        return ["cannot tell: git is not available here"]
+    missing = [p for p in paths if not ok(git("ls-files", "--error-unmatch", p))]
+    if not ok(git("diff", "--quiet", "--", *paths)):
         missing.append("unstaged changes under docs/v or docs/index.html")
     return missing
 
 
-def in_head(b):
-    """True if build b is in the last commit (so it may be deployed)."""
-    return subprocess.run(["git", "cat-file", "-e", f"HEAD:docs/v/{b}/js/app.js"], cwd=DOCS.parent, capture_output=True).returncode == 0
+def in_ref(ref, b):
+    """True if build b exists in commit `ref`."""
+    return ok(git("cat-file", "-e", f"{ref}:docs/v/{b}/js/app.js"))
+
+
+def deployed_ref():
+    """The branch GitHub Pages serves: this branch's upstream, else origin/main. None if unknown."""
+    up = git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{upstream}")
+    for ref in ([up.stdout.strip()] if ok(up) else []) + ["origin/main"]:
+        if ok(git("rev-parse", "--verify", "--quiet", ref)):
+            return ref
+    return None
+
+
+def live_builds(ref, pushes=4):
+    """Builds loaded by the deployed index.html and by the index.html of the last few pushes
+    (this clone's reflog of the deployed branch), since visitors may still have those cached.
+    These are never deleted."""
+    found = set()
+    for i in range(pushes):
+        r = git("show", f"{ref}@{{{i}}}:docs/index.html" if i else f"{ref}:docs/index.html")
+        if ok(r):
+            found |= set(re.findall(r"v/([0-9a-f]{10})/", r.stdout))
+    return found
 
 
 def added_at(b):
     """Commit time when build b first appeared, to order builds missing from builds.txt."""
-    out = subprocess.run(["git", "log", "--diff-filter=A", "--format=%ct", "--", f"docs/v/{b}/js/app.js"],
-                         cwd=DOCS.parent, capture_output=True, text=True).stdout.split()
+    r = git("log", "--diff-filter=A", "--format=%ct", "--", f"docs/v/{b}/js/app.js")
+    out = r.stdout.split() if ok(r) else []
     return int(out[-1]) if out else 0
 
 
@@ -116,7 +152,7 @@ def main():
         elif not problems:
             missing = untracked(build)
             if missing:
-                print("\n".join(f"not committed or staged: {p}" for p in missing) + "\nRun: git add docs/v docs/index.html")
+                print("\n".join(f"not committed or staged: {p}" for p in missing) + "\nStage them: git add docs/v docs/index.html")
                 sys.exit(1)
     if problems:
         print("\n".join(problems) + "\nRun: python3 scripts/release_assets.py")
@@ -131,17 +167,29 @@ def main():
     if new_html != html:
         index.write_text(new_html, encoding="utf-8")
 
-    # Only committed builds can be live or cached by a visitor, so only they count toward KEEP.
-    # A build made while iterating and never committed is deleted as soon as it is replaced.
     listed = [b for b in (LIST.read_text().split() if LIST.exists() else []) if BUILD_ID.match(b)]
     on_disk = sorted(p.name for p in BUILDS.iterdir() if p.is_dir() and BUILD_ID.match(p.name))
-    committed = [b for b in on_disk if b != bid and in_head(b)]
+    if git("status") is None:
+        # Without git we cannot tell which builds are live, so delete nothing.
+        LIST.write_text("\n".join([b for b in listed if b != bid] + [bid]) + "\n")
+        print(f"v/{bid}: index.html points here. git not available: no old builds deleted.")
+        return
+    # Only committed builds can be live or cached by a visitor, so only they count toward KEEP.
+    # A build made while iterating and never committed is deleted as soon as it is replaced.
+    # The build the deployed branch serves is never deleted; with no deployed branch known,
+    # no committed build is deleted.
+    ref = deployed_ref()
+    live = live_builds(ref) if ref else None
+    committed = [b for b in on_disk if b != bid and in_ref("HEAD", b)]
     unlisted = sorted((b for b in committed if b not in listed), key=added_at)
     order = unlisted + [b for b in listed if b in committed] + [bid]
-    for old in [b for b in on_disk if b not in order[-KEEP:]]:
+    keep = set(order[-KEEP:]) | (live if live is not None else set(committed))
+    for old in [b for b in on_disk if b not in keep]:
         shutil.rmtree(BUILDS / old, ignore_errors=True)
-    LIST.write_text("\n".join(order[-KEEP:]) + "\n")
-    print(f"v/{bid}: index.html points here; kept {', '.join(order[-KEEP:])}")
+    kept = [b for b in on_disk if b in keep and b not in order] + [b for b in order if b in keep]
+    LIST.write_text("\n".join(kept) + "\n")
+    note = f"; live on {ref}: {', '.join(sorted(live)) or 'none'}" if ref else "; no deployed branch found, committed builds kept"
+    print(f"v/{bid}: index.html points here; kept {', '.join(kept)}{note}")
 
 
 if __name__ == "__main__":
