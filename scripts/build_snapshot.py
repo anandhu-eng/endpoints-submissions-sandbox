@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 DEFAULT_REPO = "anandhu-eng/endpoints-submissions-sandbox"
-DEFAULT_AS_OF = "2026-11-17T12:00:00-08:00"
+DEFAULT_AS_OF = "2026-11-17T10:00:00-08:00"  # same as seed/scenarios.json
 ROOT = Path(__file__).resolve().parent.parent
 
 HIDDEN = re.compile(r"<!--[\s\S]*?-->")
@@ -173,8 +173,14 @@ def item_events(item, comments, real_login):
     return events, created, author
 
 
+def sandbox_only(label):
+    # `status: <db status>` labels stand in for the DB column; the real repo has none.
+    return label.startswith("status: ")
+
+
 def finish(events, as_of):
-    kept = [e for e in events if e["at"] and e["at"] <= as_of]
+    kept = [e for e in events if e["at"] and e["at"] <= as_of
+            and not (e["kind"] == "label" and sandbox_only(e["label"]))]
     kept.sort(key=lambda e: (e["at"], e["kind"] != "state"))
     for e in kept:
         e["at"] = iso(e["at"])
@@ -182,7 +188,8 @@ def finish(events, as_of):
 
 
 def replay_labels(number, real_labels, events):
-    labels = set(real_labels)
+    labels = {l for l in real_labels if not sandbox_only(l)}
+    real_labels = sorted(labels)
     replayed = {}
     for e in events:
         if e["kind"] == "label":
