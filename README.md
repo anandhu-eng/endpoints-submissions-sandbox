@@ -11,6 +11,7 @@ Every org, person, model, system and number here is invented. Submitters are Ubu
 | `docs/` | The page: static HTML, CSS and plain JavaScript, with no build step. GitHub Pages serves this folder. |
 | `docs/data/snapshot.json` | The data the page reads. Generated; don't edit by hand. |
 | `scripts/build_snapshot.py` | Builds the snapshot from this repo through the GitHub API (GET requests only). |
+| `scripts/stamp_assets.py` | Puts a content version on every script and stylesheet URL, so a deploy never mixes cached old files with new ones. Run it after editing `docs/js` or `docs/styles.css`. |
 | `seed/` | Scenarios, seeding script and validator for the simulated PRs, issues and comments. See `seed/README.md`. |
 | `sim/` | Personas, calendar (holidays, publication dates) and rows with no PR or issue. |
 | `DESIGN.md` | Design tokens, status colours and the references used. |
@@ -22,6 +23,15 @@ cd docs && python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
 Then open http://127.0.0.1:8765/.
+
+## Before you push a page change
+
+Browsers keep each file from GitHub Pages for 10 minutes. If one module is new and another is still the cached old copy, the page shows nothing. After editing anything in `docs/js` or `docs/styles.css`:
+
+```
+python3 scripts/stamp_assets.py            # rewrite the ?v= stamps
+python3 scripts/stamp_assets.py --check    # must print "all stamps current"
+```
 
 ## Rebuild the data
 

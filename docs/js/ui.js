@@ -1,10 +1,10 @@
 // Small shared render pieces (pills, chips, names). Strings come from copy.js.
 
-import { COPY } from './copy.js';
-import { esc, days1, dateText } from './format.js';
-import { icon, STAGE_LOOK, WAIT_ICON, TURN_LOOK, FLAG_ICON } from './icons.js';
-import { STAGE_BY_CODE } from './derive.js';
-import { UNASSIGNED } from './query.js';
+import { COPY } from './copy.js?v=0c38b22995';
+import { esc, days1, dateText } from './format.js?v=0c38b22995';
+import { icon, STAGE_LOOK, WAIT_ICON, TURN_LOOK, FLAG_ICON } from './icons.js?v=0c38b22995';
+import { STAGE_BY_CODE } from './derive.js?v=0c38b22995';
+import { UNASSIGNED } from './query.js?v=0c38b22995';
 
 let PEOPLE = new Map();
 export function setPeople(map) { PEOPLE = map; }

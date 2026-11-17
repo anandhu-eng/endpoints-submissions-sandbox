@@ -1,11 +1,11 @@
 // Main view: metrics, stage counts, filters sidebar, grouping toolbar and the list.
 
-import { COPY } from './copy.js';
-import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, isoText } from './format.js';
-import { icon } from './icons.js';
-import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
-import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
-import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
+import { COPY } from './copy.js?v=0c38b22995';
+import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, isoText } from './format.js?v=0c38b22995';
+import { icon } from './icons.js?v=0c38b22995';
+import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js?v=0c38b22995';
+import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js?v=0c38b22995';
+import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js?v=0c38b22995';
 
 // ---------------------------------------------------------------------------
 // Metric cards. Display only: filtering happens in the sidebar.
