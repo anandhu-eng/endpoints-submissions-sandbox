@@ -1,13 +1,13 @@
 // Wiring: load the snapshot, keep state in the URL, render, handle input.
 
 import { COPY } from './copy.js';
-import { deriveAll, computeMetrics, DEFAULT_STAGES, STAGES, TERMINAL, myWaits } from './derive.js';
+import { deriveAll, computeMetrics, DEFAULT_STAGES, STAGES, TERMINAL } from './derive.js';
 import {
-  emptyState, domains, parseUrl, toQuery, rowMatches, sortRows, stageSet, SET_KEYS, UNASSIGNED, setQueryContext,
+  emptyState, domains, parseUrl, toQuery, rowMatches, sortRows, stageSet, SET_KEYS, UNASSIGNED,
 } from './query.js';
 import { esc, setTimeZone, dateTimeText, isoText } from './format.js';
 import { icon } from './icons.js';
-import { setPeople, personName, splitName, pickerName } from './ui.js';
+import { setPeople, personName } from './ui.js';
 import {
   renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList,
 } from './render-list.js';
@@ -77,7 +77,6 @@ async function load() {
   D = deriveAll(snap);
   D.snapshot = snap;
   setPeople(D.people);
-  setQueryContext(D.ctx);
   DOM = domains(D.rows);
   const asOfText = dateTimeText(snap.as_of);
   const asOfEl = $('#as-of');
@@ -89,7 +88,6 @@ async function load() {
     a.hidden = false;
   }
   readUrl();
-  buildViewAs();
   bind();
   render();
 }
@@ -112,26 +110,16 @@ function writeUrl(push = false) {
 function hrefFor(r) { return toQuery({ ...state, id: r.shortId, node: '' }) || '?'; }
 function hrefForId(shortId) { return toQuery({ ...state, id: shortId, node: '' }) || '?'; }
 
-// View as (D10, D11): the person, their name, and which Waiting-on values are theirs.
+// No viewer identity: the page is for chairs, PGMs and the infra team, and has no View as.
+// The renderers still accept a viewer so per-person views can return in a later phase.
 function viewInfo() {
-  const [role, login] = (state.view || '').split(':');
-  return {
-    view: { role: role || '', login: login || '' },
-    youName: login ? splitName(login).name : null,
-    myWaits: (r) => (login ? myWaits(r, role, login, D.ctx) : new Set()),
-  };
+  return { view: { role: '', login: '' }, youName: null, myWaits: () => new Set() };
 }
 const isNarrow = () => window.matchMedia('(max-width: 760px)').matches;
-// D16: Overview and stage counts start collapsed in person views and on phones.
-// S9: only submitter and reviewer views collapse it, and only while their person scope is on.
+// D16: Overview and stage counts start collapsed on phones.
 function overviewOpen() {
   if (ui.overview != null) return ui.overview;
-  if (isNarrow()) return false;
-  const [role, login] = (state.view || '').split(':');
-  if (!login) return true;
-  if (role === 'reviewer') return !state.rev.has(login);
-  if (role === 'submitter') return state.org.size === 0;
-  return true;
+  return !isNarrow();
 }
 
 // S10: how many rows each Waiting-on and Queue option would show with the other filters kept.
@@ -179,7 +167,6 @@ function renderNotes() {
 
 function render() {
   renderNotes();
-  syncViewAs();
   const detailRow = state.id ? D.rows.find((r) => r.shortId === state.id) : null;
   document.body.classList.toggle('in-detail', !!detailRow);
   $('#list-view').hidden = !!detailRow;
@@ -196,8 +183,7 @@ function renderListView() {
     $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
     $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
-    const [vRole, vLogin] = (state.view || '').split(':');
-    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7, canMe: !!vLogin || vRole === 'chair' });
+    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 });
     for (const el of $$('[data-indeterminate="true"]')) el.indeterminate = true;
     $('#groupbar').innerHTML = renderGroupBar(state);
     $('#chips').innerHTML = renderChips(state);
@@ -215,17 +201,12 @@ function renderListView() {
     // D19 / D10: say what the scope hides, with a one-click way back.
     const live = (s) => D.rows.filter((r) => rowMatches(r, s)).length;
     const foot = [];
-    if (state.view.includes(':') && !state.stage) {
-      const n = D.rows.filter((r) => rowMatches(r, state, { ignoreStage: true })).length - rows.length;
-      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(state.view.startsWith('reviewer') ? COPY.list.hiddenClosed(n) : COPY.list.hiddenClosedRows(n))}</span></p>`);
-    }
     if (state.queue.size) {
       const n = live({ ...state, queue: new Set() }) - rows.length;
       if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
     }
     $('#list').innerHTML = renderList(rows, scope, state, {
       hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''),
-      emptyText: state.nofind && state.view.startsWith('reviewer:') ? COPY.list.emptyReviewerNofind : null,
     });
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
@@ -266,45 +247,6 @@ function renderDetailView(r) {
     $('#detail-view').innerHTML = renderDetail(r, detailCtx(), ui.detail);
   });
   if (opening) { const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0); }
-}
-
-// ---------------------------------------------------------------------------
-// View as (5.1)
-
-function buildViewAs() {
-  const role = $('#view-role');
-  role.innerHTML = Object.entries(COPY.viewAs.roles).map(([v, t]) => `<option value="${v}">${esc(t)}</option>`).join('');
-}
-function peopleFor(role) {
-  const all = [...D.people.values()];
-  if (role === 'submitter') return all.filter((p) => p.role === 'submitter' || D.rows.some((r) => r.submitter === p.login));
-  if (role === 'reviewer') return all.filter((p) => p.role === 'reviewer' || D.rows.some((r) => r.assignees.includes(p.login)));
-  if (role === 'chair') return all.filter((p) => p.role === 'chair');
-  return [];
-}
-function syncViewAs() {
-  const [role, login] = (state.view || '').split(':');
-  const roleSel = $('#view-role');
-  const personSel = $('#view-person');
-  roleSel.value = role || '';
-  const list = peopleFor(role || '');
-  const opts = list.map((p) => [p.login, pickerName(p.login)]).sort((a, b) => a[1].localeCompare(b[1]));
-  personSel.innerHTML = `<option value="">${esc(COPY.viewAs.pickPerson)}</option>` + opts.map(([login, name]) => `<option value="${esc(login)}">${esc(name)}</option>`).join('');
-  personSel.value = login || '';
-  personSel.disabled = !role;
-}
-function applyViewAs(role, login) {
-  const keep = { group: state.group, gsort: state.gsort, sort: state.sort, period: state.period };
-  state = { ...emptyState(), ...keep };
-  state.view = role ? (login ? `${role}:${login}` : role) : '';
-  if (role === 'submitter' && login) {
-    const org = D.people.get(login)?.org || D.rows.find((r) => r.submitter === login)?.org;
-    if (org && DOM.org.includes(org)) state.org.add(org);
-  } else if (role === 'reviewer' && login) {
-    // D10: Reviewer = me, open stages only. "Waiting on me" is a separate toggle.
-    if (DOM.rev.includes(login)) state.rev.add(login);
-  }
-  ui.overview = null;
 }
 
 // ---------------------------------------------------------------------------
@@ -360,8 +302,6 @@ function bind() {
     menuBtn.setAttribute('aria-expanded', String(open));
     $('#hdr-links').classList.toggle('open', open);
   });
-  $('#view-role').addEventListener('change', (e) => update(() => applyViewAs(e.target.value, '')));
-  $('#view-person').addEventListener('change', (e) => update(() => applyViewAs($('#view-role').value, e.target.value)));
 
   // Search
   let t = null;

@@ -57,7 +57,6 @@ export function splitName(login) {
   const m = /^(\S+) · (.+)$/.exec(full);
   return m ? { name: m[2], tag: m[1] } : { name: full, tag: '' };
 }
-export function pickerName(login) { const { name, tag } = splitName(login); return COPY.viewAs.pickerName(name, tag); }
 // you: the View-as person owns this value, so use the "you" wording when there is one (S2).
 // Arrays of logins become names; epoch-ms numbers become Pacific dates.
 export function waitReasonText(reason, you = false) {

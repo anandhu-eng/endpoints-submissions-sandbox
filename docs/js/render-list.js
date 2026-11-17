@@ -186,7 +186,7 @@ export function renderFilters(state, dom, openSections, extra = {}) {
     <button type="button" class="icon-btn only-drawer" id="close-filters" aria-label="${esc(COPY.filters.close)}">${icon('close')}</button>
   </div>
   ${section('review', COPY.filters.sections.review, `
-    ${fieldset('queue', COPY.filters.queue, checkList('queue', dom.queue, state, (v) => COPY.filters.queueOptions[v], { counts: extra.counts?.queue, disabled: extra.canMe ? {} : { me: COPY.filters.pickPersonFirst } }), state.queue.size)}
+    ${fieldset('queue', COPY.filters.queue, checkList('queue', dom.queue, state, (v) => COPY.filters.queueOptions[v], { counts: extra.counts?.queue }), state.queue.size)}
     ${fieldset('wait', COPY.filters.wait, checkList('wait', dom.wait, state, undefined, { counts: extra.counts?.wait }), state.wait.size)}
     ${fieldset('due', COPY.filters.due, dueList, state.due.size)}
     ${fieldset('rev', COPY.filters.rev, `<label class="toggle" for="f-nofind"><input type="checkbox" id="f-nofind" data-bool="nofind" ${state.nofind ? 'checked' : ''}><span>${esc(COPY.filters.nofind)}</span></label>${checkList('rev', dom.rev, state)}`, state.rev.size)}

@@ -3,7 +3,7 @@
 
 import {
   STAGES, DEFAULT_STAGES, WAIT_VALUES, FLAGS, TYPES, DIVISIONS, AVAILABILITY, PENALTY_LEVELS, DUE_OPTIONS,
-  STATUS_ORDER, normOrg, QUEUES, owesAction,
+  STATUS_ORDER, normOrg, QUEUES,
 } from './derive.js';
 
 export const SET_KEYS = ['queue', 'wait', 'due', 'rev', 'by', 'org', 'sub', 'model', 'type', 'div', 'avail', 'otype', 'pen', 'flag'];
@@ -12,15 +12,12 @@ export const SORT_KEYS = ['due', 'day', 'stage', 'created', 'id', 'wait'];
 export const PERIODS = ['all', '90', '30'];
 export const GSORTS = ['count', 'az', 'm1', 'm2'];
 
-// Derived context (people, calendar) for the "Waiting on me" queue.
-let CTX = null;
-export function setQueryContext(ctx) { CTX = ctx; }
 export const UNASSIGNED = '__unassigned__';
 
 export function emptyState() {
   const s = {
     q: '', stage: null, n: 5, nofind: false, from: '', to: '', test: false,
-    group: [], gsort: 'count', sort: 'due', period: 'all', view: '', id: '', node: '',
+    group: [], gsort: 'count', sort: 'due', period: 'all', id: '', node: '',
   };
   for (const k of SET_KEYS) s[k] = new Set();
   return s;
@@ -56,7 +53,7 @@ export function parseUrl(search, dom, rows) {
   const p = new URLSearchParams(search);
   const s = emptyState();
   const ignored = [];
-  const known = new Set(['q', 'stage', 'n', 'nofind', 'from', 'to', 'test', 'group', 'gsort', 'sort', 'period', 'view', 'id', 'node', ...SET_KEYS]);
+  const known = new Set(['q', 'stage', 'n', 'nofind', 'from', 'to', 'test', 'group', 'gsort', 'sort', 'period', 'id', 'node', ...SET_KEYS]);
   const list = (v) => v.split(',').map((x) => x.trim()).filter(Boolean);
   for (const [key, value] of p) {
     if (!known.has(key)) { ignored.push(key); continue; }
@@ -88,8 +85,6 @@ export function parseUrl(search, dom, rows) {
     } else if (key === 'id') {
       const r = rows.find((x) => x.shortId === value || x.id === value);
       if (r) s.id = r.shortId; else ignored.push(`id=${value}`);
-    } else if (key === 'view') {
-      if (/^(submitter|reviewer|chair)(:[\w.-]+)?$/.test(value)) s.view = value; else ignored.push(`view=${value}`);
     } else {
       s[key] = value;
     }
@@ -111,7 +106,6 @@ export function toQuery(s) {
   if (s.gsort !== 'count') put('gsort', s.gsort);
   if (s.sort !== 'due') put('sort', s.sort);
   if (s.period !== 'all') put('period', s.period);
-  put('view', s.view);
   put('id', s.id);
   if (s.id) put('node', s.node);
   const str = p.toString().replace(/%2C/g, ',').replace(/%3A/g, ':');
@@ -139,7 +133,7 @@ export function rowMatches(r, s, { ignoreStage = false } = {}) {
   if (r.isTest && !s.test) return false;
   if (!matchesSearch(r, s.q)) return false;
   if (!ignoreStage) { const st = stageSet(s); if (st.size && !st.has(r.stage)) return false; }
-  if (s.queue.size && ![...s.queue].some((q) => queueMatches(r, q, s.view))) return false;
+  if (s.queue.size && ![...s.queue].some((q) => queueMatches(r, q))) return false;
   if (s.wait.size && ![...r.waitSet].some((w) => s.wait.has(w))) return false;
   if (s.due.size && ![...s.due].some((d) => dueMatches(r, d, s.n))) return false;
   if (s.rev.size) {
@@ -162,10 +156,9 @@ export function rowMatches(r, s, { ignoreStage = false } = {}) {
   return true;
 }
 
-export function queueMatches(r, q, view) {
+export function queueMatches(r, q) {
   if (q === 'ready') return r.ready;
   if (q === 'needschair') return r.needsChair;
-  if (q === 'me') { const [role, login] = (view || '').split(':'); return !!CTX && owesAction(r, role, login, CTX); }
   return false;
 }
 

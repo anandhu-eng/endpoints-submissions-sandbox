@@ -142,8 +142,7 @@ html.dark .skip { color: #1a2028; }
 .proto-note { display: inline-flex; align-items: center; gap: 6px; color: var(--amber-fg); font-weight: 600; }
 .proto-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber-fg); }
 .as-of { color: var(--text-muted); }
-.view-as { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
-.header-links { display: flex; align-items: center; gap: 12px; }
+.header-links { display: flex; align-items: center; gap: 12px; margin-left: auto; }
 .hlink { font-size: 13px; font-weight: 500; color: var(--navy-ui); text-decoration: none; }
 .hlink:hover { text-decoration: underline; color: var(--navy-ui); }
 
@@ -573,8 +572,6 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
 @media (max-width: 760px) {
   .site-header { padding: 8px 16px; gap: 8px 12px; position: static; }
   .brand-bottom { font-size: 18px; }
-  .view-as { margin-left: 0; order: 3; width: 100%; }
-  .view-as select { flex: 1; min-width: 0; }
   .header-links { margin-left: auto; }
   .hlink { display: none; }
   .main { padding: 12px 16px 40px; }

@@ -28,7 +28,7 @@ export const FLAGS = [
 ];
 export const TURN_STATES = ['submitter', 'reviewer', 'waived', 'resolved', 'none'];
 // Work queues (D4, D10): ready to finalize, needs a chair, and "what the View-as person owes".
-export const QUEUES = ['ready', 'needschair', 'me'];
+export const QUEUES = ['ready', 'needschair'];
 export const TYPES = ['agentic', 'single_turn', 'mixed', 'unknown'];
 export const DIVISIONS = ['standardized', 'serviced', 'rdi'];
 export const AVAILABILITY = ['available', 'preview', 'rdi'];
