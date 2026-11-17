@@ -195,9 +195,9 @@ function renderListView() {
     const ov = overviewOpen();
     $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
-    $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7, state, ui.closedOpen) : '';
+    $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7, state) : '';
     const [vRole, vLogin] = (state.view || '').split(':');
-    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), canMe: !!vLogin || vRole === 'chair' });
+    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7, canMe: !!vLogin || vRole === 'chair' });
     for (const el of $$('[data-indeterminate="true"]')) el.indeterminate = true;
     $('#groupbar').innerHTML = renderGroupBar(state);
     $('#chips').innerHTML = viewToggles() + renderChips(state);

@@ -27,12 +27,18 @@ export function roleBadge(login) {
   return `<span class="role role-${esc(role)}">${role === 'bot' ? icon('bot') : ''}${esc(label)}</span>`;
 }
 
+// A "(Weeks 1–3)" suffix wraps as one piece, never mid-range.
+function keepParens(text) {
+  return esc(text).replace(/\(([^)]*)\)/g, (m) => `<span class="nw">${m}</span>`);
+}
 export function stagePill(code, { size = 'sm', withStatus = true } = {}) {
   if (!code) return `<span class="muted">${esc(COPY.missing)}</span>`;
   const [ic, tone] = STAGE_LOOK[code] || ['dashed', 'slate'];
   const status = STAGE_BY_CODE[code]?.status || '';
   const help = COPY.stageHelp[code] || '';
-  return `<span class="stage-cell"><span class="pill pill-${size} tone-${tone}" title="${esc(help)}">${icon(ic)}<span>${esc(COPY.stages[code] || code)}</span></span>${
+  // Without the visible DB status, the pill's tooltip carries it.
+  const title = withStatus ? help : `${help} (${COPY.dbStatus}: ${status})`;
+  return `<span class="stage-cell"><span class="pill pill-${size} tone-${tone}" title="${esc(title)}">${icon(ic)}<span>${keepParens(COPY.stages[code] || code)}</span></span>${
     withStatus ? `<span class="db-status" title="${esc(COPY.dbStatus)}">${esc(status)}</span>` : ''}</span>`;
 }
 export function stageLabelText(code) {

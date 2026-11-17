@@ -343,8 +343,10 @@ export const COPY = {
     ascending: 'ascending',
     descending: 'descending',
     reverse: 'Reverse order',
+    penaltyBadge: (n) => `Penalty level ${n}`,
+    penaltyHelp: 'Current penalty level after waivers. Each level delays publication by one cycle; level 3 withdraws the submission.',
     cols: {
-      id: 'Submission · GitHub', stage: 'Stage · DB status', wait: 'Waiting on', findings: 'Findings',
+      id: 'Submission', stage: 'Stage', wait: 'Waiting on', findings: 'Findings',
       day: 'Review day', due: 'Next deadline', pen: 'Penalty level', rev: 'Reviewers', flags: 'Flags', links: 'GitHub',
     },
     findingsCell: (open, total) => `${open} open / ${total}`,

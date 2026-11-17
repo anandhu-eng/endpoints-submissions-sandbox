@@ -1,11 +1,11 @@
 // Main view: metrics, stage counts, filters sidebar, grouping toolbar and the list.
 
 import { COPY } from './copy.js';
-import { esc, days1, timeEl, plainDateText, dateText } from './format.js';
+import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, isoText } from './format.js';
 import { icon } from './icons.js';
 import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
 import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
-import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel, extLink } from './ui.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
 
 // ---------------------------------------------------------------------------
 // Metric tiles. Each tile names the filter it applies.
@@ -96,6 +96,16 @@ function publishBlock(m) {
   return `<ul class="legend static">${rows.map(([label, n]) => `<li><span class="legend-item"><span>${esc(label)}</span><b>${n}</b></span></li>`).join('')}</ul>`;
 }
 
+// Secondary metrics as compact rows: name (and one short line) on the left, value on the right.
+function metricRow(state, id, t) {
+  const on = tileActive(state, id);
+  const lines = [].concat(t.line || []).filter(Boolean);
+  return `<button type="button" class="mrow${on ? ' on' : ''}${t.warn ? ' warn' : ''}" ${press(state, id)} title="${tipFor(state, id, t.detail)}">
+    <span class="mrow-text"><span class="mrow-name">${esc(COPY.metrics[id].name)}</span>${lines.map((l) => `<span class="mrow-sub">${esc(l)}</span>`).join('')}</span>
+    <span class="mrow-value">${t.warn ? icon('alert', 'mrow-warn') : ''}<span class="num">${esc(t.value)}</span>${t.unit ? `<span class="unit">${esc(t.unit)}</span>` : ''}</span>
+  </button>`;
+}
+
 export function renderMetrics(m, state, showMore) {
   const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
   const M = COPY.metrics;
@@ -128,7 +138,7 @@ export function renderMetrics(m, state, showMore) {
       </div>
     </div>
     <div class="mcards">${primary.join('')}</div>
-    <div class="mcards cards-more" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => card(state, id, secondary[id])).join('')}</div>
+    <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(state, id, secondary[id])).join('')}</div>
     <div class="metrics-foot">
       <button type="button" class="btn-link" id="more-metrics" aria-expanded="${showMore}" aria-controls="tiles-more">${esc(showMore ? COPY.metrics.fewer : COPY.metrics.more)}</button>
       <details class="caveats" id="caveats"><summary>${icon('info')}${esc(COPY.metrics.caveatsTitle)}</summary><ul>${COPY.metrics.caveats.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></details>
@@ -139,35 +149,28 @@ export function renderMetrics(m, state, showMore) {
 // ---------------------------------------------------------------------------
 // Stage counts (M7), grouped by DB status, terminal statuses folded into "Closed".
 
-export function renderStageCounts(counts, state, closedOpen) {
+export function renderStageCounts(counts, state) {
+  // One button per DB status with its total; the per-stage counts are in the tooltip and in
+  // the sidebar Stage filter (M7). Terminal statuses fold into "Closed" (D19).
   const active = stageSet(state);
   const isOnly = (codes) => state.stage && state.stage.size === codes.length && codes.every((c) => state.stage.has(c));
-  const statusBlock = (status) => {
-    const stages = STAGES.filter((s) => s.status === status);
-    const total = stages.reduce((a, s) => a + counts[s.code], 0);
-    const codes = stages.map((s) => s.code);
-    return `<div class="sc-status">
-      <button type="button" class="sc-head" data-stages="${codes.join(',')}" aria-pressed="${isOnly(codes)}" title="${esc(status)}">
-        <span>${esc(COPY.stageGroups[status])}</span><span class="db-status">${esc(status)}</span><span class="sc-total num">${total}</span></button>
-      <div class="sc-items">${stages.map((s) => `
-        <button type="button" class="sc-item${active.has(s.code) ? '' : ' dim'}" data-stages="${s.code}" aria-pressed="${isOnly([s.code])}">
-          ${stagePill(s.code, { withStatus: false })}<span class="num">${counts[s.code]}</span></button>`).join('')}</div>
-    </div>`;
+  const breakdown = (stages) => stages.map((s) => `${COPY.stages[s.code]}: ${counts[s.code]}`).join('\n');
+  const item = (label, codes, stages, attrs, pressed) => {
+    const total = codes.reduce((a, c) => a + counts[c], 0);
+    return `<button type="button" class="sc-pipe${total ? '' : ' zero'}" ${attrs} aria-pressed="${pressed}" title="${esc(breakdown(stages))}">
+      <span>${esc(label)}</span><b class="num">${total}</b></button>`;
   };
-  const open = STATUS_ORDER.filter((s) => !TERMINAL.has(s));
-  const closed = STATUS_ORDER.filter((s) => TERMINAL.has(s));
-  const closedCodes = STAGES.filter((s) => TERMINAL.has(s.status)).map((s) => s.code);
-  const closedTotal = closedCodes.reduce((a, c) => a + counts[c], 0);
-  // D19: "Closed n" adds every terminal stage to the filter (click again to remove them).
-  const closedOn = closedCodes.every((c) => active.has(c));
+  const open = STATUS_ORDER.filter((s) => !TERMINAL.has(s)).map((status) => {
+    const stages = STAGES.filter((s) => s.status === status);
+    const codes = stages.map((s) => s.code);
+    return item(COPY.stageGroups[status], codes, stages, `data-stages="${codes.join(',')}"`, isOnly(codes));
+  });
+  const closedStages = STAGES.filter((s) => TERMINAL.has(s.status));
+  const closedCodes = closedStages.map((s) => s.code);
+  const closed = item(COPY.stageGroups.closed, closedCodes, closedStages, `id="sc-closed" data-closed="${closedCodes.join(',')}"`, closedCodes.every((c) => active.has(c)));
   return `<section class="stage-counts" aria-labelledby="sc-h">
     <h2 id="sc-h" class="micro" title="${esc(COPY.metrics.M7.help)}">${esc(COPY.metrics.M7.name)}</h2>
-    <div class="sc-row">${open.map(statusBlock).join('')}
-      <div class="sc-closed">
-        <button type="button" class="sc-head" id="sc-closed" data-closed="${closedCodes.join(',')}" aria-pressed="${closedOn}"><span>${esc(COPY.stageGroups.closed)}</span><span class="sc-total num">${closedTotal}</span></button>
-        ${closedOn ? `<div class="sc-row">${closed.map(statusBlock).join('')}</div>` : ''}
-      </div>
-    </div>
+    <div class="sc-pipeline">${open.join('')}${closed}</div>
   </section>`;
 }
 
@@ -201,7 +204,8 @@ export function renderFilters(state, dom, openSections, extra = {}) {
       <span>${esc(COPY.stageGroups[status])}</span><span class="db-status">${esc(status)}</span></label>
       <ul class="checks nested">${stages.map((s) => {
         const sid = `f-stage-${s.code}`;
-        return `<li><label for="${sid}"><input type="checkbox" id="${sid}" data-stage="${s.code}" ${st.has(s.code) ? 'checked' : ''}><span>${esc(COPY.stages[s.code])}</span><span class="db-status">${esc(status)}</span></label></li>`;
+        const n = extra.stageCounts ? extra.stageCounts[s.code] ?? 0 : null;
+        return `<li><label for="${sid}"><input type="checkbox" id="${sid}" data-stage="${s.code}" ${st.has(s.code) ? 'checked' : ''}><span>${esc(COPY.stages[s.code])}</span>${n != null ? `<span class="opt-count num">${n}</span>` : ''}</label></li>`;
       }).join('')}</ul></li>`;
   }).join('');
 
@@ -315,28 +319,31 @@ export function renderGroupBar(state) {
 // ---------------------------------------------------------------------------
 // List
 
-const COLS = ['id', 'stage', 'wait', 'findings', 'day', 'due', 'pen', 'rev', 'flags'];
-const SORTABLE = { id: 'id', stage: 'stage', day: 'day', due: 'due' };
+const COLS = ['id', 'stage', 'wait', 'findings', 'due', 'rev', 'flags'];
+const SORTABLE = { id: 'id', stage: 'stage', due: 'due' };
 
 function deadlineCell(r, asOf, state) {
+  const when = (at) => `<time class="meta block" datetime="${esc(isoText(at))}" title="${esc(dateTimeText(at))}">${esc(shortDateTimeText(at))}</time>`;
   // S5: held submissions open for review after the embargo date.
   if (r.stage === 'CC_HELD' && r.db.embargo_date) return `<span class="due-kind">${esc(COPY.list.opensAfter(dateText(r.db.embargo_date)))}</span>`;
   if (r.status === 'FINALIZED' && r.due) {
     if (r.due.rdi) return `<span class="due-fin">${esc(COPY.list.notAutoPublished)}</span>`;
     const reasons = r.due.reasons.map((x) => reasonText(x)).join('; ');
-    // D25: lead with the date; the cohort code is secondary.
-    return `<span class="due-fin">${esc(r.due.cohort ? COPY.list.publishesOn(dateText(r.due.at)) : COPY.missing)}</span>${r.due.cohort ? ` <span class="db-status">${esc(r.due.cohort.id)}</span>` : ''}${reasons ? `<span class="meta block">${esc(reasons)}</span>` : ''}`;
+    // D25: lead with the date; the cohort code and the delay reasons go to the tooltip.
+    const tip = [r.due.cohort?.id, reasons].filter(Boolean).join(' · ');
+    return `<span class="due-fin" title="${esc(tip)}">${esc(r.due.cohort ? COPY.list.publishesOn(dateText(r.due.at)) : COPY.missing)}</span>`;
   }
   // D18: with a Deadline filter on, show the deadline that matched.
   const m = state ? matchedDeadline(r, state) : null;
+  const matched = m ? ` title="${esc(COPY.list.matched)}"` : '';
   if (m && (m.kind === 'overdue' || m.kind === 'open12')) {
-    return `<span class="due-kind soon">${icon('alert')}${esc(COPY.list.deadlineKinds[m.kind])}${m.finding}</span>${m.at ? `<span class="meta block">${timeEl(m.at)}</span>` : ''}<span class="meta block">${esc(COPY.list.matched)}</span>`;
+    return `<span class="due-kind soon"${matched}>${icon('alert')}${esc(COPY.list.deadlineKinds[m.kind])}${m.finding}</span>${m.at ? when(m.at) : ''}`;
   }
   const d = m && m.at ? m : r.nextDeadline;
-  if (!d) return `<span class="muted">${esc(COPY.list.noDeadline)}</span>`;
+  if (!d) return `<span class="muted">${esc(COPY.missing)}</span>`;
   const kind = d.kind === 'penalty' ? `${COPY.list.deadlineKinds.penalty(d.level)}${d.finding}` : COPY.list.deadlineKinds[d.kind];
   const soon = d.at - asOf < 2 * 864e5;
-  return `<span class="due-kind${soon ? ' soon' : ''}">${soon ? icon('clock') : ''}${esc(kind)}</span><span class="meta block">${timeEl(d.at)}</span>${m && m.at ? `<span class="meta block">${esc(COPY.list.matched)}</span>` : ''}`;
+  return `<span class="due-kind${soon ? ' soon' : ''}"${matched}>${soon ? icon('clock') : ''}${esc(kind)}</span>${when(d.at)}`;
 }
 
 export function reviewDayText(r) {
@@ -351,32 +358,32 @@ export function reasonText(x) {
 }
 
 function rowHtml(r, ctx) {
+  // At most two lines per cell; detail moves into tooltips and the detail view.
   const c = r.counts;
   const also = ctx.groupKeys ? alsoInCount(r, ctx.groupKeys) : 0;
   const link = ctx.hrefFor(r);
   const reviewers = r.assignees.length ? r.assignees.map((a) => esc(personName(a))).join(', ') : `<span class="muted">${esc(COPY.filters.unassigned)}</span>`;
-  const revBadge = c.reviewer ? `<span class="badge-rev" title="${esc(COPY.list.reviewerBadge(c.reviewer))}">${icon('eye')}${c.reviewer}</span>` : '';
   const mine = ctx.myWaits ? ctx.myWaits(r) : new Set();
   const supLinks = [
     r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}${esc(COPY.detail.supersedes(r.supersedes))}</a>` : '',
     r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}${esc(COPY.detail.supersededBy(r.supersededBy))}</a>` : '',
   ].join('');
-  const flagList = [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + supLinks;
-  const stuck = r.stuckReasons.length ? `<span class="meta block warn-text">${icon('alert')}${esc(COPY.metrics.M12.name)}: ${esc(r.stuckReasons.map((x) => COPY.list.stuckReasons[x]).join(', '))}</span>` : '';
+  const stuck = r.stuckReasons.length ? `<span class="flag flag-stuck" title="${esc(r.stuckReasons.map((x) => COPY.list.stuckReasons[x]).join(', '))}">${icon('alert')}<span>${esc(COPY.metrics.M12.name)}</span></span>` : '';
+  // The penalty level shows only when there is one (most rows have none).
+  const penalty = r.penalty ? `<span class="flag flag-penalty" title="${esc(COPY.list.penaltyHelp)}">${esc(COPY.list.penaltyBadge(r.penalty))}</span>` : '';
+  const flagList = stuck + penalty + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + supLinks;
+  const waits = r.waiting.map((w) => `<span class="wait-line" title="${esc(w.reason.map((x) => waitReasonText(x, mine.has(w.value))).join('; '))}">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}</span>`).join('');
+  const findTip = c.total ? [COPY.list.findingsTurns(c.submitter, c.reviewer), c.waived ? COPY.list.findingsWaived(c.waived) : ''].filter(Boolean).join(' · ') : '';
   return `<tr class="row" data-depth="${ctx.depth}" data-id="${esc(r.shortId)}">
     <td data-col="id" class="c-id">
-      <a class="sub-link mono" href="${esc(link)}" data-open="${esc(r.shortId)}" aria-label="${esc(COPY.list.open(r.shortId))}">${esc(r.shortId)}</a>
-      <span class="block">${esc(r.org || COPY.missing)}</span>
+      <span class="block"><a class="sub-link mono" href="${esc(link)}" data-open="${esc(r.shortId)}" aria-label="${esc(COPY.list.open(r.shortId))}">${esc(r.shortId)}</a> <span class="c-org">${esc(r.org || COPY.missing)}</span></span>
       <span class="meta block">${esc(r.models.join(', ') || COPY.missing)} · ${esc(COPY.types[r.type] || r.type)}</span>
-      <span class="row-links meta block">${[r.pr ? extLink(r.pr.url, COPY.list.pr(r.pr.number)) : '', r.ti ? extLink(r.ti.url, COPY.list.issue(r.ti.number)) : ''].filter(Boolean).join(' ')}</span>
       ${also > 0 ? `<span class="meta block also">${esc(COPY.grouping.alsoIn(also))}</span>` : ''}
     </td>
-    <td data-col="stage" data-label="${esc(COPY.list.cols.stage)}">${stagePill(r.stage)}${stuck}</td>
-    <td data-col="wait" data-label="${esc(COPY.list.cols.wait)}">${r.waiting.map((w) => `<span class="wait-line">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<span class="meta block wait-why">${esc(w.reason.map((x) => waitReasonText(x, mine.has(w.value))).join('; '))}</span></span>`).join('')}</td>
-    <td data-col="findings" data-label="${esc(COPY.list.cols.findings)}">${c.total ? `<span>${esc(COPY.list.findingsCell(c.open, c.total))}</span>${revBadge}<span class="meta block">${esc(COPY.list.findingsTurns(c.submitter, c.reviewer))}${c.waived ? ` · ${esc(COPY.list.findingsWaived(c.waived))}` : ''}</span>` : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
-    <td data-col="day" data-label="${esc(COPY.list.cols.day)}">${r.clock.reviewDay != null ? esc(reviewDayText(r)) : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
+    <td data-col="stage" data-label="${esc(COPY.list.cols.stage)}">${stagePill(r.stage, { withStatus: false })}${r.clock.reviewDay != null ? `<span class="meta block">${esc(reviewDayText(r))}</span>` : ''}</td>
+    <td data-col="wait" data-label="${esc(COPY.list.cols.wait)}"><span class="waits">${waits}</span></td>
+    <td data-col="findings" data-label="${esc(COPY.list.cols.findings)}">${c.total ? `<span title="${esc(findTip)}">${esc(COPY.list.findingsCell(c.open, c.total))}</span>` : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
     <td data-col="due" data-label="${esc(COPY.list.cols.due)}">${deadlineCell(r, ctx.asOf, ctx.state)}</td>
-    <td data-col="pen" data-label="${esc(COPY.list.cols.pen)}" class="num">${esc(r.penalty)}</td>
     <td data-col="rev" data-label="${esc(COPY.list.cols.rev)}">${reviewers}</td>
     <td data-col="flags" data-label="${esc(COPY.list.cols.flags)}"><span class="flags">${flagList || `<span class="muted">${esc(COPY.missing)}</span>`}</span></td>
   </tr>`;
