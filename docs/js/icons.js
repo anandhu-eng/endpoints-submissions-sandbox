@@ -61,5 +61,5 @@ export const TURN_LOOK = { submitter: ['user', 'turn-sub'], reviewer: ['eye', 't
 export const FLAG_ICON = {
   provisional: 'hourglass', test: 'flag', embargoed: 'clock', penalty_delayed: 'clock', finalize_pending: 'run',
   non_chair_finalize: 'alert', withdrawn_after_finalization: 'slash', compliance_overdue: 'alert', escalated: 'alert', legacy: 'db',
-  penalty_waived: 'slash', supersedes: 'arrow', superseded_by: 'slash',
+  penalty_waived: 'slash', supersedes: 'arrow', superseded_by: 'slash', non_chair_finalize_removed: 'slash',
 };

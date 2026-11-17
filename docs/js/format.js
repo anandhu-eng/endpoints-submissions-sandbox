@@ -128,8 +128,41 @@ export function markdown(src) {
   return out.join('');
 }
 
-// Plain text excerpt: no Markdown, no hidden comments, no persona prefix.
-export function excerpt(src, max = 200) {
-  const t = stripPersonaPrefix(String(src || '').replace(/<!--[\s\S]*?-->/g, '')).replace(/[`*_>#|]/g, ' ').replace(/\s+/g, ' ').trim();
-  return t.length > max ? t.slice(0, max - 1).trimEnd() + '…' : t;
+// W2: excerpt rendered with the thread's inline Markdown (code spans kept). Cut by characters
+// of source text, never inside a code span or a link.
+export function excerptHtml(src, max = 200) {
+  const lines = stripPersonaPrefix(String(src || '').replace(/<!--[\s\S]*?-->/g, '')).split(/\r?\n/)
+    .filter((l) => !/^\s*\|?\s*:?-{2,}/.test(l) && !/^\s*```/.test(l))
+    .map((l) => l.replace(/^\s{0,3}(#{1,6}\s+|>\s?|[-*]\s+|\d+\.\s+)/, ''));
+  let t = lines.join(' ').replace(/\s+/g, ' ').trim();
+  if (t.length > max) {
+    let cut = max;
+    const ticks = (t.slice(0, cut).match(/`/g) || []).length;
+    if (ticks % 2) { const close = t.indexOf('`', cut); cut = close >= 0 ? close + 1 : t.length; }
+    const open = t.lastIndexOf('[', cut - 1);
+    if (open > t.lastIndexOf(')', cut - 1) && /^\[[^\]]*\]\([^)\s]*\)/.test(t.slice(open))) cut = open + t.slice(open).match(/^\[[^\]]*\]\([^)\s]*\)/)[0].length;
+    t = cut < t.length ? t.slice(0, cut).trimEnd() + '…' : t;
+  }
+  return inline(esc(t));
+}
+
+// "Nov 20, 8:00 AM PT" (no year): bot run times (S3).
+export function dayTimeText(msOrIso) {
+  if (msOrIso == null) return COPY.missing;
+  const d = new Date(typeof msOrIso === 'number' ? msOrIso : Date.parse(msOrIso));
+  return `${fmt({ month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(d)} ${COPY.tz}`;
+}
+// "Nov 12, 8:00" for narrow tables (S14).
+export function shortDateTimeText(msOrIso) {
+  if (msOrIso == null) return COPY.missing;
+  const d = new Date(typeof msOrIso === 'number' ? msOrIso : Date.parse(msOrIso));
+  const p = {};
+  for (const x of fmt({ month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d)) p[x.type] = x.value;
+  return `${p.month} ${p.day}, ${Number(p.hour)}:${p.minute}`;
+}
+// <time> that shows the long form, and the short form on phones.
+export function timeElShort(msOrIso) {
+  if (msOrIso == null) return `<span class="muted">${esc(COPY.missing)}</span>`;
+  const iso = isoText(msOrIso);
+  return `<time datetime="${esc(iso)}" title="${esc(iso)}"><span class="t-long">${esc(dateTimeText(msOrIso))}</span><span class="t-short">${esc(shortDateTimeText(msOrIso))}</span></time>`;
 }

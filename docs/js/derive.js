@@ -22,7 +22,7 @@ export const DEFAULT_STAGES = STAGES.filter((s) => !TERMINAL.has(s.status)).map(
 
 export const WAIT_VALUES = ['submitter', 'reviewer', 'chair', 'lm', 'submitter_compliance', 'unknown', 'nobody'];
 export const FLAGS = [
-  'provisional', 'test', 'embargoed', 'penalty_delayed', 'finalize_pending', 'non_chair_finalize',
+  'provisional', 'test', 'embargoed', 'penalty_delayed', 'finalize_pending', 'non_chair_finalize', 'non_chair_finalize_removed',
   'penalty_waived', 'supersedes', 'superseded_by',
   'withdrawn_after_finalization', 'compliance_overdue', 'escalated', 'legacy',
 ];
@@ -147,6 +147,35 @@ export function makeCalendar(cal = {}) {
     tz, holidays, cohorts, parts, dateOf, addDays, daysBetween, isBusinessDay, dayStart, at,
     businessMs, businessDays, addBusinessDays, nextBusinessDate,
   };
+}
+
+// The lifecycle bot runs daily at 7:00 and 8:00 AM PT (INFRA_FINDINGS). It applies a penalty
+// stage, or closes a finding past its reply deadline, on the first run at or after the instant (S3).
+const BOT_RUNS = [[7, 0], [8, 0]];
+export function nextBotRun(cal, at) {
+  if (at == null) return null;
+  let d = cal.dateOf(at);
+  for (let i = 0; i < 3; i++) {
+    for (const [h, mi] of BOT_RUNS) { const t = cal.at(d, h, mi, 0); if (t >= at) return t; }
+    d = cal.addDays(d, 1);
+  }
+  return null;
+}
+
+// W3/W4: the one rule for "open turn as of as_of". A turn is an open wait only when its
+// label is still on, the row's clock has not stopped (D6, withdrawal or finalization), and
+// the finding is not Waived (D2). Every count of open turns, open findings and longest
+// open waits goes through this function.
+export function openTurnAsOf(f) {
+  if (f.stopped) return null;
+  if (f.turnState !== 'submitter' && f.turnState !== 'reviewer') return null;
+  return f.turns.find((t) => t.open && t.kind === f.turnState) || null;
+}
+// The finding's state for counts: "stopped" when the row's clock stopped before it was settled.
+function liveStateOf(f) {
+  if (f.turnState === 'resolved') return 'resolved';
+  if (f.stopped) return 'stopped';
+  return f.turnState;
 }
 
 // Reviewer reply deadline (D5, REQUIREMENTS 3.6, LM step 7): day 0 is the Pacific
@@ -331,6 +360,7 @@ function deriveFinding(f, sub, ctx, stopAt) {
       // Missed: the bot ended the turn after the reply deadline, with no reply first.
       t.missed = !runsPastStop && t.labelEnd != null && replyAt == null && isBot(t.labelEndActor) && t.labelEnd > t.deadline;
       t.overdue = t.open && asOf > t.deadline;
+      t.closeRun = nextBotRun(cal, t.deadline);
     } else t.missed = false;
     if (t.kind === 'submitter' && t.open) {
       // Next stage the page will show, after an L1 waiver lowers it by one.
@@ -338,6 +368,7 @@ function deriveFinding(f, sub, ctx, stopAt) {
       if (nextIdx >= 0) {
         t.nextLevel = nextIdx + 1 - waiveShift;
         t.nextLevelAt = cal.addBusinessDays(t.start, PENALTY_THRESHOLDS[nextIdx]);
+        t.nextLevelRun = nextBotRun(cal, t.nextLevelAt);
       }
     }
   }
@@ -386,13 +417,21 @@ function deriveFinding(f, sub, ctx, stopAt) {
     if (last) latestAsk = { at: ms(last.at), actor: last.actor, body: last.body || '', url: last.url || f.url };
     else if (turnKind === 'submitter') latestAsk = { at: created, actor: f.author, body: f.body || '', url: f.url };
   }
+  // W1: on a Waived finding, quote the latest chair comment made since the waiver, if any.
+  let waiverAt = null;
+  for (const e of labelEvents) if (e.label === WAIVE_ALL && e.action === 'added') waiverAt = ms(e.at);
+  if (waived) {
+    const chairNotes = comments.filter((c) => ctx.isChair(c.actor) && (waiverAt == null || ms(c.at) >= waiverAt) && ms(c.at) <= asOf);
+    const note = chairNotes[chairNotes.length - 1];
+    if (note) latestAsk = { at: ms(note.at), actor: note.actor, body: note.body || '', url: note.url || f.url, fromChair: true };
+  }
 
   return {
     issue: f, number: f.number, title: f.title, url: f.url, author: f.author, parent: f.parent,
     state: f.state, stateReason: f.state_reason, closed, closedAt, labels, turnState, closedStillLabelled,
     turns, openTurn, openSubmitter, openReviewer, currentWait: openTurn ? openTurn.labelDays : null,
     longest, longestSubmitterWhole, rawPenalty, impliedPenalty, penaltyStage, waivers, waivedAll, waivedL1,
-    escalated, type, byOrg, againstOrg, latestAsk,
+    escalated, type, byOrg, againstOrg, latestAsk, waiverAt, stopped: stopAt != null,
     replyOverdue, openLong, missedDeadline, penaltySoon, unresolvedDays,
     labelOnlyEnds: turns.some((t) => t.labelOnly), events,
   };
@@ -480,6 +519,9 @@ function deriveSubmission(s, ctx) {
     for (const e of evs) if (e.action === 'added') finalizedBy = e.actor;
   }
   if (isRP && finalizedOn && finalizedBy) flags.add(isChair(finalizedBy) ? 'finalize_pending' : 'non_chair_finalize');
+  // S8: a non-chair once added the label, and it is no longer in effect. History only; not Waiting on Chair.
+  const nonChairAdds = pr ? sortEvents(pr.events).filter((e) => e.kind === 'label' && e.label === FINALIZED_LABEL && e.action === 'added' && !isChair(e.actor)) : [];
+  if (nonChairAdds.length && !flags.has('non_chair_finalize')) flags.add('non_chair_finalize_removed');
   if (findings.some((f) => f.waivers.length)) flags.add('penalty_waived');
   if (status === 'WITHDRAWN' && db.finalized_at) flags.add('withdrawn_after_finalization');
   const prOpened = pr ? ms(pr.created_at) : null;
@@ -488,15 +530,27 @@ function deriveSubmission(s, ctx) {
   if (!ti && status !== 'COMPLIANCE_CHECKING' && !isRP) flags.add('legacy');
 
   // Finding roll-up
-  const counts = { total: findings.length, open: 0, submitter: 0, reviewer: 0, waived: 0, resolved: 0, none: 0 };
+  const counts = { total: findings.length, open: 0, submitter: 0, reviewer: 0, waived: 0, resolved: 0, none: 0, stopped: 0 };
   for (const f of findings) {
-    counts[f.turnState]++;
-    if (!f.closed) counts.open++;
+    f.liveTurn = openTurnAsOf(f);
+    f.liveState = liveStateOf(f);
+    counts[f.liveState]++;
+    if (['submitter', 'reviewer', 'waived', 'none'].includes(f.liveState)) counts.open++;
   }
 
   // Due cohort (6.1) for FINALIZED rows
   let due = null;
   if (status === 'FINALIZED') due = dueCohort(db, cal, stage);
+
+  // S4: dispute-resolution referral = the latest chair comment after Week 6 closed.
+  let referral = null;
+  if (isRP && wk6Close != null && wk6Close < asOf) {
+    const pool = [...(ti?.events || []), ...findings.flatMap((f) => f.events)]
+      .filter((e) => e.kind === 'comment' && isChair(e.actor) && ms(e.at) > wk6Close && ms(e.at) <= asOf)
+      .sort((a, b) => ms(a.at) - ms(b.at));
+    const last = pool[pool.length - 1];
+    if (last) referral = { actor: last.actor, at: ms(last.at), body: last.body || '', url: last.url || ti?.url };
+  }
 
   // Ready to finalize (D4, M16)
   const ready = isRP && !!ti && findings.length > 0 && stage !== 'RP_PAST_WK6'
@@ -507,9 +561,9 @@ function deriveSubmission(s, ctx) {
   const active = status === 'COMPLIANCE_CHECKING' || isRP || status === 'FINALIZED';
   const waiting = [];
   const add = (value, reason) => waiting.push({ value, reason });
-  if (isRP && counts.submitter) add('submitter', { key: 'submitterFindings', args: [findings.filter((f) => f.turnState === 'submitter').map((f) => f.number)] });
+  if (isRP && counts.submitter) add('submitter', { key: 'submitterFindings', args: [findings.filter((f) => f.liveState === 'submitter').map((f) => f.number)] });
   if (isRP) {
-    const rev = findings.filter((f) => f.turnState === 'reviewer').map((f) => f.number);
+    const rev = findings.filter((f) => f.liveState === 'reviewer').map((f) => f.number);
     const idle = stage === 'RP_PEER' ? noFindingAssignees : [];
     if (rev.length || idle.length) {
       const reasons = [];
@@ -521,7 +575,7 @@ function deriveSubmission(s, ctx) {
   const chairReasons = [];
   if (isRP && ti && !assignees.length) chairReasons.push({ key: 'chairAssign', args: [] });
   if (isRP && flags.has('escalated')) chairReasons.push({ key: 'chairMeeting', args: [] });
-  if (stage === 'RP_PAST_WK6') chairReasons.push({ key: 'chairReferral', args: [] });
+  if (stage === 'RP_PAST_WK6') chairReasons.push(referral ? { key: 'chairReferredBy', args: [[referral.actor], referral.at] } : { key: 'chairReferral', args: [] });
   if (ready) chairReasons.push({ key: 'chairReady', args: [] });
   else if (stage === 'RP_OBJECTION' && !counts.submitter && !counts.reviewer && !counts.none) chairReasons.push({ key: 'chairPhase', args: [] });
   if (flags.has('non_chair_finalize')) chairReasons.push({ key: 'chairNonChair', args: [[finalizedBy]] });
@@ -550,7 +604,7 @@ function deriveSubmission(s, ctx) {
   const nextDeadline = future[0] || null;
   const bdUntil = (t) => (t != null && t > asOf ? cal.businessDays(asOf, t) : null);
 
-  const openSubWaits = findings.filter((f) => f.turnState === 'submitter').map((f) => f.openSubmitter).filter(Boolean).map((t) => t.labelDays);
+  const openSubWaits = findings.map((f) => f.liveTurn).filter((t) => t && t.kind === 'submitter').map((t) => t.labelDays);
   const longestSubmitterWait = openSubWaits.length ? Math.max(...openSubWaits) : null;
 
   // Stuck (M12)
@@ -573,7 +627,7 @@ function deriveSubmission(s, ctx) {
     stageOrder: STAGE_BY_CODE[stage]?.order ?? 99, db, pr, ti, findings, counts, flags, waiting, waitSet,
     assignees, noFindingAssignees, finalizedBy, latestCheck,
     clock: { startMs, startDate, wk3Close, wk6Close, reviewDay: isRP ? reviewDay : null, pastWk6Days: isRP ? pastWk6Days : 0 },
-    stopAt, ready, needsChair: waitSet.has('chair') && !ready, supersedes: null, supersededBy: null,
+    stopAt, referral, ready, needsChair: waitSet.has('chair') && !ready, supersedes: null, supersededBy: null,
     bdToWk3: isRP ? bdUntil(wk3Close) : null, bdToWk6: isRP ? bdUntil(wk6Close) : null,
     nextDeadline, due, penalty: db.penalties_imposed ?? 0, longestSubmitterWait, stuckReasons,
     objectorOrgs, objectionTypes, createdMs, createdDate: createdMs != null ? cal.dateOf(createdMs) : null,
@@ -617,13 +671,14 @@ export function turnsOf(rows, kind, { periodDays = null, asOf, author = null } =
     if (r.isTest) continue;
     for (const f of r.findings) {
       if (author && f.author !== author) continue;
-      for (const t of f.turns) if (t.kind === kind) out.push({ t, f, r });
+      const live = openTurnAsOf(f);
+      for (const t of f.turns) if (t.kind === kind) out.push({ t, f, r, live: t === live });
     }
   }
   const from = periodDays ? asOf - periodDays * DAY : null;
   // Stopped turns (D6) are neither done nor open.
   const done = out.filter(({ t }) => t.responseEnd != null && !t.missed && (from == null || t.responseEnd >= from));
-  const open = out.filter(({ t }) => t.responseEnd == null && t.open);
+  const open = out.filter(({ t, live }) => live && t.responseEnd == null);
   return {
     stats: stats(done.map(({ t }) => t.responseDays)),
     open: open.length,
@@ -689,11 +744,11 @@ export function computeMetrics(rows, rowsIgnoringStage, ctx, period) {
     },
     M9: { count: live.filter((r) => r.waitSet.has('submitter')).length, findings: rp.reduce((a, r) => a + r.counts.submitter, 0) },
     M10: {
-      count: rpFindings.filter((f) => f.turnState !== 'resolved' && f.turnState !== 'waived').length,
-      waived: rpFindings.filter((f) => f.turnState === 'waived').length,
-      submitter: rpFindings.filter((f) => f.turnState === 'submitter').length,
-      reviewer: rpFindings.filter((f) => f.turnState === 'reviewer').length,
-      none: rpFindings.filter((f) => f.turnState === 'none').length,
+      count: rpFindings.filter((f) => ['submitter', 'reviewer', 'none'].includes(f.liveState)).length,
+      waived: rpFindings.filter((f) => f.liveState === 'waived').length,
+      submitter: rpFindings.filter((f) => f.liveState === 'submitter').length,
+      reviewer: rpFindings.filter((f) => f.liveState === 'reviewer').length,
+      none: rpFindings.filter((f) => f.liveState === 'none').length,
     },
     M11: rpFindings.filter((f) => f.penaltySoon).length,
     M12: live.filter((r) => r.stuckReasons.length).length,
@@ -726,7 +781,8 @@ export function summarizeGroup(rows, ctx, period, reviewer = null) {
     longestSub: sub.longestOpen,
     stuck: live.filter((r) => r.stuckReasons.length).length,
   };
-  if (reviewer) out.missed = rev.missed;
+  out.waived = live.reduce((a, r) => a + r.counts.waived, 0);
+  if (reviewer) { out.missed = rev.missed; out.openRev = rev.open; out.longestRev = rev.longestOpen; }
   if (reviewer) {
     out.assigned = live.filter((r) => r.assignees.includes(reviewer)).length;
     out.m3 = firstFinding(live, ctx, reviewer).stats;
@@ -747,7 +803,7 @@ export function myWaits(r, role, login, ctx) {
     if (mine && r.waitSet.has('submitter_compliance')) out.add('submitter_compliance');
   } else if (role === 'reviewer' && login) {
     const myOrg = me?.org ? normOrg(me.org) : null;
-    const mineF = r.findings.some((f) => f.turnState === 'reviewer' && (f.author === login || (myOrg && normOrg(f.byOrg) === myOrg)));
+    const mineF = r.findings.some((f) => f.liveState === 'reviewer' && (f.author === login || (myOrg && normOrg(f.byOrg) === myOrg)));
     const idle = r.waiting.find((w) => w.value === 'reviewer')?.reason.some((x) => x.key === 'reviewerNoFinding' && x.args[0].includes(login));
     if (r.waitSet.has('reviewer') && (mineF || idle)) out.add('reviewer');
   } else if (role === 'chair') {

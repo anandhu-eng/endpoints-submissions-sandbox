@@ -122,9 +122,26 @@ function viewInfo() {
 }
 const isNarrow = () => window.matchMedia('(max-width: 760px)').matches;
 // D16: Overview and stage counts start collapsed in person views and on phones.
+// S9: only submitter and reviewer views collapse it, and only while their person scope is on.
 function overviewOpen() {
   if (ui.overview != null) return ui.overview;
-  return !((state.view || '').includes(':') || isNarrow());
+  if (isNarrow()) return false;
+  const [role, login] = (state.view || '').split(':');
+  if (!login) return true;
+  if (role === 'reviewer') return !state.rev.has(login);
+  if (role === 'submitter') return state.org.size === 0;
+  return true;
+}
+
+// S10: how many rows each Waiting-on and Queue option would show with the other filters kept.
+function optionCounts() {
+  const out = { wait: {}, queue: {} };
+  for (const key of ['wait', 'queue']) {
+    const s = { ...state, [key]: new Set() };
+    const rows = D.rows.filter((r) => rowMatches(r, s));
+    for (const v of DOM[key]) out[key][v] = rows.filter((r) => rowMatches(r, { ...s, [key]: new Set([v]) })).length;
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -178,7 +195,8 @@ function renderListView() {
     $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
     $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7, state, ui.closedOpen) : '';
-    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections);
+    const [vRole, vLogin] = (state.view || '').split(':');
+    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), canMe: !!vLogin || vRole === 'chair' });
     for (const el of $$('[data-indeterminate="true"]')) el.indeterminate = true;
     $('#groupbar').innerHTML = renderGroupBar(state);
     $('#chips').innerHTML = viewToggles() + renderChips(state);
@@ -206,6 +224,7 @@ function renderListView() {
     }
     $('#list').innerHTML = renderList(rows, scope, state, {
       hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''),
+      emptyText: state.nofind && state.view.startsWith('reviewer:') ? COPY.list.emptyReviewerNofind : null,
     });
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
@@ -241,7 +260,8 @@ function activeFilterCount() {
   return n;
 }
 
-function detailCtx() { return { asOf: D.asOf, derived: D, hrefForId, ...viewInfo() }; }
+function hrefNode(r, n) { return toQuery({ ...state, id: r.shortId, node: String(n) }) || '?'; }
+function detailCtx() { return { asOf: D.asOf, derived: D, hrefForId, hrefNode, ...viewInfo() }; }
 
 function renderDetailView(r) {
   const opening = $('#detail-view').dataset.id !== r.shortId;
@@ -491,6 +511,19 @@ function bind() {
       const id = $('#full-id').textContent;
       const done = () => { $('#copy-status').textContent = COPY.detail.copied; };
       try { navigator.clipboard.writeText(id).then(done, done); } catch { done(); }
+      return;
+    }
+    // S1: a finding in "What to do" opens its conversation on this page.
+    const goto = tgt.closest('[data-goto-node]');
+    if (goto && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+      e.preventDefault();
+      selectTab('issues', false);
+      const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(goto.dataset.gotoNode)}"]`);
+      if (item) {
+        for (let p = item.parentElement.closest('[role="treeitem"]'); p; p = p.parentElement.closest('[role="treeitem"]')) toggleNode(p, true);
+        selectNode(item);
+        const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' });
+      }
       return;
     }
     const jump = tgt.closest('.turn-link, #jump-turn');

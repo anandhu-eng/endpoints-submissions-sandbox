@@ -649,3 +649,18 @@ a.flag:hover { text-decoration: underline; }
   td[data-col="flags"] { min-width: 0; max-width: 150px; }
   td[data-col="pen"] { width: 64px; }
 }
+
+/* ---- Round 2 ---- */
+.opt-count { margin-left: auto; padding-left: 8px; font-size: 12px; color: var(--text-muted); }
+.checks label.is-disabled { color: var(--text-muted); cursor: not-allowed; }
+.opt-why { padding-left: 24px; }
+.flag-non_chair_finalize_removed { color: var(--text-muted); border-style: dashed; font-weight: 500; }
+.md-inline code { font-family: var(--mono); font-size: 0.92em; padding: 0 3px; border-radius: 3px; background: var(--kbd-bg); font-style: normal; }
+.todo-node { font-weight: 600; }
+.wait-list .referral { list-style: none; margin-left: 20px; }
+.band-title .meta { font-weight: 500; }
+.t-short { display: none; }
+@media (max-width: 760px) {
+  .turn-table .t-long { display: none; }
+  .turn-table .t-short { display: inline; white-space: nowrap; }
+}

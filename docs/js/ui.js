@@ -1,7 +1,7 @@
 // Small shared render pieces (pills, chips, names). Strings come from copy.js.
 
 import { COPY } from './copy.js';
-import { esc, days1 } from './format.js';
+import { esc, days1, dateText } from './format.js';
 import { icon, STAGE_LOOK, WAIT_ICON, TURN_LOOK, FLAG_ICON } from './icons.js';
 import { STAGE_BY_CODE } from './derive.js';
 import { UNASSIGNED } from './query.js';
@@ -52,9 +52,12 @@ export function splitName(login) {
   return m ? { name: m[2], tag: m[1] } : { name: full, tag: '' };
 }
 export function pickerName(login) { const { name, tag } = splitName(login); return COPY.viewAs.pickerName(name, tag); }
-export function waitReasonText(reason) {
-  const fn = COPY.waiting.reasons[reason.key];
-  return typeof fn === 'function' ? fn(...(reason.args || []).map((a) => (Array.isArray(a) && typeof a[0] === 'string' ? a.map(personName) : a))) : fn || '';
+// you: the View-as person owns this value, so use the "you" wording when there is one (S2).
+// Arrays of logins become names; epoch-ms numbers become Pacific dates.
+export function waitReasonText(reason, you = false) {
+  const fn = (you && COPY.waiting.reasonsYou[reason.key]) || COPY.waiting.reasons[reason.key];
+  const args = (reason.args || []).map((a) => (Array.isArray(a) && typeof a[0] === 'string' ? a.map(personName) : typeof a === 'number' && a > 1e11 ? dateText(a) : a));
+  return typeof fn === 'function' ? fn(...args) : fn || '';
 }
 
 export function flagBadge(flag) {
@@ -69,7 +72,7 @@ export function turnBadge(state) {
 
 export function extLink(url, text, cls = '') {
   if (!url) return esc(text);
-  return `<a class="ext ${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}${icon('external', 'ext-icon')}<span class="sr-only"> ${esc(COPY.external)}</span></a>`;
+  return `<a class="ext ${cls}" href="${esc(url)}" target="_blank" rel="noopener noreferrer" title="${esc(COPY.githubTitle)}">${esc(text)}${icon('external', 'ext-icon')}<span class="sr-only"> ${esc(COPY.external)}</span></a>`;
 }
 
 export function bd(x) { return `${days1(x)}`; }

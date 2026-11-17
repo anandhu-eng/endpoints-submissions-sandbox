@@ -1,7 +1,7 @@
 // Detail view (REQUIREMENTS section 6): header, PR timeline, issue tree and conversation.
 
 import { COPY } from './copy.js';
-import { esc, days1, timeEl, markdown, dateText, excerpt } from './format.js';
+import { esc, days1, timeEl, timeElShort, markdown, dateText, dayTimeText, excerptHtml } from './format.js';
 import { icon } from './icons.js';
 import { ms } from './derive.js';
 import { stagePill, waitChip, waitReasonText, flagBadge, personHtml, personName, roleBadge, turnBadge, extLink, person } from './ui.js';
@@ -25,28 +25,37 @@ function todoItems(r, ctx) {
   const T = COPY.detail.todo;
   const role = ctx.view?.role || '';
   const login = ctx.view?.login || '';
-  let fs = r.findings.filter((f) => f.openTurn && ['submitter', 'waived', 'reviewer'].includes(f.turnState));
+  let fs = r.findings.filter((f) => f.openTurn && !f.stopped && ['submitter', 'waived', 'reviewer'].includes(f.turnState));
   if (role === 'submitter') fs = fs.filter((f) => f.turnState !== 'reviewer');
   else if (role === 'reviewer') fs = fs.filter((f) => f.turnState === 'reviewer' && (!login || f.author === login || ctx.myWaits(r).has('reviewer')));
+  const badge = (key) => ` <span class="nbadge" title="${esc(COPY.detail.tree.badgeHelp[key])}">${icon('alert')}${esc(COPY.detail.tree.badges[key])}</span>`;
   return fs.map((f) => {
     const t = f.openTurn;
     const ask = f.latestAsk;
-    const askHtml = ask ? `<p class="todo-ask"><span class="meta">${esc(T.ask(personName(ask.actor), dateText(ask.at)))}</span> <q>${esc(excerpt(ask.body))}</q> ${extLink(ask.url, COPY.detail.timeline.view, 'ev-link')}</p>` : '';
+    // W2: the quote uses the thread's Markdown, so code spans and underscores stay as written.
+    const askHtml = ask ? `<p class="todo-ask"><span class="meta">${esc(ask.fromChair ? T.chairNote(personName(ask.actor), dateText(ask.at)) : T.ask(personName(ask.actor), dateText(ask.at)))}</span> <q class="md-inline">${excerptHtml(ask.body)}</q> ${extLink(ask.url, COPY.detail.timeline.view, 'ev-link')}</p>` : '';
+    const since = `<p class="meta">${esc(T.waitingSince(days1(t.labelDays), dateText(t.start)))}</p>`;
     let due = ''; let miss = ''; let how = '';
     if (f.turnState === 'waived') {
-      due = `<p>${esc(T.waived)}</p>`;
-      how = T.howSubmitter;
+      // W1: nothing to do. "The chairs are deciding" only when the row is referred or escalated.
+      const deciding = r.stage === 'RP_PAST_WK6' || !!r.referral || f.escalated || r.flags.has('escalated');
+      due = `<p class="todo-how">${esc(deciding ? T.waivedDeciding : T.waivedNoAction)}</p>`;
     } else if (f.turnState === 'submitter') {
-      due = `<p class="todo-due">${t.nextLevelAt ? `${esc(T.dueSubmitter(t.nextLevel))}${timeEl(t.nextLevelAt)} <span class="meta">(${esc(T.dueSubmitterNote)})</span>` : esc(T.dueMax)}${f.replyOverdue ? ` <span class="nbadge" title="${esc(COPY.detail.tree.badgeHelp.replyOverdue)}">${icon('alert')}${esc(COPY.detail.tree.badges.replyOverdue)}</span>` : ''}</p>`;
+      // Name the bot run only when it differs from the penalty time itself.
+      const sameAsRun = t.nextLevelRun && new Date(t.nextLevelRun).getTime() === new Date(t.nextLevelAt).getTime();
+      const runNote = !t.nextLevelRun ? T.dueSubmitterNote : sameAsRun ? '' : T.dueRun(dayTimeText(t.nextLevelRun));
+      due = `<p class="todo-due">${t.nextLevelAt ? `${esc(T.dueSubmitter(t.nextLevel))}${timeEl(t.nextLevelAt)}${runNote ? ` <span class="meta">(${esc(runNote)})</span>` : ''}` : esc(T.dueMax)}${f.replyOverdue ? badge('replyOverdue') : ''}</p>`;
       miss = T.missSubmitter; how = T.howSubmitter;
     } else {
       const wk6First = r.clock.wk6Close && r.clock.wk6Close > ctx.asOf && r.clock.wk6Close < t.deadline;
-      due = `<p class="todo-due">${esc(T.dueReviewer)}${timeEl(t.deadline)}${t.overdue ? ` <span class="nbadge" title="${esc(COPY.detail.tree.badgeHelp.replyOverdue)}">${icon('alert')}${esc(COPY.detail.tree.badges.replyOverdue)}</span>` : ''}${wk6First ? `<span class="meta block">${esc(T.wk6First)}${timeEl(r.clock.wk6Close)}</span>` : ''}</p>`;
-      miss = T.missReviewer; how = T.howReviewer;
+      due = `<p class="todo-due">${esc(T.dueReviewer)}${timeEl(t.deadline)}${t.overdue ? badge('replyOverdue') : ''}${wk6First ? `<span class="meta block">${esc(T.wk6First)}${timeEl(r.clock.wk6Close)}. ${esc(T.wk6Then)}</span>` : ''}</p>`;
+      miss = `${T.missReviewer}${t.closeRun ? ' ' + T.closeRun(dayTimeText(t.closeRun)) : ''}`; how = T.howReviewer;
     }
+    // S1: the finding links to its conversation on this page, and to GitHub.
+    const here = `<a class="todo-node" href="${esc(ctx.hrefNode(r, f.number))}" data-goto-node="${f.number}">#${esc(f.number)} ${esc(f.title)}</a>`;
     return `<li class="todo">
-      <div class="todo-head">${turnBadge(f.turnState)} ${extLink(f.url, '#' + f.number)} <span class="meta">${esc(f.title)}</span></div>
-      ${askHtml}${due}${miss ? `<p class="meta">${esc(miss)}</p>` : ''}<p class="todo-how">${esc(how)}</p></li>`;
+      <div class="todo-head">${turnBadge(f.turnState)} ${here} ${extLink(f.url, COPY.detail.timeline.view, 'ev-link')}</div>
+      ${since}${askHtml}${due}${miss ? `<p class="meta">${esc(miss)}</p>` : ''}${how ? `<p class="todo-how">${esc(how)}</p>` : ''}</li>`;
   });
 }
 
@@ -71,7 +80,8 @@ function header(r, ctx) {
     [COPY.detail.clock.wk3, timeEl(c.wk3Close)],
     [COPY.detail.clock.wk6, timeEl(c.wk6Close)],
   ]);
-  const waiting = `<ul class="wait-list">${r.waiting.map((w) => `<li>${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<ul>${w.reason.map((x) => `<li>${esc(waitReasonText(x))}</li>`).join('')}</ul></li>`).join('')}</ul>`;
+  const waiting = `<ul class="wait-list">${r.waiting.map((w) => `<li>${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<ul>${w.reason.map((x) => `<li>${esc(waitReasonText(x, mine.has(w.value)))}</li>`).join('')}</ul></li>`).join('')}${
+    r.referral ? `<li class="referral"><p class="todo-ask"><q class="md-inline">${excerptHtml(r.referral.body)}</q> ${extLink(r.referral.url, COPY.detail.timeline.view, 'ev-link')}</p></li>` : ''}</ul>`;
   const ts = kv(Object.entries(COPY.detail.timestamps).map(([k, label]) => [label, r.db[k] ? timeEl(r.db[k]) : dash()]));
   const todos = todoItems(r, ctx);
   const todo = todos.length ? `<ul class="todo-list">${todos.join('')}</ul>` : `<p class="muted">${esc(COPY.detail.todo.none)}</p>`;
@@ -253,10 +263,11 @@ function nodeContent(node, r) {
     `<span>${esc(f.penaltyStage === 'waived' ? D.penaltyWaived : D.penalty(f.impliedPenalty))}</span>`,
     ...f.waivers.map((w) => `<span class="label-name">${esc(w)}</span>`),
   ].filter(Boolean).join('<span class="dot" aria-hidden="true">·</span>');
+  // S7: one chip when Escalated and Open 12+ both apply; Escalated wins and the tooltip names both.
   const badges = [
-    f.escalated ? [D.badges.escalated, COPY.flagHelp.escalated] : null,
+    f.escalated ? [D.badges.escalated, f.openLong ? D.badgeHelp.escalatedBoth : COPY.flagHelp.escalated] : null,
     f.replyOverdue ? [D.badges.replyOverdue, D.badgeHelp.replyOverdue] : null,
-    f.openLong ? [D.badges.openLong, D.badgeHelp.openLong] : null,
+    f.openLong && !f.escalated ? [D.badges.openLong, D.badgeHelp.openLong] : null,
     f.waivedL1 ? [D.badges.waiverL1, D.badgeHelp.waiverL1] : null,
     f.closedStillLabelled ? [D.badges.closedLabelled, ''] : null,
     f.labelOnlyEnds ? [D.badges.labelOnly, COPY.turns.labelOnlyHelp] : null,
@@ -310,10 +321,12 @@ export function renderConversation(r, ui, ctx) {
   }
   const T = COPY.turns;
   const current = turns.find((t) => t.open);
+  // W5: the open turn always has a band, even before anyone has replied.
+  if (current && !segments.some((sg) => sg.turn === current)) segments.push({ turn: current, items: [] });
   const turnTable = turns.length ? `<div class="turn-table-wrap"><table class="mini turn-table"><caption class="sr-only">${esc(T.tableCaption)}</caption><thead><tr>
       <th scope="col">${esc(T.table.owner)}</th><th scope="col">${esc(T.table.start)}</th><th scope="col">${esc(T.table.end)}</th><th scope="col" class="num">${esc(T.table.days)}</th><th scope="col">${esc(T.table.labelOnly)}</th></tr></thead><tbody>
-      ${turns.map((t, i) => `<tr${t === current ? ' class="current"' : ''}><td><a href="#turn-${i}" class="turn-link">${esc(T[t.kind])}</a></td><td>${timeEl(t.start)}</td>
-        <td>${t.open ? esc(T.table.open) : t.stopped ? esc(T.stopped) : timeEl(t.labelEnd)}</td><td class="num">${esc(days1(t.labelDays))}</td><td>${esc(t.labelOnly ? T.table.yes : T.table.no)}</td></tr>`).join('')}
+      ${turns.map((t, i) => `<tr${t === current ? ' class="current"' : ''}><td><a href="#turn-${i}" class="turn-link">${esc(T[t.kind])}</a></td><td>${timeElShort(t.start)}</td>
+        <td>${t.open ? esc(T.table.open) : t.stopped ? esc(T.stopped) : timeElShort(t.labelEnd)}</td><td class="num">${esc(days1(t.labelDays))}</td><td>${esc(t.labelOnly ? T.table.yes : T.table.no)}</td></tr>`).join('')}
       </tbody></table>${current ? `<a class="btn-link" href="#turn-${turns.indexOf(current)}" id="jump-turn">${esc(T.jump)}</a>` : ''}</div>` : '';
   const idDone = new Set();
   const body = segments.map((s) => {
@@ -326,11 +339,12 @@ export function renderConversation(r, ui, ctx) {
       t.endedBy === 'reply' ? `<span class="meta">${esc(T.endedByReply(days1(t.responseDays)))}</span>` : '',
       t.missed ? `<span class="nbadge">${esc(T.missed)}</span>` : '',
       t.stopped ? `<span class="meta">${esc(T.stopped)}</span>` : '',
+      t.open && t.responseEnd == null ? `<span class="meta">· ${esc(T.noReplyYet)}</span>` : '',
     ].join(' ');
     const first = !idDone.has(t); idDone.add(t);
     return `<section class="band band-${t.kind}"${first ? ` id="turn-${turns.indexOf(t)}" tabindex="-1"` : ''} aria-label="${esc(T.bandTitle(who, days1(t.labelDays), t.open))}">
       <h4 class="band-title">${icon(t.kind === 'submitter' ? 'user' : 'eye')}${esc(T.bandTitle(who, days1(t.labelDays), t.open))} ${tags}</h4>
-      <ol class="timeline">${items}</ol></section>`;
+      ${items ? `<ol class="timeline">${items}</ol>` : ''}</section>`;
   }).join('');
   return `<div class="convo-head">
       <h3 class="micro">${esc(COPY.detail.tree.conversation(issue.number))}</h3>

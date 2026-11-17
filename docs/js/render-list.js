@@ -3,7 +3,7 @@
 import { COPY } from './copy.js';
 import { esc, days1, timeEl, plainDateText, dateText } from './format.js';
 import { icon } from './icons.js';
-import { STAGES, STATUS_ORDER, TERMINAL, summarizeGroup } from './derive.js';
+import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
 import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
 import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel, extLink } from './ui.js';
 
@@ -70,7 +70,7 @@ export function renderMetrics(m, state, showMore) {
     M12: { value: m.M12, warn: m.M12 > 0 },
     M13: { value: m.M13.count, warn: m.M13.count > 0, sub: [COPY.metrics.M13parts(m.M13.overdue, m.M13.openLong)] },
     M14: { value: m.M14 },
-    M15: { value: m.M15.stats.median == null ? COPY.metrics.none : days1(m.M15.stats.median), unit: m.M15.stats.median == null ? '' : COPY.metrics.calDays, sub: [COPY.metrics.meanN(days1(m.M15.stats.mean), m.M15.stats.n), m.M15.excluded ? COPY.metrics.excluded(m.M15.excluded, COPY.metrics.noStart) : null] },
+    M15: { pre: m.M15.stats.median == null ? '' : COPY.metrics.median, value: m.M15.stats.median == null ? COPY.metrics.none : days1(m.M15.stats.median), unit: m.M15.stats.median == null ? '' : COPY.metrics.calDays, sub: [COPY.metrics.meanN(days1(m.M15.stats.mean), m.M15.stats.n), m.M15.excluded ? COPY.metrics.excluded(m.M15.excluded, COPY.metrics.noStart) : null] },
     M16: { value: m.M16 },
     M17: { value: m.M17, warn: m.M17 > 0 },
   };
@@ -145,11 +145,14 @@ export function renderStageCounts(counts, state, closedOpen) {
 
 function countPill(n) { return n ? `<span class="count-pill">${n}</span>` : ''; }
 
-function checkList(key, values, state, labelFn = (v) => valueLabel(key, v)) {
+// opts.counts: rows per value (S10); opts.disabled: value -> reason it cannot be used yet.
+function checkList(key, values, state, labelFn = (v) => valueLabel(key, v), opts = {}) {
   if (!values.length) return `<p class="muted meta">${esc(COPY.missing)}</p>`;
   return `<ul class="checks">${values.map((v) => {
     const id = `f-${key}-${String(v).replace(/[^\w-]/g, '_')}`;
-    return `<li><label for="${id}"><input type="checkbox" id="${id}" data-filter="${key}" value="${esc(v)}" ${state[key].has(v) ? 'checked' : ''}><span>${esc(labelFn(v))}</span></label></li>`;
+    const why = opts.disabled?.[v];
+    const n = opts.counts ? opts.counts[v] ?? 0 : null;
+    return `<li><label for="${id}"${why ? ` title="${esc(why)}" class="is-disabled"` : ''}><input type="checkbox" id="${id}" data-filter="${key}" value="${esc(v)}" ${state[key].has(v) ? 'checked' : ''} ${why && !state[key].has(v) ? 'disabled' : ''}><span>${esc(labelFn(v))}</span>${n != null ? `<span class="opt-count num">${n}</span>` : ''}</label>${why ? `<span class="meta block opt-why">${esc(why)}</span>` : ''}</li>`;
   }).join('')}</ul>`;
 }
 
@@ -157,7 +160,7 @@ function fieldset(key, title, body, n) {
   return `<fieldset class="fgroup"><legend class="field-label">${esc(title)}${countPill(n)}</legend>${body}</fieldset>`;
 }
 
-export function renderFilters(state, dom, openSections) {
+export function renderFilters(state, dom, openSections, extra = {}) {
   const st = stageSet(state);
   const stageTree = STATUS_ORDER.map((status) => {
     const stages = STAGES.filter((s) => s.status === status);
@@ -189,11 +192,10 @@ export function renderFilters(state, dom, openSections) {
     <button type="button" class="icon-btn only-drawer" id="close-filters" aria-label="${esc(COPY.filters.close)}">${icon('close')}</button>
   </div>
   ${section('review', COPY.filters.sections.review, `
-    ${fieldset('queue', COPY.filters.queue, checkList('queue', dom.queue, state, (v) => COPY.filters.queueOptions[v]), state.queue.size)}
-    ${fieldset('wait', COPY.filters.wait, checkList('wait', dom.wait, state), state.wait.size)}
+    ${fieldset('queue', COPY.filters.queue, checkList('queue', dom.queue, state, (v) => COPY.filters.queueOptions[v], { counts: extra.counts?.queue, disabled: extra.canMe ? {} : { me: COPY.filters.pickPersonFirst } }), state.queue.size)}
+    ${fieldset('wait', COPY.filters.wait, checkList('wait', dom.wait, state, undefined, { counts: extra.counts?.wait }), state.wait.size)}
     ${fieldset('due', COPY.filters.due, dueList, state.due.size)}
-    ${fieldset('rev', COPY.filters.rev, checkList('rev', dom.rev, state), state.rev.size)}
-    <label class="toggle" for="f-nofind"><input type="checkbox" id="f-nofind" data-bool="nofind" ${state.nofind ? 'checked' : ''}><span>${esc(COPY.filters.nofind)}</span></label>
+    ${fieldset('rev', COPY.filters.rev, `<label class="toggle" for="f-nofind"><input type="checkbox" id="f-nofind" data-bool="nofind" ${state.nofind ? 'checked' : ''}><span>${esc(COPY.filters.nofind)}</span></label>${checkList('rev', dom.rev, state)}`, state.rev.size)}
     <fieldset class="fgroup"><legend class="field-label">${esc(COPY.filters.stage)}${countPill(state.stage ? state.stage.size : 0)}</legend>
       <p class="meta muted">${esc(state.stage ? (state.stage.size ? '' : COPY.filters.allStages) : COPY.filters.defaultStages)} ${esc(COPY.filters.stageHelp)}</p>
       <ul class="checks tree-checks">${stageTree}</ul></fieldset>
@@ -226,10 +228,16 @@ export function renderChips(state) {
   const add = (key, value, text) => chips.push(`<button type="button" class="chip" data-chip="${key}" data-value="${esc(value)}" aria-label="${esc(COPY.filters.chipRemove(text))}"><span>${esc(text)}</span>${icon('close')}</button>`);
   if (state.q) add('q', '', `${COPY.filters.search}: ${state.q}`);
   if (state.stage) {
-    // D17: "all except X" when that is shorter than the list of chosen stages.
+    // S11: describe the choice against the default stages when that is shorter.
+    const def = new Set(DEFAULT_STAGES);
     const on = STAGES.filter((s) => state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
     const off = STAGES.filter((s) => !state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
-    const text = !state.stage.size || !off.length ? COPY.filters.allStages : off.length < on.length ? COPY.filters.allExcept(off.join(', ')) : on.join(', ');
+    const removed = STAGES.filter((s) => def.has(s.code) && !state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
+    const added = STAGES.filter((s) => !def.has(s.code) && state.stage.has(s.code)).map((s) => COPY.stages[s.code]);
+    // Stage names can contain commas, so separate them with semicolons.
+  const vsDefault = [removed.length ? COPY.filters.defaultExcept(removed.join('; ')) : '', added.length ? COPY.filters.defaultPlus(added.join('; ')) : ''].filter(Boolean).join(' · ');
+    const plain = off.length < on.length ? COPY.filters.allExcept(off.join(', ')) : on.join(', ');
+    const text = !state.stage.size || !off.length ? COPY.filters.allStages : (removed.length + added.length < Math.min(on.length, off.length) ? vsDefault : plain);
     add('stage', '', `${COPY.filters.stage}: ${text}`);
   }
   const names = { queue: COPY.filters.queue, wait: COPY.filters.wait, due: COPY.filters.due, rev: COPY.filters.rev, by: COPY.filters.by, org: COPY.filters.org, sub: COPY.filters.sub, model: COPY.filters.model, type: COPY.filters.type, div: COPY.filters.div, avail: COPY.filters.avail, otype: COPY.filters.otype, pen: COPY.filters.pen, flag: COPY.filters.flag };
@@ -280,6 +288,8 @@ const COLS = ['id', 'stage', 'wait', 'findings', 'day', 'due', 'pen', 'rev', 'fl
 const SORTABLE = { id: 'id', stage: 'stage', day: 'day', due: 'due' };
 
 function deadlineCell(r, asOf, state) {
+  // S5: held submissions open for review after the embargo date.
+  if (r.stage === 'CC_HELD' && r.db.embargo_date) return `<span class="due-kind">${esc(COPY.list.opensAfter(dateText(r.db.embargo_date)))}</span>`;
   if (r.status === 'FINALIZED' && r.due) {
     if (r.due.rdi) return `<span class="due-fin">${esc(COPY.list.notAutoPublished)}</span>`;
     const reasons = r.due.reasons.map((x) => reasonText(x)).join('; ');
@@ -331,8 +341,8 @@ function rowHtml(r, ctx) {
       ${also > 0 ? `<span class="meta block also">${esc(COPY.grouping.alsoIn(also))}</span>` : ''}
     </td>
     <td data-col="stage" data-label="${esc(COPY.list.cols.stage)}">${stagePill(r.stage)}${stuck}</td>
-    <td data-col="wait" data-label="${esc(COPY.list.cols.wait)}">${r.waiting.map((w) => `<span class="wait-line">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<span class="meta block wait-why">${esc(w.reason.map(waitReasonText).join('; '))}</span></span>`).join('')}</td>
-    <td data-col="findings" data-label="${esc(COPY.list.cols.findings)}">${c.total ? `<span>${esc(COPY.list.findingsCell(c.open, c.total))}</span>${revBadge}<span class="meta block">${esc(COPY.list.findingsTurns(c.submitter, c.reviewer))}</span>` : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
+    <td data-col="wait" data-label="${esc(COPY.list.cols.wait)}">${r.waiting.map((w) => `<span class="wait-line">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<span class="meta block wait-why">${esc(w.reason.map((x) => waitReasonText(x, mine.has(w.value))).join('; '))}</span></span>`).join('')}</td>
+    <td data-col="findings" data-label="${esc(COPY.list.cols.findings)}">${c.total ? `<span>${esc(COPY.list.findingsCell(c.open, c.total))}</span>${revBadge}<span class="meta block">${esc(COPY.list.findingsTurns(c.submitter, c.reviewer))}${c.waived ? ` · ${esc(COPY.list.findingsWaived(c.waived))}` : ''}</span>` : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
     <td data-col="day" data-label="${esc(COPY.list.cols.day)}">${r.clock.reviewDay != null ? esc(reviewDayText(r)) : `<span class="muted">${esc(COPY.missing)}</span>`}</td>
     <td data-col="due" data-label="${esc(COPY.list.cols.due)}">${deadlineCell(r, ctx.asOf, ctx.state)}</td>
     <td data-col="pen" data-label="${esc(COPY.list.cols.pen)}" class="num">${esc(r.penalty)}</td>
@@ -343,7 +353,8 @@ function rowHtml(r, ctx) {
 
 function groupHeader(g, summary, expanded, ctx) {
   const label = valueLabel(g.key, g.value);
-  const waits = Object.entries(summary.wait).map(([k, n]) => `${COPY.waiting.values[k]} ${n}`).join(' · ');
+  const waitList = Object.entries(summary.wait).map(([k, n]) => `${COPY.waiting.values[k]} ${n}`).join(', ');
+  const waits = waitList ? COPY.grouping.waitingOn(waitList) : '';
   const bits = [
     COPY.grouping.count(summary.count),
     waits,
@@ -351,7 +362,9 @@ function groupHeader(g, summary, expanded, ctx) {
     COPY.grouping.m2(summary.m2.median == null ? COPY.missing : days1(summary.m2.median), summary.m2.n),
   ];
   if (summary.m3) { bits.splice(1, 0, COPY.grouping.assigned(summary.assigned)); bits.push(COPY.grouping.m3(summary.m3.median == null ? COPY.missing : days1(summary.m3.median), summary.m3.n)); }
-  if (summary.openSub) bits.push(COPY.grouping.openLongest(summary.openSub, days1(summary.longestSub)));
+  if (summary.openSub) bits.push(COPY.grouping.openOnSubmitter(summary.openSub, days1(summary.longestSub)));
+  if (summary.openRev) bits.push(COPY.grouping.openOnReviewer(summary.openRev, days1(summary.longestRev)));
+  if (summary.waived) bits.push(COPY.grouping.waived(summary.waived));
   if (summary.missed) bits.push(COPY.grouping.missed(summary.missed));
   if (summary.stuck) bits.push(COPY.grouping.stuck(summary.stuck));
   const id = `g-${g.path.replace(/[^\w-]/g, '_')}`;
@@ -375,7 +388,7 @@ export function renderList(rows, allRowsCount, state, ctx) {
 
   let body = '';
   if (!rows.length) {
-    body = `<tr><td colspan="${COLS.length}" class="empty">${esc(COPY.list.empty)} <button type="button" class="btn-link" data-action="clear-all">${esc(COPY.list.emptyAction)}</button></td></tr>`;
+    body = `<tr><td colspan="${COLS.length}" class="empty">${esc(ctx.emptyText || COPY.list.empty)} <button type="button" class="btn-link" data-action="clear-all">${esc(COPY.list.emptyAction)}</button></td></tr>`;
   } else if (!state.group.length) {
     body = rows.map((r) => rowHtml(r, { ...ctx, depth: 0 })).join('');
   } else {
