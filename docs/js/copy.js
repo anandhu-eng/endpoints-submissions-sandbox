@@ -237,6 +237,8 @@ export const COPY = {
     title: 'Filters',
     open: 'Filters',
     close: 'Close filters',
+    hide: 'Hide filters',
+    hideHelp: 'Hide filters. The Filters button above the list shows them again.',
     clearAll: 'Clear all filters',
     search: 'Search',
     searchPlaceholder: 'Short id, PR #, issue #, org, model',

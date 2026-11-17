@@ -190,6 +190,7 @@ export function renderFilters(state, dom, openSections, extra = {}) {
   <div class="sidebar-head">
     <h2 class="micro">${esc(COPY.filters.title)}</h2>
     <button type="button" class="btn-quiet" id="clear-all">${esc(COPY.filters.clearAll)}</button>
+    <button type="button" class="icon-btn xs only-wide" id="hide-filters" aria-label="${esc(COPY.filters.hide)}" title="${esc(COPY.filters.hideHelp)}">${icon('chevsLeft')}</button>
     <button type="button" class="icon-btn only-drawer" id="close-filters" aria-label="${esc(COPY.filters.close)}">${icon('close')}</button>
   </div>
   ${section('review', COPY.filters.sections.review, `

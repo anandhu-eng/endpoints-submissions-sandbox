@@ -329,12 +329,18 @@ function bind() {
   };
   $('#open-filters').addEventListener('click', () => {
     if (window.matchMedia('(max-width: 1023px)').matches) openDrawer(!drawer.classList.contains('open'));
-    else { document.body.classList.toggle('filters-hidden'); $('#open-filters').setAttribute('aria-expanded', String(!document.body.classList.contains('filters-hidden'))); }
+    else showSidebar(document.body.classList.contains('filters-hidden'));
   });
+  // Wide screens: the sidebar sits beside the list; « in its header or the Filters button hides it.
+  const showSidebar = (show) => {
+    document.body.classList.toggle('filters-hidden', !show);
+    $('#open-filters').setAttribute('aria-expanded', String(show));
+  };
   $('#backdrop').addEventListener('click', () => openDrawer(false));
 
   drawer.addEventListener('click', (e) => {
     if (e.target.closest('#close-filters')) openDrawer(false);
+    if (e.target.closest('#hide-filters')) { showSidebar(false); $('#open-filters').focus(); }
     if (e.target.closest('#clear-all')) update(clearFilters);
   });
   drawer.addEventListener('toggle', (e) => {

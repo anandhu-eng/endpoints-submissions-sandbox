@@ -219,6 +219,9 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 .main:focus { outline: none; }
 .backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 44; }
 .only-drawer { display: none; }
+.only-wide { display: inline-flex; }
+#hide-filters { color: var(--text-muted); }
+#hide-filters:hover { color: var(--text-strong); }
 
 .title-row { display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; margin-bottom: 12px; }
 .view-heading { font-size: 19px; font-weight: 700; letter-spacing: -0.015em; color: var(--navy); line-height: 1.375; }
@@ -563,6 +566,7 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .sidebar.open { transform: none; }
   body.filters-hidden .sidebar { display: block; }
   .only-drawer { display: inline-flex; }
+  .only-wide { display: none; }
   #open-filters[aria-expanded="true"] { background: transparent; color: var(--navy-ui); border-color: rgba(31, 58, 92, 0.35); }
 }
 @media (max-width: 959px) {

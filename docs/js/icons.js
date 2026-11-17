@@ -20,6 +20,7 @@ const P = {
   chevRight: '<path d="M9 6l6 6-6 6"/>',
   chevDown: '<path d="M6 9l6 6 6-6"/>',
   chevLeft: '<path d="M15 6l-6 6 6 6"/>',
+  chevsLeft: '<path d="M12 6l-6 6 6 6M19 6l-6 6 6 6"/>',
   up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
   down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
   close: '<path d="M6 6l12 12M18 6L6 18"/>',
