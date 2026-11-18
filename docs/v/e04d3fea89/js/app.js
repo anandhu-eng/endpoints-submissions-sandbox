@@ -9,7 +9,7 @@ import { esc, setTimeZone, dateTimeText, isoText } from './format.js';
 import { icon } from './icons.js';
 import { setPeople, personName } from './ui.js';
 import {
-  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderList,
+  renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderGroupTools, renderList,
 } from './render-list.js';
 import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
 
@@ -209,7 +209,7 @@ function renderListView() {
       if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
     }
     $('#list').innerHTML = renderList(rows, scope, state, {
-      hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''),
+      hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''), groupTools: renderGroupTools(state),
     });
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
@@ -249,7 +249,13 @@ function renderDetailView(r) {
   keepFocus(() => {
     $('#detail-view').innerHTML = renderDetail(r, detailCtx(), ui.detail);
   });
-  if (opening) { const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  if (opening) {
+    const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
+    // A link to a finding on a narrow screen: show its conversation, not the top of the page.
+    if (state.node && tabsNarrow.matches) { const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' }); }
+    else if (state.node) convoIntoView();
+  }
+  pinPanels();
 }
 
 // ---------------------------------------------------------------------------
@@ -271,14 +277,15 @@ function setStages(set) {
   state.stage = set.size === def.size && [...set].every((c) => def.has(c)) ? null : set;
 }
 
+// Every change of submission starts without a pushed finding entry (see selectNode).
 function openDetail(shortId) {
-  state.id = shortId; state.node = '';
+  state.id = shortId; state.node = ''; ui.detail.pushedNode = false;
   writeUrl(true);
   render();
 }
 function closeDetail() {
   const id = state.id;
-  state.id = ''; state.node = '';
+  state.id = ''; state.node = ''; ui.detail.pushedNode = false;
   writeUrl(true);
   render();
   const link = document.querySelector(`[data-open="${CSS.escape(id)}"]`);
@@ -288,7 +295,7 @@ function step(delta) {
   const rows = visibleRows();
   const i = rows.findIndex((r) => r.shortId === state.id);
   const next = rows[i + delta];
-  if (next) { state.id = next.shortId; state.node = ''; writeUrl(true); render(); }
+  if (next) { state.id = next.shortId; state.node = ''; ui.detail.pushedNode = false; writeUrl(true); render(); }
 }
 
 function bind() {
@@ -318,6 +325,18 @@ function bind() {
     const first = $('#list .sub-link');
     if (first) first.focus();
   });
+
+  // The list toolbar is sticky below 1024px and its height varies; CSS uses it as scroll padding
+  // so focus and jumps land below it.
+  const toolbar = $('.toolbar');
+  if (toolbar && 'ResizeObserver' in window) {
+    new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-h', `${Math.ceil(toolbar.getBoundingClientRect().height)}px`)).observe(toolbar);
+  }
+
+  // Capture also sees scrolls inside the panels, e.g. keyboard focus scrolling a panel not yet pinned.
+  document.addEventListener('scroll', pinPanels, { capture: true, passive: true });
+  window.addEventListener('resize', pinPanels);
+  if ('ResizeObserver' in window) new ResizeObserver(pinPanels).observe($('#main'));
 
   // Filters: a drawer below 1024px; beside the list from 1024px, where « or the Filters
   // button hides it. The hidden choice is remembered in this browser.
@@ -455,7 +474,18 @@ function bind() {
     if (tgt.closest('#tl-order')) { ui.detail.newest = !ui.detail.newest; return rerenderTimeline(); }
     const tab = tgt.closest('[role="tab"]');
     if (tab) return selectTab(tab.id === 'tab-issues' ? 'issues' : 'pr', true);
-    if (tgt.closest('#back-to-tree')) { ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0'; const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return; }
+    if (tgt.closest('#back-to-tree')) {
+      // Wide screens: the tree sits above the conversation in the same panel; go back up to it.
+      if (!tabsNarrow.matches) {
+        $('#panel-issues .panel-body').scrollTop = 0;
+        const s = $('#issue-tree [aria-selected="true"]') || $('#issue-tree [tabindex="0"]'); if (s) s.focus(); return;
+      }
+      // Opening a finding on a narrow screen pushed a history entry; going back pops it (popstate re-renders).
+      if (ui.detail.pushedNode) { history.back(); return; }
+      ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0';
+      state.node = ''; writeUrl();
+      const s = $('#issue-tree [aria-selected="true"]'); if (s) s.focus(); return;
+    }
     const tw = tgt.closest('[data-twisty]');
     if (tw) return toggleNode(tw.closest('[role="treeitem"]'));
     if (tgt.closest('a')) return;
@@ -484,7 +514,15 @@ function bind() {
     else if (e.key === 'Escape') closeDetail();
   });
 
-  window.addEventListener('popstate', () => { readUrl(); render(); });
+  window.addEventListener('popstate', () => {
+    const fromNode = state.node;
+    readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render();
+    // Back from a finding's conversation: focus that finding in the tree (scroll is already restored).
+    if (fromNode && !state.node && state.id) {
+      const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(fromNode)}"]`);
+      if (item) { for (const x of $$('#issue-tree [role="treeitem"]')) x.tabIndex = -1; item.tabIndex = 0; item.focus({ preventScroll: true }); }
+    }
+  });
 }
 
 // D20: copy the current URL (all state lives in it).
@@ -496,6 +534,9 @@ function copyLink() {
 function selectTab(tab, focus) {
   ui.detail.tab = tab;
   $('.panels').dataset.tab = tab;
+  // With the tab bar stuck mid-panel, start the new panel at its top (scroll-margin clears the bars).
+  const bar = $('.panel-tabs-bar');
+  if (bar && $('.panels').getBoundingClientRect().top < bar.getBoundingClientRect().bottom) $('.panels').scrollIntoView({ block: 'start' });
   for (const b of $$('.panel-tabs [role="tab"]')) {
     const on = b.id === `tab-${tab}`;
     b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1;
@@ -506,6 +547,7 @@ function selectTab(tab, focus) {
 function rerenderTimeline() {
   const r = D.rows.find((x) => x.shortId === state.id);
   keepFocus(() => { $('#timeline').innerHTML = renderTimeline(r, detailCtx(), ui.detail); });
+  pinPanels();
 }
 
 // ---------------------------------------------------------------------------
@@ -526,11 +568,34 @@ function toggleNode(item, force) {
   if (tw) tw.innerHTML = icon(open ? 'chevDown' : 'chevRight');
   const n = item.dataset.node;
   open ? ui.detail.collapsed.delete(n) : ui.detail.collapsed.add(n);
+  pinPanels();
+}
+const tabsNarrow = window.matchMedia('(max-width: 959px)');
+// Detail on wide screens: the panels' contents scroll only once the panels reach the header
+// (the page is scrolled to the end; nothing follows the panels). Before that, the wheel scrolls
+// the page. A panel left part-way down keeps its scrollbar, so its top stays reachable.
+function pinPanels() {
+  const p = $('.panels');
+  if (!p || !document.body.classList.contains('in-detail')) return;
+  const pinned = !tabsNarrow.matches && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+  for (const b of p.querySelectorAll('.panel > .panel-body')) {
+    const on = pinned || b.scrollTop > 0;
+    b.classList.toggle('scrolls', on);
+    b.parentElement.classList.toggle('more-above', on && b.scrollTop > 0);
+    // The bottom shadow shows whenever content is cut off, even before the panel can scroll.
+    b.parentElement.classList.toggle('more-below', b.scrollTop + b.clientHeight < b.scrollHeight - 1);
+    // The conversation heading is stuck at the panel's top: the shadow moves under it and "All findings" shows.
+    const hd = b.querySelector('#convo .convo-head');
+    b.parentElement.classList.toggle('head-stuck', !!hd && b.scrollTop > 0 && hd.getBoundingClientRect().top <= b.getBoundingClientRect().top + 1);
+  }
 }
 function selectNode(item) {
   const n = item.dataset.node;
   state.node = n; ui.detail.node = n; ui.detail.showConvo = true;
-  writeUrl();
+  // Narrow screens replace the tree with the conversation, so the phone's Back gesture should return to the tree.
+  const push = tabsNarrow.matches && !ui.detail.pushedNode;
+  writeUrl(push);
+  if (push) ui.detail.pushedNode = true;
   for (const x of $$('#issue-tree [role="treeitem"]')) {
     const on = x === item;
     x.setAttribute('aria-selected', String(on)); x.classList.toggle('selected', on);
@@ -539,6 +604,25 @@ function selectNode(item) {
   const r = D.rows.find((x) => x.shortId === state.id);
   $('#convo').innerHTML = renderConversation(r, ui.detail, detailCtx());
   $('#panel-issues').dataset.convo = '1';
+  if (tabsNarrow.matches) {
+    const h = $('#convo .convo-head h3'); if (h) h.focus({ preventScroll: true });
+    $('#convo').scrollIntoView({ block: 'start' });
+  } else if (convoIntoView()) {
+    // The tree item scrolled away, so focus follows the conversation, as on narrow screens.
+    const h = $('#convo .convo-head h3'); if (h) h.focus({ preventScroll: true });
+  }
+  pinPanels();
+}
+// Wide screens: the conversation sits under the tree. If its heading is out of sight, or too near
+// the bottom to show any of the conversation, bring it to the panel's top. True if it scrolled.
+// The heading sticks to the panel's top, so the conversation's own top is what is checked.
+function convoIntoView() {
+  const head = $('#convo .convo-head'), body = $('#panel-issues .panel-body');
+  if (!head || !body) return false;
+  const c = $('#convo').getBoundingClientRect(), b = body.getBoundingClientRect();
+  if (c.top >= b.top && c.top <= Math.min(b.bottom, window.innerHeight) - 120) return false;
+  head.scrollIntoView({ block: 'start' });
+  return true;
 }
 function treeKey(e, item) {
   const items = visibleItems();

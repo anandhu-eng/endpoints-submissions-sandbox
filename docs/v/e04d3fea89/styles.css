@@ -257,7 +257,9 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 /* ---------------------------------------------------------------- metrics */
 .metrics { margin-bottom: 12px; }
 .metrics-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 8px; }
-.metrics-head .seg-group { margin-left: auto; }
+.mresp { grid-column: span 2; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; align-content: start; }
+.mresp-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+.mresp-head .meta { flex-basis: 100%; }
 /* Metric cards: a title, one large number, at most one supporting line, then an optional
    phase bar or breakdown list. Modelled on stat panels (DESIGN.md references 5, 12). */
 .mcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
@@ -380,8 +382,11 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 .wait { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--text-strong); white-space: nowrap; }
 .wait .icon { width: 14px; height: 14px; color: var(--text-muted); }
 .wait-nobody { color: var(--text-muted); font-weight: 400; }
-.flag { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; padding: 1px 6px; border: 1px solid var(--line-control); border-radius: 4px; color: var(--text-strong); white-space: nowrap; }
-.flag .icon { width: 12px; height: 12px; }
+/* Flags are one size everywhere: same height, padding, type and radius, and the text never wraps.
+   In the table they stack and fill the column, so a cell's badges line up; in cards they sit in a row. */
+.flag { display: inline-flex; align-items: center; gap: 4px; box-sizing: border-box; height: 22px; max-width: 100%; padding: 0 7px; font-size: 11.5px; line-height: 1; font-weight: 600; border: 1px solid var(--line-control); border-radius: 4px; background: var(--bg-band); color: var(--text-strong); white-space: nowrap; }
+.flag > span { overflow: hidden; text-overflow: ellipsis; }
+.flag .icon { width: 12px; height: 12px; flex: none; }
 .flag-provisional { color: var(--amber-fg); background: var(--amber-bg); border-color: transparent; }
 .flag-escalated, .flag-compliance_overdue, .flag-non_chair_finalize { color: var(--warn); border-color: currentColor; }
 .flag-test { border-style: dashed; }
@@ -593,7 +598,9 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .mcards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mcard.wide { grid-column: span 2; }
   .mcard { padding: 14px; }
-  .metrics-head .seg-group { margin-left: 0; }
+  /* Label on its own line, so the three buttons stay on one row down to 320px. */
+  .mresp .seg-group { width: 100%; }
+  .mresp .seg-label { flex-basis: 100%; margin: 0 0 4px; }
   .kv { grid-template-columns: minmax(0, 40%) 1fr; }
   .cards { grid-template-columns: minmax(0, 1fr); }
   .detail-title { font-size: 22px; line-height: 28px; }
@@ -602,14 +609,14 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .list-head, .toolbar { border-radius: 0; }
   .groupbar .spacer { display: none; }
 }
-/* The list becomes cards when it is too narrow for the table (about 905px of columns),
+/* The list becomes cards when it is too narrow for the table (about 965px of columns),
    on phones and on mid-width screens with the filters open. Keyed to the list's own width. */
 #list { container: list / inline-size; }
-@container list (max-width: 919px) {
+@container list (max-width: 979px) {
   /* One hover colour for the whole card, not per cell; flags in a row, as on phones. */
   table.data tr.row:hover td { background: transparent; }
   table.data tr.row:hover { background: var(--bg-hover); }
-  table.data td[data-col="flags"] .flags { flex-direction: row; flex-wrap: wrap; }
+  table.data td[data-col="flags"] .flags { display: inline-flex; flex-direction: row; flex-wrap: wrap; align-items: center; }
   .table-wrap { overflow: visible; border: 0; }
   table.data, table.data tbody { display: block; }
   table.data thead { display: none; }
@@ -635,7 +642,7 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   td[data-col="due"] { min-width: 130px; }
   td[data-col="stage"] .pill { white-space: normal; }
   td[data-col="stage"] { min-width: 160px; max-width: 220px; }
-  td[data-col="flags"] .flags { flex-direction: column; align-items: flex-start; }
+  td[data-col="flags"] .flags { display: flex; flex-direction: column; align-items: stretch; }
   td[data-col="links"] { white-space: nowrap; }
 }
 .wait-line { display: block; margin-bottom: 4px; }
@@ -644,8 +651,7 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
 @media (min-width: 761px) { td[data-col="wait"] { min-width: 110px; max-width: 200px; } td[data-col="wait"] .wait { white-space: normal; } }
 td[data-col="stage"] .pill { border-radius: 10px; }
 @media (min-width: 761px) {
-  td[data-col="flags"] { min-width: 150px; max-width: 210px; }
-  td[data-col="flags"] .flag { white-space: normal; }
+  td[data-col="flags"] { min-width: 150px; }
   td[data-col="rev"] { min-width: 90px; }
 }
 .status-strip .stage-cell { flex-wrap: wrap; max-width: 100%; }
@@ -716,10 +722,6 @@ a.flag:hover { text-decoration: underline; }
 .md-table th, .md-table td { border: 1px solid var(--line-table); padding: 3px 8px; text-align: left; vertical-align: top; }
 .md-table th { background: var(--bg-band); }
 
-/* D26: flags wrap without clipping */
-@media (min-width: 761px) {
-  td[data-col="flags"] .flags { flex-wrap: wrap; }
-}
 /* D26: the list fits 1440 with the sidebar open; long cells wrap instead of widening the table */
 @media (min-width: 761px) {
   table.data thead th { white-space: normal; vertical-align: bottom; }
@@ -732,7 +734,7 @@ a.flag:hover { text-decoration: underline; }
 .opt-count { margin-left: auto; padding-left: 8px; font-size: 12px; color: var(--text-muted); }
 .checks label.is-disabled { color: var(--text-muted); cursor: not-allowed; }
 .opt-why { padding-left: 24px; }
-.flag-non_chair_finalize_removed { color: var(--text-muted); border-style: dashed; font-weight: 500; }
+.flag-non_chair_finalize_removed { color: var(--text-muted); border-style: dashed; }
 .md-inline code { font-family: var(--mono); font-size: 0.92em; padding: 0 3px; border-radius: 3px; background: var(--kbd-bg); font-style: normal; }
 .todo-node { font-weight: 600; }
 .wait-list .referral { list-style: none; margin-left: 20px; }
@@ -783,3 +785,118 @@ a.flag:hover { text-decoration: underline; }
   .title-row { gap: 8px; }
   #open-filters, .copy-link { flex: 1 1 auto; justify-content: center; }
 }
+
+/* Sizes of the sticky bars. They set the sticky offsets and the scroll padding, so jumps,
+   scrollIntoView and keyboard focus land below the bars instead of under them.
+   --toolbar-h is measured by app.js (the list toolbar's height varies with grouping and filters). */
+:root { --stick-header: var(--header-h); --stick-tabs: 0px; --ptitle-h: 34px; --convo-h: 0px; }
+@media (max-width: 959px) { :root { --stick-tabs: var(--tabs-h); } }
+@media (max-width: 760px) { :root { --stick-header: 0px; } }
+html { scroll-padding-top: calc(var(--stick-header) + 8px); }
+@media (max-width: 1023px) { html { scroll-padding-top: calc(var(--stick-header) + var(--toolbar-h, 0px) + 8px); } }
+html:has(body.in-detail) { scroll-padding-top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h) + var(--convo-h) + 8px); }
+.panel-title { min-height: var(--ptitle-h); box-sizing: border-box; }
+.panels { scroll-margin-top: calc(var(--stick-header) + var(--stick-tabs)); }
+
+/* Grouping tools sit in the list head once a grouping is set. */
+.gb-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+
+@media (max-width: 1023px) {
+  /* Filter chips in the sticky toolbar: one line that scrolls sideways, so the bar keeps its height. */
+  .toolbar .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px 2px; }
+  .toolbar .chips::-webkit-scrollbar { display: none; }
+  .toolbar .chip { flex: none; }
+  .list-head { flex-wrap: wrap; row-gap: 8px; }
+  .gb-tools { width: 100%; margin-left: 0; }
+  .gb-tools #g-sort, .gb-tools #g-add { flex: 1 1 140px; min-width: 140px; }
+  .gb-tools .btn-quiet { flex: 1 1 auto; }
+}
+
+@media (max-width: 959px) {
+  /* In a finding's conversation, its heading and the way back stay under the tabs and panel title. */
+  html:has(#panel-issues[data-convo="1"]) { --convo-h: 52px; }
+  #panel-issues[data-convo="1"] .convo-head {
+    position: sticky; top: calc(var(--stick-header) + var(--stick-tabs) + var(--ptitle-h)); z-index: 4;
+    min-height: 52px; box-sizing: border-box; margin: -12px -12px 8px; padding: 4px 12px;
+    background: var(--bg-card); border-bottom: 1px solid var(--line);
+  }
+  #back-to-tree { order: -1; display: inline-flex; align-items: center; gap: 2px; min-height: 44px; }
+  #back-to-tree .icon { width: 16px; height: 16px; }
+  .panel-tabs-bar .panel-tabs { display: flex; flex: 1; }
+  .panel-tabs .seg-btn { flex: 1; }
+}
+
+@media (max-width: 760px) {
+  /* Turn table: keep who, start and business days; "Ended" is the next row's start. */
+  .turn-table th:nth-child(3), .turn-table td:nth-child(3), .turn-table th:nth-child(5), .turn-table td:nth-child(5) { display: none; }
+  /* Tap targets about 44px; 16px text in fields stops iOS zooming on focus. */
+  .seg-btn, .btn-back, #open-filters, .copy-link { min-height: 44px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .icon-btn.xs { width: 32px; height: 32px; }
+  .gchip [data-gremove] { width: 36px; height: 36px; }
+  .gchip { height: 40px; }
+  .field-control, .field-control.sm { height: 40px; font-size: 16px; }
+  /* Finding rows: the GitHub link goes under the title instead of taking a column. */
+  .tnode-row { flex-wrap: wrap; }
+  .tnode-row .node-link { flex-basis: 100%; padding-left: 22px; min-height: 32px; display: inline-flex; align-items: center; }
+}
+
+/* Cards: a tap anywhere on the card opens the submission. Other links stay on top. */
+@container list (max-width: 979px) {
+  table.data tr.row { position: relative; }
+  table.data .sub-link::after { content: ''; position: absolute; inset: 0; }
+  table.data tr.row a:not(.sub-link), table.data tr.row button { position: relative; z-index: 1; }
+}
+
+/* Narrow-screen polish from the UX review. */
+@media (max-width: 1023px) {
+  /* Fade at the right edge: more filter chips are a swipe away. */
+  .toolbar .chips { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); }
+}
+@media (min-width: 761px) and (max-width: 1023px) { .gb-sort { margin-left: 0; } }
+@media (max-width: 959px) {
+  /* The panel title already links the tracking issue; the conversation's own link shows as an icon. */
+  .convo-head .ev-link { font-size: 0; min-width: 44px; min-height: 44px; justify-content: center; }
+  .convo-head .ev-link .ext-icon { width: 16px; height: 16px; }
+}
+@media (max-width: 380px) { .gchip-n { display: none; } }
+@media (max-width: 760px) {
+  .date-pair .field-control { font-size: 16px; }
+  #toggle-overview { min-height: 44px; display: inline-flex; align-items: center; }
+}
+/* Touch tablets: period buttons about 44px, as on phones. */
+@media (max-width: 1023px) { .mresp .seg-btn { min-height: 44px; } }
+
+/* Wide screens: the PR and tracking issue panels fit the screen under the header. The page scrolls
+   until they reach it; then each panel's content scrolls on its own. app.js sets .scrolls. */
+@media (min-width: 960px) {
+  body.in-detail .main { padding-bottom: 12px; }
+  .panel { display: flex; flex-direction: column; max-height: max(320px, calc(100vh - var(--header-h) - 24px)); }
+  .panel > .panel-body { flex: 1 1 auto; min-height: 0; overflow-y: hidden; scroll-padding-top: 8px; }
+  .panel > .panel-body.scrolls { overflow-y: auto; }
+  /* Shadows under the title and at the bottom edge show when there is more to scroll. They sit over
+     the content, so cards and tables inside the panel do not hide them. app.js sets the classes. */
+  .panel { position: relative; }
+  .panel::before, .panel::after { content: ''; position: absolute; left: 1px; right: 1px; height: 12px; pointer-events: none; z-index: 3; opacity: 0; transition: opacity .15s; }
+  .panel::before { top: var(--ptitle-h); background: linear-gradient(var(--scroll-shade), transparent); }
+  .panel::after { bottom: 1px; background: linear-gradient(transparent, var(--scroll-shade)); }
+  .panel.more-above::before, .panel.more-below::after { opacity: 1; }
+}
+:root { --scroll-shade: rgb(0 0 0 / 0.14); }
+html.dark { --scroll-shade: rgb(0 0 0 / 0.6); }
+@media (min-width: 960px) {
+  /* The conversation's heading stays at the top of the issue panel while the conversation scrolls.
+     "All findings" goes back up to the tree. Jumps land below the heading; the heading itself goes to the top.
+     top: -12px cancels the panel body's padding, so the heading meets the panel title. */
+  #convo .convo-head { position: sticky; top: -12px; z-index: 2; min-height: 44px; box-sizing: border-box; margin: 0 -12px 8px; padding: 4px 12px; background: var(--bg-card); border-bottom: 1px solid var(--line); }
+  #back-to-tree { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; min-height: 32px; padding: 0 6px; }
+  /* Until the heading is stuck the tree is in view, so the button is hidden (kept in place so the heading does not shift). */
+  .panel:not(.head-stuck) #back-to-tree { visibility: hidden; }
+  .panel.head-stuck::before { top: calc(var(--ptitle-h) + 44px); }
+  #back-to-tree .icon { width: 14px; height: 14px; }
+  #back-to-tree .bt-narrow { display: none; }
+  #panel-issues .panel-body { scroll-padding-top: 56px; }
+  /* Also the heading's links and button, so tabbing to them does not scroll the panel. */
+  #convo, #convo .convo-head, #convo .convo-head * { scroll-margin-top: -56px; }
+}
+@media (max-width: 959px) { #back-to-tree .bt-wide { display: none; } }

@@ -4,7 +4,7 @@ import { COPY } from './copy.js';
 import { esc, days1, timeEl, timeElShort, markdown, dateText, dayTimeText, excerptHtml } from './format.js';
 import { icon } from './icons.js';
 import { ms } from './derive.js';
-import { stagePill, waitChip, waitReasonText, flagBadge, personHtml, personName, roleBadge, turnBadge, extLink, person } from './ui.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, stuckBadge, penaltyBadge, personHtml, personName, roleBadge, turnBadge, extLink, person } from './ui.js';
 import { reasonText, reviewDayText } from './render-list.js';
 
 const TL_TYPES = ['state', 'commit', 'comment', 'review', 'label', 'check', 'assign', 'db'];
@@ -115,10 +115,10 @@ function header(r, ctx) {
 
   const links = [r.pr ? extLink(r.pr.url, COPY.detail.links.pr(r.pr.number), 'btn-quiet') : '', r.ti ? extLink(r.ti.url, COPY.detail.links.issue(r.ti.number), 'btn-quiet') : ''].join('');
   const sup = [
-    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}${esc(COPY.detail.supersedes(r.supersedes))}</a>` : '',
-    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}${esc(COPY.detail.supersededBy(r.supersededBy))}</a>` : '',
+    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}<span>${esc(COPY.detail.supersedes(r.supersedes))}</span></a>` : '',
+    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}<span>${esc(COPY.detail.supersededBy(r.supersededBy))}</span></a>` : '',
   ].join('');
-  const flagHtml = [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + sup;
+  const flagHtml = stuckBadge(r) + penaltyBadge(r) + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + sup;
 
   return `
   <div class="detail-top">
@@ -346,9 +346,9 @@ export function renderConversation(r, ui, ctx) {
       ${items ? `<ol class="timeline">${items}</ol>` : ''}</section>`;
   }).join('');
   return `<div class="convo-head">
-      <h3 class="micro">${esc(COPY.detail.tree.conversation(issue.number))}</h3>
+      <h3 class="micro" tabindex="-1">${esc(COPY.detail.tree.conversation(issue.number))}</h3>
       ${extLink(issue.url, COPY.detail.timeline.view, 'ev-link')}
-      <button type="button" class="btn-link only-narrow" id="back-to-tree">${esc(COPY.detail.tree.backToTree)}</button>
+      <button type="button" class="btn-link" id="back-to-tree">${icon('chevLeft', 'bt-narrow')}${icon('up', 'bt-wide')}${esc(COPY.detail.tree.backToTree)}</button>
     </div>
     ${turnTable}
     <article class="ev ev-body"><div class="ev-head">${icon('issue', 'ev-ic')}<span class="ev-text">${personHtml(issue.author)} ${roleBadge(issue.author)} ${esc(COPY.detail.timeline.opened)}</span><span class="ev-time">${timeEl(issue.created_at)}</span></div>

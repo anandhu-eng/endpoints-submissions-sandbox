@@ -348,7 +348,7 @@ export function renderConversation(r, ui, ctx) {
   return `<div class="convo-head">
       <h3 class="micro" tabindex="-1">${esc(COPY.detail.tree.conversation(issue.number))}</h3>
       ${extLink(issue.url, COPY.detail.timeline.view, 'ev-link')}
-      <button type="button" class="btn-link only-narrow" id="back-to-tree">${icon('chevLeft')}${esc(COPY.detail.tree.backToTree)}</button>
+      <button type="button" class="btn-link" id="back-to-tree">${icon('chevLeft', 'bt-narrow')}${icon('up', 'bt-wide')}${esc(COPY.detail.tree.backToTree)}</button>
     </div>
     ${turnTable}
     <article class="ev ev-body"><div class="ev-head">${icon('issue', 'ev-ic')}<span class="ev-text">${personHtml(issue.author)} ${roleBadge(issue.author)} ${esc(COPY.detail.timeline.opened)}</span><span class="ev-time">${timeEl(issue.created_at)}</span></div>
