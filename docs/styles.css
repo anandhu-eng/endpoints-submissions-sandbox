@@ -687,7 +687,8 @@ a.flag:hover { text-decoration: underline; }
 .detail-head-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
 .detail-head-row .detail-links { margin: 0; }
 .status-strip { margin-top: 6px; }
-.top-band { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr) minmax(250px, 1fr); gap: 12px; margin-bottom: 12px; align-items: start; }
+/* Cards in a row share the tallest card's height. */
+.top-band { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr) minmax(250px, 1fr); gap: 12px; margin-bottom: 12px; align-items: stretch; }
 .top-band.with-pub { grid-template-columns: minmax(200px, 1fr) minmax(0, 2fr) minmax(230px, 1fr) minmax(230px, 1fr); }
 .top-band .card-body { padding: 10px 12px; }
 .card-clock .kv, .card-pub .kv { grid-template-columns: auto 1fr; }
@@ -705,6 +706,10 @@ a.flag:hover { text-decoration: underline; }
 @media (max-width: 1279px) {
   .top-band, .top-band.with-pub { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .top-band .card-todo { grid-column: 1 / -1; }
+  /* Same order with or without a publication card: "Waiting on" and the clock side by side,
+     then "What to do", then the publication card, both full width. */
+  .top-band { grid-auto-flow: dense; }
+  .top-band .card-pub { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
   .top-band, .top-band.with-pub { grid-template-columns: minmax(0, 1fr); }
