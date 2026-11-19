@@ -12,6 +12,7 @@ import {
   renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderGroupTools, renderList,
 } from './render-list.js';
 import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
+import { computeProgram, renderProgram } from './program.js';
 
 // Every import linked. index.html shows a load-error note if this never runs.
 window.reviewStatusReady = true;
@@ -79,6 +80,7 @@ async function load() {
   setTimeZone(snap.calendar?.timezone);
   D = deriveAll(snap);
   D.snapshot = snap;
+  D.program = computeProgram(snap);
   setPeople(D.people);
   DOM = domains(D.rows);
   const asOfText = dateTimeText(snap.as_of);
@@ -183,7 +185,7 @@ function renderListView() {
     const { rows: mRows, noStage } = metricRows();
     const metrics = computeMetrics(mRows, noStage, D.ctx, state.period);
     const ov = overviewOpen();
-    $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
+    $('#metrics').innerHTML = (ov ? renderProgram(D.program) + renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
     $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
     $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 });
@@ -253,7 +255,9 @@ function renderDetailView(r) {
     const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
     // A link to a finding on a narrow screen: show its conversation, not the top of the page.
     if (state.node && tabsNarrow.matches) { const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' }); }
+    else if (state.node) convoIntoView();
   }
+  pinPanels();
 }
 
 // ---------------------------------------------------------------------------
@@ -330,6 +334,11 @@ function bind() {
   if (toolbar && 'ResizeObserver' in window) {
     new ResizeObserver(() => document.documentElement.style.setProperty('--toolbar-h', `${Math.ceil(toolbar.getBoundingClientRect().height)}px`)).observe(toolbar);
   }
+
+  // Capture also sees scrolls inside the panels, e.g. keyboard focus scrolling a panel not yet pinned.
+  document.addEventListener('scroll', pinPanels, { capture: true, passive: true });
+  window.addEventListener('resize', pinPanels);
+  if ('ResizeObserver' in window) new ResizeObserver(pinPanels).observe($('#main'));
 
   // Filters: a drawer below 1024px; beside the list from 1024px, where « or the Filters
   // button hides it. The hidden choice is remembered in this browser.
@@ -468,6 +477,11 @@ function bind() {
     const tab = tgt.closest('[role="tab"]');
     if (tab) return selectTab(tab.id === 'tab-issues' ? 'issues' : 'pr', true);
     if (tgt.closest('#back-to-tree')) {
+      // Wide screens: the tree sits above the conversation in the same panel; go back up to it.
+      if (!tabsNarrow.matches) {
+        $('#panel-issues .panel-body').scrollTop = 0;
+        const s = $('#issue-tree [aria-selected="true"]') || $('#issue-tree [tabindex="0"]'); if (s) s.focus(); return;
+      }
       // Opening a finding on a narrow screen pushed a history entry; going back pops it (popstate re-renders).
       if (ui.detail.pushedNode) { history.back(); return; }
       ui.detail.showConvo = false; $('#panel-issues').dataset.convo = '0';
@@ -535,6 +549,7 @@ function selectTab(tab, focus) {
 function rerenderTimeline() {
   const r = D.rows.find((x) => x.shortId === state.id);
   keepFocus(() => { $('#timeline').innerHTML = renderTimeline(r, detailCtx(), ui.detail); });
+  pinPanels();
 }
 
 // ---------------------------------------------------------------------------
@@ -555,8 +570,27 @@ function toggleNode(item, force) {
   if (tw) tw.innerHTML = icon(open ? 'chevDown' : 'chevRight');
   const n = item.dataset.node;
   open ? ui.detail.collapsed.delete(n) : ui.detail.collapsed.add(n);
+  pinPanels();
 }
 const tabsNarrow = window.matchMedia('(max-width: 959px)');
+// Detail on wide screens: the panels' contents scroll only once the panels reach the header
+// (the page is scrolled to the end; nothing follows the panels). Before that, the wheel scrolls
+// the page. A panel left part-way down keeps its scrollbar, so its top stays reachable.
+function pinPanels() {
+  const p = $('.panels');
+  if (!p || !document.body.classList.contains('in-detail')) return;
+  const pinned = !tabsNarrow.matches && window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+  for (const b of p.querySelectorAll('.panel > .panel-body')) {
+    const on = pinned || b.scrollTop > 0;
+    b.classList.toggle('scrolls', on);
+    b.parentElement.classList.toggle('more-above', on && b.scrollTop > 0);
+    // The bottom shadow shows whenever content is cut off, even before the panel can scroll.
+    b.parentElement.classList.toggle('more-below', b.scrollTop + b.clientHeight < b.scrollHeight - 1);
+    // The conversation heading is stuck at the panel's top: the shadow moves under it and "All findings" shows.
+    const hd = b.querySelector('#convo .convo-head');
+    b.parentElement.classList.toggle('head-stuck', !!hd && b.scrollTop > 0 && hd.getBoundingClientRect().top <= b.getBoundingClientRect().top + 1);
+  }
+}
 function selectNode(item) {
   const n = item.dataset.node;
   state.node = n; ui.detail.node = n; ui.detail.showConvo = true;
@@ -575,7 +609,22 @@ function selectNode(item) {
   if (tabsNarrow.matches) {
     const h = $('#convo .convo-head h3'); if (h) h.focus({ preventScroll: true });
     $('#convo').scrollIntoView({ block: 'start' });
+  } else if (convoIntoView()) {
+    // The tree item scrolled away, so focus follows the conversation, as on narrow screens.
+    const h = $('#convo .convo-head h3'); if (h) h.focus({ preventScroll: true });
   }
+  pinPanels();
+}
+// Wide screens: the conversation sits under the tree. If its heading is out of sight, or too near
+// the bottom to show any of the conversation, bring it to the panel's top. True if it scrolled.
+// The heading sticks to the panel's top, so the conversation's own top is what is checked.
+function convoIntoView() {
+  const head = $('#convo .convo-head'), body = $('#panel-issues .panel-body');
+  if (!head || !body) return false;
+  const c = $('#convo').getBoundingClientRect(), b = body.getBoundingClientRect();
+  if (c.top >= b.top && c.top <= Math.min(b.bottom, window.innerHeight) - 120) return false;
+  head.scrollIntoView({ block: 'start' });
+  return true;
 }
 function treeKey(e, item) {
   const items = visibleItems();

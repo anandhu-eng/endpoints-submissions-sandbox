@@ -12,6 +12,7 @@ import {
   renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderGroupTools, renderList,
 } from './render-list.js';
 import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
+import { computeProgram, renderProgram } from './program.js';
 
 // Every import linked. index.html shows a load-error note if this never runs.
 window.reviewStatusReady = true;
@@ -79,6 +80,7 @@ async function load() {
   setTimeZone(snap.calendar?.timezone);
   D = deriveAll(snap);
   D.snapshot = snap;
+  D.program = computeProgram(snap);
   setPeople(D.people);
   DOM = domains(D.rows);
   const asOfText = dateTimeText(snap.as_of);
@@ -183,7 +185,7 @@ function renderListView() {
     const { rows: mRows, noStage } = metricRows();
     const metrics = computeMetrics(mRows, noStage, D.ctx, state.period);
     const ov = overviewOpen();
-    $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
+    $('#metrics').innerHTML = (ov ? renderProgram(D.program) + renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
     $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
     $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 });

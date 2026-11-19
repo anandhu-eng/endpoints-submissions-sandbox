@@ -164,6 +164,24 @@ export const COPY = {
   availability: { available: 'Available', preview: 'Preview', rdi: 'RDI' },
   roles: { submitter: 'submitter', reviewer: 'reviewer', chair: 'chair', engineer: 'engineer', bot: 'bot' },
 
+  program: {
+    heading: 'Program',
+    scope: 'All submissions. Filters do not change these.',
+    subsTitle: 'Submissions per month',
+    subsNote: (n, months) => `${n} in the last ${months} months`,
+    subsAria: (list) => `Submissions per month: ${list}`,
+    monthTip: (month, year, n) => `${month} ${year}: ${n} submission${n === 1 ? '' : 's'}`,
+    orgsTitle: 'Submitting orgs',
+    orgsNote: (months) => `Last ${months} months`,
+    orgsDelta: (d, before) => (d === 0 ? `Same as the ${before} before` : `${d > 0 ? '+' : '−'}${Math.abs(d)} vs the ${before} before`),
+    suiteTitle: 'Suite coverage',
+    suiteNote: (k, months) => `Models each org ran, of ${k}, last ${months} months`,
+    suiteAvg: (pct) => `Average ${pct}%`,
+    share: 'Share',
+    used: 'used',
+    usedTip: (org, model) => `${org} ran ${model}`,
+  },
+
   metrics: {
     heading: 'Overview',
     more: 'More metrics',

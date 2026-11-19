@@ -69,6 +69,14 @@ export function flagBadge(flag) {
   return `<span class="flag flag-${esc(flag)}" title="${esc(COPY.flagHelp[flag] || '')}">${icon(FLAG_ICON[flag] || 'flag')}<span>${esc(COPY.flags[flag] || flag)}</span></span>`;
 }
 
+// Badges the page computes, shown before the flags in the list and the detail view.
+export function stuckBadge(r) {
+  return r.stuckReasons.length ? `<span class="flag flag-stuck" title="${esc(r.stuckReasons.map((x) => COPY.list.stuckReasons[x]).join(', '))}">${icon('alert')}<span>${esc(COPY.metrics.M12.name)}</span></span>` : '';
+}
+export function penaltyBadge(r) {
+  return r.penalty ? `<span class="flag flag-penalty" title="${esc(COPY.list.penaltyHelp)}">${icon('flag')}<span>${esc(COPY.list.penaltyBadge(r.penalty))}</span></span>` : '';
+}
+
 export function turnBadge(state) {
   const [ic, cls] = TURN_LOOK[state] || TURN_LOOK.none;
   const title = state === 'none' ? COPY.turns.noneHelp : '';

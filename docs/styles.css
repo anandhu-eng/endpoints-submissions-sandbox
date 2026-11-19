@@ -254,6 +254,25 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 .date-pair .field-control { width: 100%; min-width: 0; padding: 0 4px; font-size: 12px; }
 .date-pair label { min-width: 0; }
 
+/* ---------------------------------------------------------------- program metrics (draft) */
+.program { margin-bottom: 16px; }
+.pcards { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.6fr) minmax(0, 1.4fr); gap: 12px; align-items: start; }
+.pchart { width: 100%; height: auto; display: block; }
+.pchart .pbar { fill: var(--phase-2); }
+.pchart .pbase { stroke: var(--line-table); stroke-width: 1; }
+.pchart .pval { font: 600 11px var(--font); fill: var(--text-strong); }
+.pchart .plab { font: 11px var(--font); fill: var(--text-muted); }
+.pgrid-wrap { overflow-x: auto; }
+.pgrid { border-collapse: collapse; font-size: 12px; line-height: 16px; width: 100%; }
+.pgrid th { font-weight: 500; text-align: left; color: var(--text); white-space: nowrap; padding: 2px 8px 2px 0; }
+.pgrid thead th { font-size: 11px; color: var(--text-muted); vertical-align: bottom; }
+.pgrid .pcol { display: inline-block; max-width: 56px; overflow: hidden; text-overflow: ellipsis; }
+.pgrid td { text-align: center; padding: 2px 4px; }
+.pgrid .ppct { text-align: right; color: var(--text-strong); padding-left: 8px; }
+.pdot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--line-control); vertical-align: middle; }
+.pdot.on { background: var(--phase-2); border-color: var(--phase-2); }
+@media (max-width: 900px) { .pcards { grid-template-columns: minmax(0, 1fr); } }
+
 /* ---------------------------------------------------------------- metrics */
 .metrics { margin-bottom: 12px; }
 .metrics-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 8px; }

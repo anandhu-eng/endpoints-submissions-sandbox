@@ -5,7 +5,7 @@ import { esc, days1, plainDateText, dateText, dateTimeText, shortDateTimeText, i
 import { icon } from './icons.js';
 import { STAGES, STATUS_ORDER, TERMINAL, DEFAULT_STAGES, summarizeGroup } from './derive.js';
 import { stageSet, groupRows, alsoInCount, matchedDeadline, GROUP_KEYS, MULTI_KEYS, SORT_KEYS, PERIODS, GSORTS, UNASSIGNED } from './query.js';
-import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel } from './ui.js';
+import { stagePill, waitChip, waitReasonText, flagBadge, stuckBadge, penaltyBadge, personName, valueLabel } from './ui.js';
 
 // ---------------------------------------------------------------------------
 // Metric cards. Display only: filtering happens in the sidebar.
@@ -14,12 +14,13 @@ import { stagePill, waitChip, waitReasonText, flagBadge, personName, valueLabel 
 const SECONDARY = ['M3', 'M9', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17'];
 
 // A response-time figure: the median is the value; mean, n and caveats go to the tooltip.
-function respStat(m, line, extra, calendar = false) {
+// `turns`: the caption says how many turns the median covers, so a change of period shows.
+function respStat(m, line, extra, calendar = false, turns = false) {
   const v = m.stats.median;
   return {
     value: v == null ? COPY.metrics.none : days1(v),
     unit: v == null ? '' : COPY.metrics.daysShort,
-    caption: v == null ? '' : calendar ? COPY.metrics.medianCaptionCal : COPY.metrics.medianCaption,
+    caption: v == null ? '' : calendar ? COPY.metrics.medianCaptionCal : turns ? COPY.metrics.medianOfTurns(m.stats.n) : COPY.metrics.medianCaption,
     line,
     detail: [COPY.metrics.meanN(days1(m.stats.mean), m.stats.n), ...extra],
   };
@@ -84,11 +85,25 @@ function definitions() {
 export function renderMetrics(m, state, showMore) {
   const pill = COPY.metrics.periodPill[state.period] || COPY.metrics.periodPill.all;
   const M = COPY.metrics;
+  const resp = [
+    card('M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null], false, true), pill }),
+    card('M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null], false, true), pill }),
+  ];
+  // The period control sits right above the two tiles it changes, so the change is on screen on phones too.
   const primary = [
     card('M4', { value: m.M4, wide: true }, phaseBlock(m)),
     card('M5', { value: m.M5.count, wide: true }, publishBlock(m)),
-    card('M1', { ...respStat(m.M1, M.waitingNow(m.M1.open, days1(m.M1.longestOpen)), [m.M1.labelOnly ? M.labelOnlyTurns(m.M1.labelOnly) : null, m.M1.excluded ? M.excluded(m.M1.excluded, M.noStart) : null]), pill }),
-    card('M2', { ...respStat(m.M2, [M.waitingNow(m.M2.open, days1(m.M2.longestOpen)), m.M2.missed ? M.missedShort(m.M2.missed) : null], [m.M2.labelOnly ? M.labelOnlyTurns(m.M2.labelOnly) : null]), pill }),
+    `<div class="mresp" role="group" aria-labelledby="resp-h">
+      <div class="mresp-head">
+        <span id="resp-h" class="micro">${esc(M.respTitle)}</span>
+        <div class="seg-group" role="group" aria-label="${esc(M.period)}" title="${esc(M.periodHelp)}">
+          <span class="seg-label micro">${esc(M.period)}</span>
+          ${PERIODS.map((p) => `<button type="button" class="seg-btn" id="period-${p}" data-period="${p}" aria-pressed="${state.period === p}">${esc(M.periods[p])}</button>`).join('')}
+        </div>
+        <span class="meta">${esc(M.periodNote)}</span>
+      </div>
+      ${resp.join('')}
+    </div>`,
   ];
   const secondary = {
     M3: respStat({ stats: m.M3.stats }, M.openTurns(m.M3.open, days1(m.M3.longestOpen)), [m.M3.excluded ? M.excluded(m.M3.excluded, M.noStart) : null]),
@@ -107,10 +122,6 @@ export function renderMetrics(m, state, showMore) {
     <div class="metrics-head">
       <h2 id="metrics-h" class="micro">${esc(COPY.metrics.heading)}</h2>
       <span class="meta">${esc(COPY.metrics.scope(m.total))}</span>
-      <div class="seg-group" role="group" aria-label="${esc(COPY.metrics.period)}" title="${esc(COPY.metrics.periodHelp)}">
-        <span class="seg-label micro">${esc(COPY.metrics.period)}</span>
-        ${PERIODS.map((p) => `<button type="button" class="seg-btn" id="period-${p}" data-period="${p}" aria-pressed="${state.period === p}">${esc(COPY.metrics.periods[p])}</button>`).join('')}
-      </div>
     </div>
     <div class="mcards">${primary.join('')}</div>
     <div class="mrows" id="tiles-more" ${showMore ? '' : 'hidden'}>${SECONDARY.map((id) => metricRow(id, secondary[id])).join('')}</div>
@@ -257,6 +268,22 @@ export function renderChips(state) {
 // ---------------------------------------------------------------------------
 // Grouping and sort toolbar
 
+function addLevelSelect(state) {
+  const left = GROUP_KEYS.filter((k) => !state.group.includes(k));
+  return state.group.length < 3 ? `<label class="sr-only" for="g-add">${esc(COPY.grouping.add)}</label>
+    <select id="g-add" class="field-control sm"><option value="">${esc(state.group.length ? COPY.grouping.add : COPY.grouping.none)}</option>${left.map((k) => `<option value="${k}">${esc(COPY.grouping.keys[k])}</option>`).join('')}</select>` : `<span class="meta muted">${esc(COPY.grouping.max)}</span>`;
+}
+
+// Grouping tools shown in the list head once a grouping is set.
+export function renderGroupTools(state) {
+  if (!state.group.length) return '';
+  return `<div class="gb-tools">${addLevelSelect(state)}
+    <label class="sr-only" for="g-sort">${esc(COPY.grouping.sort)}</label>
+    <select id="g-sort" class="field-control sm" title="${esc(COPY.grouping.sort)}">${GSORTS.map((g) => `<option value="${g}" ${state.gsort === g ? 'selected' : ''}>${esc({ count: COPY.grouping.sortCount, az: COPY.grouping.sortAz, m1: COPY.grouping.sortM1, m2: COPY.grouping.sortM2 }[g])}</option>`).join('')}</select>
+    <button type="button" class="btn-quiet" id="expand-all">${esc(COPY.grouping.expandAll)}</button>
+    <button type="button" class="btn-quiet" id="collapse-all">${esc(COPY.grouping.collapseAll)}</button></div>`;
+}
+
 export function renderGroupBar(state) {
   const chips = state.group.map((k, i) => `
     <span class="gchip"><span class="gchip-n">${i + 1}</span><span>${esc(COPY.grouping.keys[k])}</span>
@@ -264,22 +291,22 @@ export function renderGroupBar(state) {
       <button type="button" class="icon-btn xs" data-gmove="${i}" data-dir="1" ${i === state.group.length - 1 ? 'disabled' : ''} aria-label="${esc(COPY.grouping.moveDown(COPY.grouping.keys[k]))}">${icon('chevRight')}</button>
       <button type="button" class="icon-btn xs" data-gremove="${i}" aria-label="${esc(COPY.grouping.remove(COPY.grouping.keys[k]))}">${icon('close')}</button>
     </span>`).join(`<span class="gsep" aria-hidden="true">›</span>`);
-  const left = GROUP_KEYS.filter((k) => !state.group.includes(k));
-  const addSel = state.group.length < 3 ? `<label class="sr-only" for="g-add">${esc(COPY.grouping.add)}</label>
-    <select id="g-add" class="field-control sm"><option value="">${esc(state.group.length ? COPY.grouping.add : COPY.grouping.none)}</option>${left.map((k) => `<option value="${k}">${esc(COPY.grouping.keys[k])}</option>`).join('')}</select>` : `<span class="meta muted">${esc(COPY.grouping.max)}</span>`;
+  const addSel = addLevelSelect(state);
   const sortKey = state.sort.replace(/^-/, '');
   const desc = state.sort.startsWith('-');
+  // Two rows: "Group by" and "Sort". Side by side on wide screens, stacked on phones.
+  // Once grouped, the level chips stay here; adding a level, group order and expand/collapse
+  // move to the list head (renderGroupTools), so this bar stays short where it is sticky.
   return `<div class="groupbar">
+    <div class="gb-row gb-group">
     <span class="field-label inline">${esc(COPY.grouping.title)}</span>
-    <div class="gchips">${chips}${addSel}</div>
-    ${state.group.length ? `<label class="sr-only" for="g-sort">${esc(COPY.grouping.sort)}</label>
-      <select id="g-sort" class="field-control sm" title="${esc(COPY.grouping.sort)}">${GSORTS.map((g) => `<option value="${g}" ${state.gsort === g ? 'selected' : ''}>${esc({ count: COPY.grouping.sortCount, az: COPY.grouping.sortAz, m1: COPY.grouping.sortM1, m2: COPY.grouping.sortM2 }[g])}</option>`).join('')}</select>
-      <button type="button" class="btn-quiet" id="expand-all">${esc(COPY.grouping.expandAll)}</button>
-      <button type="button" class="btn-quiet" id="collapse-all">${esc(COPY.grouping.collapseAll)}</button>` : ''}
-    <span class="spacer"></span>
+    <div class="gchips">${chips}${state.group.length ? '' : addSel}</div>
+    </div>
+    <div class="gb-row gb-sort">
     <label class="field-label inline" for="sort-key">${esc(COPY.list.sortLabel)}</label>
     <select id="sort-key" class="field-control sm">${SORT_KEYS.map((k) => `<option value="${k}" ${k === sortKey ? 'selected' : ''}>${esc(COPY.list.sorts[k])}</option>`).join('')}</select>
     <button type="button" class="icon-btn" id="sort-dir" aria-label="${esc(COPY.list.reverse)} (${esc(desc ? COPY.list.descending : COPY.list.ascending)})" title="${esc(COPY.list.reverse)}">${icon(desc ? 'down' : 'up')}</button>
+    </div>
   </div>`;
 }
 
@@ -332,12 +359,12 @@ function rowHtml(r, ctx) {
   const reviewers = r.assignees.length ? r.assignees.map((a) => esc(personName(a))).join(', ') : `<span class="muted">${esc(COPY.filters.unassigned)}</span>`;
   const mine = ctx.myWaits ? ctx.myWaits(r) : new Set();
   const supLinks = [
-    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}${esc(COPY.detail.supersedes(r.supersedes))}</a>` : '',
-    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}${esc(COPY.detail.supersededBy(r.supersededBy))}</a>` : '',
+    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}<span>${esc(COPY.detail.supersedes(r.supersedes))}</span></a>` : '',
+    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}<span>${esc(COPY.detail.supersededBy(r.supersededBy))}</span></a>` : '',
   ].join('');
-  const stuck = r.stuckReasons.length ? `<span class="flag flag-stuck" title="${esc(r.stuckReasons.map((x) => COPY.list.stuckReasons[x]).join(', '))}">${icon('alert')}<span>${esc(COPY.metrics.M12.name)}</span></span>` : '';
+  const stuck = stuckBadge(r);
   // The penalty level shows only when there is one (most rows have none).
-  const penalty = r.penalty ? `<span class="flag flag-penalty" title="${esc(COPY.list.penaltyHelp)}">${esc(COPY.list.penaltyBadge(r.penalty))}</span>` : '';
+  const penalty = penaltyBadge(r);
   const flagList = stuck + penalty + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + supLinks;
   const waits = r.waiting.map((w) => `<span class="wait-line" title="${esc(w.reason.map((x) => waitReasonText(x, mine.has(w.value))).join('; '))}">${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}</span>`).join('');
   const findTip = c.total ? [COPY.list.findingsTurns(c.submitter, c.reviewer), c.waived ? COPY.list.findingsWaived(c.waived) : ''].filter(Boolean).join(' · ') : '';
@@ -417,6 +444,7 @@ export function renderList(rows, allRowsCount, state, ctx) {
   return `<div class="list-head">
       <h2 id="list-h" class="micro">${esc(COPY.list.heading)}</h2>
       <span class="meta">${esc(COPY.list.showing(rows.length, allRowsCount))}</span>
+      ${ctx.groupTools || ''}
     </div>
     <div class="table-wrap"><table class="data" aria-labelledby="list-h"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
     ${ctx.footer || ''}`;
