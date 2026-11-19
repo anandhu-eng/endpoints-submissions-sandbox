@@ -24,10 +24,13 @@ let D = null;          // deriveAll() result
 let DOM = null;        // allowed filter values
 let state = emptyState();
 let ignoredNote = [];
+const PROGRAM_KEY = 'reviewStatus.programFirst';
+function readProgramFirst() { try { return localStorage.getItem(PROGRAM_KEY) !== '0'; } catch (e) { return true; } }
 const ui = {
   showMore: false, closedOpen: false, overview: null, openSections: new Set(['review']), groupOpen: new Map(), groupDefault: null,
   detail: { types: new Set(['state', 'commit', 'comment', 'review', 'label', 'check', 'assign', 'db']), newest: false, collapsed: new Set(), tab: 'pr', showConvo: false },
   dismissed: new Set(),
+  programFirst: readProgramFirst(), programBy: 'month', programByOrg: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -185,7 +188,10 @@ function renderListView() {
     const { rows: mRows, noStage } = metricRows();
     const metrics = computeMetrics(mRows, noStage, D.ctx, state.period);
     const ov = overviewOpen();
-    $('#metrics').innerHTML = (ov ? renderProgram(D.program) + renderMetrics(metrics, state, ui.showMore) : '') +
+    const program = ov ? renderProgram(D.program, ui) : '';
+    $('#program-top').innerHTML = ui.programFirst ? program : '';
+    $('#program-bottom').innerHTML = ui.programFirst ? '' : program;
+    $('#metrics').innerHTML = (ov ? renderMetrics(metrics, state, ui.showMore) : '') +
       `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
     $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
     $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 });
@@ -376,6 +382,9 @@ function bind() {
     if (e.target.closest('#hide-filters')) { showSidebar(false); $('#open-filters').focus(); }
     if (e.target.closest('#clear-all')) update(clearFilters);
   });
+  $('#list-view').addEventListener('toggle', (e) => {
+    if (e.target.id === 'program-by-org') ui.programByOrg = e.target.open;
+  }, true);
   drawer.addEventListener('toggle', (e) => {
     const d = e.target;
     if (d.matches && d.matches('details.fsection')) { const id = d.id.replace('fs-', ''); d.open ? ui.openSections.add(id) : ui.openSections.delete(id); }
@@ -405,6 +414,16 @@ function bind() {
     const per = tgt.closest('[data-period]');
     if (per) return update(() => { state.period = per.dataset.period; });
     if (tgt.closest('#more-metrics')) { ui.showMore = !ui.showMore; return render(); }
+    const place = tgt.closest('[data-program-place]');
+    if (place) {
+      ui.programFirst = place.dataset.programPlace === 'first';
+      try { localStorage.setItem(PROGRAM_KEY, ui.programFirst ? '1' : '0'); } catch (e) { /* storage blocked: not remembered */ }
+      render();
+      // The section moved: bring the pressed button back into view.
+      return $(`#program-place-${place.dataset.programPlace}`)?.focus();
+    }
+    const by = tgt.closest('[data-program-by]');
+    if (by) { ui.programBy = by.dataset.programBy; return render(); }
     if (tgt.closest('#toggle-overview')) { ui.overview = !overviewOpen(); return render(); }
     if (tgt.closest('#copy-link')) return copyLink();
     const chip = tgt.closest('[data-chip]');

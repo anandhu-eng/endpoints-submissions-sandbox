@@ -255,23 +255,43 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 .date-pair label { min-width: 0; }
 
 /* ---------------------------------------------------------------- program metrics (draft) */
+/* One 12-column grid; each tile sets its span. Three numbers, then the chart (8) beside coverage (4). */
 .program { margin-bottom: 16px; }
-.pcards { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.6fr) minmax(0, 1.4fr); gap: 12px; align-items: start; }
-.pchart { width: 100%; height: auto; display: block; }
-.pchart .pbar { fill: var(--phase-2); }
-.pchart .pbase { stroke: var(--line-table); stroke-width: 1; }
-.pchart .pval { font: 600 11px var(--font); fill: var(--text-strong); }
-.pchart .plab { font: 11px var(--font); fill: var(--text-muted); }
-.pgrid-wrap { overflow-x: auto; }
-.pgrid { border-collapse: collapse; font-size: 12px; line-height: 16px; width: 100%; }
-.pgrid th { font-weight: 500; text-align: left; color: var(--text); white-space: nowrap; padding: 2px 8px 2px 0; }
-.pgrid thead th { font-size: 11px; color: var(--text-muted); vertical-align: bottom; }
-.pgrid .pcol { display: inline-block; max-width: 56px; overflow: hidden; text-overflow: ellipsis; }
-.pgrid td { text-align: center; padding: 2px 4px; }
-.pgrid .ppct { text-align: right; color: var(--text-strong); padding-left: 8px; }
-.pdot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--line-control); vertical-align: middle; }
+#program-bottom .program { margin-top: 4px; }
+.program-place { margin-left: auto; }
+.pgrid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
+.pgrid > .pstat { grid-column: span 4; gap: 4px; }
+.pgrid > .pchart-card { grid-column: span 8; }
+.pgrid > .pcover-card { grid-column: span 4; }
+.pcard-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
+.pchart { list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; height: 188px; }
+.pcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.pval { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-strong); margin-bottom: 2px; }
+/* padding-top leaves room for the count above the tallest column; heights resolve against the rest. */
+.pbar-track { flex: 1; width: 100%; padding-top: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; border-bottom: 1px solid var(--line-table); }
+.pbar { display: block; width: min(calc(100% - 2px), 40px); background: var(--phase-2); border-radius: 4px 4px 0 0; }
+.plab { font-size: 11px; line-height: 16px; color: var(--text-muted); padding-top: 4px; white-space: nowrap; }
+.pmodels { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.pmodel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; font-size: 13px; line-height: 18px; }
+.pmodel-name { color: var(--text); overflow-wrap: anywhere; }
+.pmodel-n { color: var(--text-strong); font-weight: 600; text-align: right; }
+.pmodel-track { grid-column: 1 / -1; grid-row: 2; height: 8px; border-radius: 4px; background: var(--bg-status); overflow: hidden; }
+.pmodel-bar { display: block; height: 100%; background: var(--phase-2); border-radius: 4px; }
+.pdetail summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--link); }
+.pdetail .meta { display: block; margin: 6px 0; }
+.pheat-wrap { overflow-x: auto; }
+.pheat { border-collapse: separate; border-spacing: 3px; font-size: 12px; line-height: 14px; }
+.pheat th { font-weight: 500; text-align: left; color: var(--text); white-space: nowrap; padding-right: 6px; }
+.pheat td { padding: 0; }
+.pdot { display: block; width: 12px; height: 12px; border-radius: 2px; border: 1px solid var(--line-control); }
 .pdot.on { background: var(--phase-2); border-color: var(--phase-2); }
-@media (max-width: 900px) { .pcards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1100px) {
+  .pgrid > .pchart-card, .pgrid > .pcover-card { grid-column: span 12; }
+}
+@media (max-width: 640px) {
+  .pgrid > .pstat { grid-column: span 12; }
+  .program-place { margin-left: 0; }
+}
 
 /* ---------------------------------------------------------------- metrics */
 .metrics { margin-bottom: 12px; }
