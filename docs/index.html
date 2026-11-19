@@ -10,7 +10,8 @@
   (function () {
     try {
       var m = document.cookie.match(/(?:^|; )theme=([^;]*)/);
-      if (m && (m[1] === 'dark' || m[1] === 'light')) document.documentElement.setAttribute('data-theme', m[1]);
+      // Light unless dark was chosen.
+      document.documentElement.setAttribute('data-theme', m && m[1] === 'dark' ? 'dark' : 'light');
     } catch (e) { /* ignore */ }
   })();
 </script>
