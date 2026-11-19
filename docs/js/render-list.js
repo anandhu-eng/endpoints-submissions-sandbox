@@ -450,4 +450,57 @@ export function renderList(rows, allRowsCount, state, ctx) {
     ${ctx.footer || ''}`;
 }
 
+// ---------------------------------------------------------------------------
+// Compact rows: the list column beside the reading pane, and the Action needed page.
+
+// The step for one Waiting-on value, in the row's own words (e.g. "1 finding waits on the submitter (#45)").
+function stepText(r, value) {
+  const w = r.waiting.find((x) => x.value === value) || r.waiting[0];
+  return w ? w.reason.map((x) => waitReasonText(x)).filter(Boolean).join('; ') : '';
+}
+
+function compactRow(r, ctx, value) {
+  const sel = ctx.paneOn && ctx.sel === r.shortId;
+  const flags = stuckBadge(r) + penaltyBadge(r) + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('');
+  const reviewers = r.assignees.length ? r.assignees.map((a) => esc(personName(a))).join(', ') : esc(COPY.filters.unassigned);
+  const step = stepText(r, value);
+  const waits = r.waiting.map((w) => waitChip(w.value)).join('');
+  // With the pane on, a row selects; with it off, a row opens the full detail.
+  const href = ctx.paneOn ? ctx.hrefSel(r) : ctx.hrefFor(r);
+  const act = ctx.paneOn ? `data-sel="${esc(r.shortId)}"` : `data-open="${esc(r.shortId)}"`;
+  return `<li class="crow${sel ? ' sel' : ''}">
+    <a class="crow-link" id="crow-${esc(ctx.key)}-${esc(r.shortId)}" href="${esc(href)}" ${act}${sel ? ' aria-current="true"' : ''}>
+      <span class="crow-top"><span class="mono crow-id">${esc(r.shortId)}</span> <span class="crow-org">${esc(r.org || COPY.missing)}</span>${flags ? `<span class="flags">${flags}</span>` : ''}</span>
+      ${step ? `<span class="crow-step">${esc(step)}</span>` : ''}
+      <span class="crow-due">${deadlineCell(r, ctx.asOf, ctx.state)}</span>
+      <span class="crow-meta">${stagePill(r.stage, { withStatus: false })}<span class="waits">${waits}</span></span>
+      <span class="meta crow-sub">${esc(r.models.join(', ') || COPY.missing)} · ${reviewers}</span>
+    </a>
+  </li>`;
+}
+
+export function renderCompact(rows, ctx, value = null) {
+  if (!rows.length) return `<p class="empty">${esc(ctx.emptyText || COPY.list.empty)}</p>`;
+  return `<ul class="crows">${rows.map((r) => compactRow(r, ctx, value)).join('')}</ul>`;
+}
+
+// Action needed: open submissions where a person acts next, one section per role.
+export function renderAction(groups, others, ctx) {
+  const A = COPY.action;
+  const sections = groups.map((g) => `<section class="agroup" aria-labelledby="ag-${g.value}">
+      <h2 class="agroup-h" id="ag-${g.value}">${esc(A.groups[g.value])} <span class="count-pill">${g.rows.length}</span></h2>
+      ${g.rows.length ? renderCompact(g.rows, { ...ctx, key: g.value }, g.value) : `<p class="meta">${esc(A.none)}</p>`}
+    </section>`).join('');
+  return `<p class="meta view-note">${esc(A.intro)}</p>${sections}
+    ${others ? `<p class="meta view-note">${esc(A.others(others))} <a href="${esc(ctx.hrefList)}" data-view="list">${esc(A.seeAll)}</a></p>` : ''}`;
+}
+
+// Reading pane switch: Right | Off.
+export function renderPaneSwitch(pane) {
+  return `<div class="seg-group pane-switch" role="group" aria-label="${esc(COPY.pane.label)}">
+    <span class="seg-label micro">${esc(COPY.pane.label)}</span>
+    ${['right', 'off'].map((v) => `<button type="button" class="seg-btn" id="pane-${v}" data-pane="${v}" aria-pressed="${pane === v}">${esc(COPY.pane[v])}</button>`).join('')}
+  </div>`;
+}
+
 export { MULTI_KEYS };

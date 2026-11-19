@@ -11,13 +11,14 @@ export const GROUP_KEYS = ['model', 'org', 'sub', 'type', 'stage', 'rev', 'div',
 export const SORT_KEYS = ['due', 'day', 'stage', 'created', 'id', 'wait'];
 export const PERIODS = ['all', '90', '30'];
 export const GSORTS = ['count', 'az', 'm1', 'm2'];
+export const VIEWS = ['action', 'list', 'program'];
 
 export const UNASSIGNED = '__unassigned__';
 
 export function emptyState() {
   const s = {
     q: '', stage: null, n: 5, nofind: false, from: '', to: '', test: false,
-    group: [], gsort: 'count', sort: 'due', period: 'all', id: '', node: '',
+    group: [], gsort: 'count', sort: 'due', period: 'all', id: '', node: '', view: '', sel: '',
   };
   for (const k of SET_KEYS) s[k] = new Set();
   return s;
@@ -53,7 +54,7 @@ export function parseUrl(search, dom, rows) {
   const p = new URLSearchParams(search);
   const s = emptyState();
   const ignored = [];
-  const known = new Set(['q', 'stage', 'n', 'nofind', 'from', 'to', 'test', 'group', 'gsort', 'sort', 'period', 'id', 'node', ...SET_KEYS]);
+  const known = new Set(['q', 'stage', 'n', 'nofind', 'from', 'to', 'test', 'group', 'gsort', 'sort', 'period', 'id', 'node', 'view', 'sel', ...SET_KEYS]);
   const list = (v) => v.split(',').map((x) => x.trim()).filter(Boolean);
   for (const [key, value] of p) {
     if (!known.has(key)) { ignored.push(key); continue; }
@@ -82,15 +83,24 @@ export function parseUrl(search, dom, rows) {
       if (value === '1') s[key] = true; else if (value !== '0') ignored.push(`${key}=${value}`);
     } else if (key === 'from' || key === 'to') {
       if (/^\d{4}-\d{2}-\d{2}$/.test(value)) s[key] = value; else ignored.push(`${key}=${value}`);
-    } else if (key === 'id') {
+    } else if (key === 'id' || key === 'sel') {
       const r = rows.find((x) => x.shortId === value || x.id === value);
-      if (r) s.id = r.shortId; else ignored.push(`id=${value}`);
+      if (r) s[key] = r.shortId; else ignored.push(`${key}=${value}`);
+    } else if (key === 'view') {
+      if (VIEWS.includes(value)) s.view = value; else ignored.push(`view=${value}`);
     } else {
       s[key] = value;
     }
   }
+  // Old links carry only filters: they open Submissions. A bare link opens Action needed.
+  if (!s.view) s.view = defaultView(s);
   return { state: s, ignored };
 }
+
+function hasFilters(s) {
+  return !!(s.q || s.stage || s.nofind || s.from || s.to || s.test || s.group.length || SET_KEYS.some((k) => s[k].size));
+}
+function defaultView(s) { return hasFilters(s) ? 'list' : 'action'; }
 
 export function toQuery(s) {
   const p = new URLSearchParams();
@@ -106,6 +116,8 @@ export function toQuery(s) {
   if (s.gsort !== 'count') put('gsort', s.gsort);
   if (s.sort !== 'due') put('sort', s.sort);
   if (s.period !== 'all') put('period', s.period);
+  if (s.view && s.view !== defaultView(s)) put('view', s.view);
+  if (s.view !== 'program') put('sel', s.sel);
   put('id', s.id);
   if (s.id) put('node', s.node);
   const str = p.toString().replace(/%2C/g, ',').replace(/%3A/g, ':');

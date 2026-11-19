@@ -13,7 +13,7 @@ export const COPY = {
     loading: 'Loading data…',
     loadError: (msg) => `Could not load data/snapshot.json: ${msg}`,
     themeToggle: 'Switch light or dark theme',
-    skipToList: 'Skip to submissions',
+    skipToList: 'Skip to main content',
     resultsLink: 'Endpoints results',
     resultsUrl: 'https://endpoints.mlcommons.org',
     sourceRepo: 'Sandbox repo',
@@ -164,12 +164,38 @@ export const COPY = {
   availability: { available: 'Available', preview: 'Preview', rdi: 'RDI' },
   roles: { submitter: 'submitter', reviewer: 'reviewer', chair: 'chair', engineer: 'engineer', bot: 'bot' },
 
+  action: {
+    heading: 'Action needed',
+    intro: 'Open submissions where a person acts next, soonest deadline first.',
+    groups: { submitter: 'Submitters', reviewer: 'Reviewers', chair: 'Chairs' },
+    none: 'Nothing waiting.',
+    others: (n) => `${n} other open submission${n === 1 ? ' waits' : 's wait'} on the lifecycle bot or nobody.`,
+    seeAll: 'See all submissions',
+  },
+
+  pane: {
+    label: 'Reading pane',
+    right: 'Right',
+    off: 'Off',
+    openFull: 'Open full detail',
+    pick: 'Select a submission to see it here.',
+    tableNote: 'Turn the reading pane off for the full table and grouping.',
+  },
+
+  views: {
+    nav: 'Pages',
+    action: 'Action needed',
+    list: 'Submissions',
+    program: 'Program',
+    filtersOnly: 'Filters apply to Submissions only.',
+  },
+
   program: {
-    heading: 'Program',
+    heading: 'Trends',
     scope: 'All submissions. Filters do not change these.',
     place: 'Show',
     placeFirst: 'First',
-    placeAfter: 'After overview',
+    placeAfter: 'After open now',
     subsTitle: 'Submissions',
     subsNote: (months) => `Last ${months} months`,
     orgsTitle: 'Submitting orgs',
@@ -195,7 +221,7 @@ export const COPY = {
   },
 
   metrics: {
-    heading: 'Overview',
+    heading: 'Open now',
     more: 'More metrics',
     fewer: 'Fewer metrics',
     period: 'Activity period',
@@ -203,7 +229,7 @@ export const COPY = {
     periodHelp: 'Response times count only turns that ended in this period. Counts are not affected.',
     respTitle: 'Response times',
     periodNote: 'The other tiles show current counts. The period changes only these two.',
-    scope: (n) => `Covers the ${n} submission${n === 1 ? '' : 's'} that match the filters. Test submissions are never counted.`,
+    scope: (n) => `${n} open submission${n === 1 ? "" : "s"}. Filters do not change these. Test submissions are never counted.`,
     median: 'median',
     mean: 'mean',
     days: 'business days',

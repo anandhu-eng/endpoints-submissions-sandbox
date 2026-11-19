@@ -59,10 +59,51 @@ function todoItems(r, ctx) {
   });
 }
 
+// Parts shared by the detail header and the reading pane.
+function clockHtml(r) {
+  const c = r.clock;
+  return c.startMs == null ? `<p class="muted">${esc(COPY.detail.clock.notStarted)}</p>` : kv([
+    [COPY.detail.clock.day, c.reviewDay != null ? esc(reviewDayText(r)) : dash()],
+    [COPY.detail.clock.start, timeEl(c.startMs, { dateOnly: true })],
+    [COPY.detail.clock.wk3, timeEl(c.wk3Close)],
+    [COPY.detail.clock.wk6, timeEl(c.wk6Close)],
+  ]);
+}
+
+function waitingHtml(r, ctx) {
+  const mine = ctx.myWaits(r);
+  return `<ul class="wait-list">${r.waiting.map((w) => `<li>${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<ul>${w.reason.map((x) => `<li>${esc(waitReasonText(x, mine.has(w.value)))}</li>`).join('')}</ul></li>`).join('')}${
+    r.referral ? `<li class="referral"><p class="todo-ask"><q class="md-inline">${excerptHtml(r.referral.body)}</q> ${extLink(r.referral.url, COPY.detail.timeline.view, 'ev-link')}</p></li>` : ''}</ul>`;
+}
+
+function publicationCard(r) {
+  if (r.status !== 'FINALIZED') return '';
+  const d = r.due;
+  // D25: the date first; if delayed, the date it would have had.
+  const when = d?.rdi ? esc(COPY.list.notAutoPublished) : d?.cohort ? `${timeEl(d.at, { dateOnly: true })} <span class="db-status">${esc(d.cohort.id)}</span>` : dash();
+  const delay = d?.delayed && d.baseAt ? `${esc(COPY.detail.wouldHaveBeen(dateText(d.baseAt), d.shift))} ${esc(d.reasons.map(reasonText).join('; '))}` : d?.reasons?.length ? esc(d.reasons.map(reasonText).join('; ')) : esc(COPY.detail.noDelay);
+  return card(COPY.detail.cards.publication, kv([[COPY.detail.dueCohort, when], [COPY.detail.delay, delay]]), 'card-pub');
+}
+
+function linksHtml(r) {
+  return [r.pr ? extLink(r.pr.url, COPY.detail.links.pr(r.pr.number), 'btn-quiet') : '', r.ti ? extLink(r.ti.url, COPY.detail.links.issue(r.ti.number), 'btn-quiet') : ''].join('');
+}
+
+function flagsHtml(r, ctx) {
+  const sup = [
+    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}<span>${esc(COPY.detail.supersedes(r.supersedes))}</span></a>` : '',
+    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}<span>${esc(COPY.detail.supersededBy(r.supersededBy))}</span></a>` : '',
+  ].join('');
+  return stuckBadge(r) + penaltyBadge(r) + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + sup;
+}
+
 function header(r, ctx) {
   const F = COPY.detail.fields;
-  const c = r.clock;
-  const mine = ctx.myWaits(r);
+  const clock = clockHtml(r);
+  const waiting = waitingHtml(r, ctx);
+  const publication = publicationCard(r);
+  const links = linksHtml(r);
+  const flagHtml = flagsHtml(r, ctx);
   const summary = kv([
     [F.org, esc(r.org || COPY.missing)],
     [F.submitter, personHtml(r.submitter)],
@@ -74,26 +115,9 @@ function header(r, ctx) {
     [F.penalty, esc(r.penalty)],
     [F.longestWait, r.longestSubmitterWait != null ? `${esc(days1(r.longestSubmitterWait))} ${esc(COPY.metrics.days)}` : dash()],
   ]);
-  const clock = c.startMs == null ? `<p class="muted">${esc(COPY.detail.clock.notStarted)}</p>` : kv([
-    [COPY.detail.clock.day, c.reviewDay != null ? esc(reviewDayText(r)) : dash()],
-    [COPY.detail.clock.start, timeEl(c.startMs, { dateOnly: true })],
-    [COPY.detail.clock.wk3, timeEl(c.wk3Close)],
-    [COPY.detail.clock.wk6, timeEl(c.wk6Close)],
-  ]);
-  const waiting = `<ul class="wait-list">${r.waiting.map((w) => `<li>${waitChip(w.value, mine.has(w.value) ? ctx.youName : null)}<ul>${w.reason.map((x) => `<li>${esc(waitReasonText(x, mine.has(w.value)))}</li>`).join('')}</ul></li>`).join('')}${
-    r.referral ? `<li class="referral"><p class="todo-ask"><q class="md-inline">${excerptHtml(r.referral.body)}</q> ${extLink(r.referral.url, COPY.detail.timeline.view, 'ev-link')}</p></li>` : ''}</ul>`;
   const ts = kv(Object.entries(COPY.detail.timestamps).map(([k, label]) => [label, r.db[k] ? timeEl(r.db[k]) : dash()]));
   const todos = todoItems(r, ctx);
   const todo = todos.length ? `<ul class="todo-list">${todos.join('')}</ul>` : `<p class="muted">${esc(COPY.detail.todo.none)}</p>`;
-
-  let publication = '';
-  if (r.status === 'FINALIZED') {
-    const d = r.due;
-    // D25: the date first; if delayed, the date it would have had.
-    const when = d?.rdi ? esc(COPY.list.notAutoPublished) : d?.cohort ? `${timeEl(d.at, { dateOnly: true })} <span class="db-status">${esc(d.cohort.id)}</span>` : dash();
-    const delay = d?.delayed && d.baseAt ? `${esc(COPY.detail.wouldHaveBeen(dateText(d.baseAt), d.shift))} ${esc(d.reasons.map(reasonText).join('; '))}` : d?.reasons?.length ? esc(d.reasons.map(reasonText).join('; ')) : esc(COPY.detail.noDelay);
-    publication = card(COPY.detail.cards.publication, kv([[COPY.detail.dueCohort, when], [COPY.detail.delay, delay]]), 'card-pub');
-  }
 
   // S4: findings waiting on the submitter
   const subF = r.findings.filter((f) => f.turnState === 'submitter');
@@ -112,13 +136,6 @@ function header(r, ctx) {
         <td class="num">${f.openReviewer ? esc(days1(f.openReviewer.labelDays)) : dash()}</td>
         <td>${f.openReviewer ? `${f.openReviewer.overdue ? `<span class="warn-text">${icon('alert')}${esc(COPY.detail.tree.badges.replyOverdue)}</span> ` : ''}${timeEl(f.openReviewer.deadline)}` : dash()}</td></tr>`).join('')}
       </tbody></table>`) : '';
-
-  const links = [r.pr ? extLink(r.pr.url, COPY.detail.links.pr(r.pr.number), 'btn-quiet') : '', r.ti ? extLink(r.ti.url, COPY.detail.links.issue(r.ti.number), 'btn-quiet') : ''].join('');
-  const sup = [
-    r.supersedes ? `<a class="flag flag-supersedes" href="${esc(ctx.hrefForId(r.supersedes))}" data-open="${esc(r.supersedes)}" title="${esc(COPY.flagHelp.supersedes)}">${icon('arrow')}<span>${esc(COPY.detail.supersedes(r.supersedes))}</span></a>` : '',
-    r.supersededBy ? `<a class="flag flag-superseded_by" href="${esc(ctx.hrefForId(r.supersededBy))}" data-open="${esc(r.supersededBy)}" title="${esc(COPY.flagHelp.superseded_by)}">${icon('slash')}<span>${esc(COPY.detail.supersededBy(r.supersededBy))}</span></a>` : '',
-  ].join('');
-  const flagHtml = stuckBadge(r) + penaltyBadge(r) + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('') + sup;
 
   return `
   <div class="detail-top">
@@ -358,6 +375,34 @@ export function renderConversation(r, ui, ctx) {
 }
 
 // ---------------------------------------------------------------------------
+
+// Reading pane: the top of the detail view, with a link to the full detail.
+export function renderPane(r, ctx) {
+  const todos = todoItems(r, ctx);
+  const todo = todos.length ? `<ul class="todo-list">${todos.join('')}</ul>` : `<p class="muted">${esc(COPY.detail.todo.none)}</p>`;
+  const F = COPY.detail.fields;
+  const facts = kv([
+    [F.models, esc(r.models.join(', ') || COPY.missing)],
+    [F.reviewers, r.assignees.length ? r.assignees.map(personHtml).join(', ') : esc(COPY.filters.unassigned)],
+    [F.submitter, personHtml(r.submitter)],
+  ]);
+  const publication = publicationCard(r);
+  return `<header class="detail-head pane-head">
+    <div class="detail-head-row">
+      <h2 class="detail-title" id="pane-title" tabindex="-1"><span class="mono">${esc(r.shortId)}</span> <span class="sep">·</span> ${esc(r.org || COPY.missing)}</h2>
+      <a class="btn-pill" id="pane-open" href="${esc(ctx.hrefForId(r.shortId))}" data-open="${esc(r.shortId)}">${esc(COPY.pane.openFull)}</a>
+    </div>
+    <div class="status-strip">${stagePill(r.stage, { size: 'md' })}<span class="flags">${flagsHtml(r, ctx)}</span></div>
+    <div class="detail-links">${linksHtml(r)}</div>
+  </header>
+  <div class="pane-cards">
+    ${card(COPY.detail.whatToDo, todo, 'card-todo')}
+    ${card(COPY.detail.cards.waiting, waitingHtml(r, ctx), 'card-wait')}
+    ${card(COPY.detail.cards.clock, clockHtml(r), 'card-clock')}
+    ${publication}
+    ${card(COPY.detail.cards.summary, facts)}
+  </div>`;
+}
 
 export function renderDetail(r, ctx, ui) {
   const tab = ui.tab || 'pr';
