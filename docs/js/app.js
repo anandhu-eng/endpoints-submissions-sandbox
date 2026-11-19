@@ -179,6 +179,8 @@ function render() {
   renderNotes();
   const detailRow = state.id ? D.rows.find((r) => r.shortId === state.id) : null;
   document.body.classList.toggle('in-detail', !!detailRow);
+  // The pages stay in the left panel on every view, the full detail included.
+  renderNav(actionGroups().count);
   $('#list-view').hidden = !!detailRow;
   $('#detail-view').hidden = !detailRow;
   if (detailRow) renderDetailView(detailRow); else { delete $('#detail-view').dataset.id; renderListView(); }
@@ -217,7 +219,6 @@ function splitHtml(rows, ctxExtra, listHtml) {
 function renderListView() {
   const view = state.view;
   const A = actionGroups();
-  renderNav(A.count);
   $('#view-heading').textContent = COPY.views[view];
   document.title = `${COPY.views[view]} · ${COPY.app.title}`;
   $('#view-action').hidden = view !== 'action';

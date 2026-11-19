@@ -52,6 +52,7 @@
 
   --header-h: 64px;
   --sidebar-w: 300px;
+  --nav-w: 216px;
   --radius-control: 6px;
   --radius-card: 4px;
   --radius-panel: 8px;
@@ -209,8 +210,9 @@ kbd { font-family: var(--mono); font-size: 11px; background: var(--kbd-bg); bord
 
 /* ---------------------------------------------------------------- layout */
 .app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); align-items: start; }
-body.filters-hidden .app, body.in-detail .app { grid-template-columns: minmax(0, 1fr); }
-body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
+/* Hiding filters, or opening a full detail, keeps the pages on the left; only the filter list goes. */
+body.filters-hidden .app, body.in-detail .app { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+body.filters-hidden #filters-body, body.in-detail #filters-body { display: none; }
 .sidebar {
   position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto;
   background: var(--bg-sidebar); border-right: 1px solid var(--line); padding: 0 0 24px;
@@ -227,6 +229,54 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 .view-heading { font-size: 19px; font-weight: 700; letter-spacing: -0.015em; color: var(--navy); line-height: 1.375; }
 .search { flex: 1; min-width: 200px; max-width: 420px; margin-left: auto; }
 .search .field-control { width: 100%; }
+
+/* ---------------------------------------------------------------- pages and reading pane */
+/* Left panel: the three pages on top, filters below (filters only on Submissions). */
+.side-nav { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-bottom: 1px solid var(--line); }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--radius-panel); color: var(--text-strong); text-decoration: none; font-size: 15px; font-weight: 500; }
+.nav-item .icon { width: 18px; height: 18px; flex: none; }
+.nav-item:hover { background: var(--bg-status); }
+.nav-item[aria-current="page"] { background: var(--nav-pill); color: var(--navy-ui); font-weight: 700; }
+.nav-item .count-pill { margin-left: auto; }
+.side-note { padding: 12px 16px; margin: 0; }
+/* The same pages as tabs, when the left panel is hidden or a drawer. */
+.view-tabs { display: none; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
+.view-tabs .nav-item { padding: 6px 12px; font-size: 14px; border: 1px solid var(--line-control); }
+.view-note { margin: 0 0 12px; }
+
+.pane-slot:empty { display: none; }
+/* Without the search box (Action needed, Program) the title-row controls sit at the right. */
+body:not([data-page="list"]) .copy-link { margin-left: auto; }
+.split-body { display: grid; grid-template-columns: minmax(340px, 420px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.split-list { min-width: 0; }
+.pane {
+  position: sticky; top: calc(var(--header-h) + 12px); max-height: calc(100vh - var(--header-h) - 24px); overflow-y: auto; min-width: 0;
+  padding: 16px; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--bg-card); box-shadow: var(--shadow-raised);
+}
+.pane-head .detail-head-row { align-items: center; }
+.pane-head .detail-title:focus { outline: none; }
+.pane-head .detail-links { margin-top: 8px; }
+.pane-cards { display: grid; gap: 12px; margin-top: 12px; }
+
+/* Compact rows. Beside the pane they form one column; with the pane off they fill the width. */
+.crows { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.split-list:only-child .crows { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); }
+.crow-link {
+  display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-panel);
+  background: var(--bg-card); color: var(--text); text-decoration: none; font-size: 13px; line-height: 18px;
+}
+.crow-link:hover { border-color: var(--line-control); background: var(--bg-hover); }
+.crow-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.crow.sel .crow-link { border-color: var(--navy-ui); box-shadow: inset 3px 0 0 var(--navy-ui); background: var(--bg-selected); }
+.crow-top { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.crow-id { color: var(--link); font-weight: 500; }
+.crow-org { color: var(--text-strong); font-weight: 600; }
+.crow-top .flags { margin-left: auto; }
+.crow-step { color: var(--text-strong); font-size: 14px; font-weight: 600; }
+.crow-due .meta.block { display: inline; margin-left: 6px; }
+.crow-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
+.agroup { margin-bottom: 20px; }
+.agroup-h { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; font-weight: 700; color: var(--text-strong); }
 
 /* ---------------------------------------------------------------- sidebar */
 .sidebar-head { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg-sidebar); z-index: 1; }
@@ -607,7 +657,10 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
 @media (max-width: 1279px) {
 }
 @media (max-width: 1023px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+  /* Closed: a narrow column with the pages only. Open: the full drawer with pages and filters. */
+  .sidebar:not(.open) { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); width: auto; transform: none; transition: none; box-shadow: none; z-index: auto; }
+  .sidebar:not(.open) #filters-body { display: none; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; width: min(320px, 88vw); z-index: 45; transform: translateX(-100%); transition: transform 250ms ease-out; box-shadow: var(--shadow-overlay); }
   .sidebar.open { transform: none; }
   body.filters-hidden .sidebar { display: block; }
@@ -625,6 +678,10 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .convo { margin-top: 0; border-top: 0; padding-top: 0; }
 }
 @media (max-width: 760px) {
+  /* Phone: the pages move to tabs above the content; the panel is a drawer again. */
+  .app, body.filters-hidden .app, body.in-detail .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar:not(.open) { position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; width: min(320px, 88vw); z-index: 45; transform: translateX(-100%); transition: transform 250ms ease-out; box-shadow: var(--shadow-overlay); }
+  .view-tabs { display: flex; }
   .site-header { padding: 8px 16px; gap: 8px 12px; position: static; }
   .brand-bottom { font-size: 18px; }
   .header-links { margin-left: auto; }
