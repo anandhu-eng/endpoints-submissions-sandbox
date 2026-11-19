@@ -1,102 +1,161 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Endpoints Review Status</title>
-  <meta name="description" content="Read-only view of MLCommons Endpoints submissions in review. Prototype with simulated data.">
-  <script>
-    // Apply the theme before first paint (same cookie as the results visualizer).
-    (function () {
-      try {
-        var m = document.cookie.match(/(?:^|; )theme=([^;]*)/);
-        var t = m ? m[1] : null;
-        var dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (dark) document.documentElement.classList.add('dark');
-      } catch (e) { /* ignore */ }
-    })();
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
-  <script>
-    // If a module fails to load (e.g. a cached old file next to a new one), say so instead of
-    // leaving the page blank. Plain text here: copy.js may be the file that failed.
-    window.addEventListener('load', function () {
-      if (window.reviewStatusReady) return;
-      var n = document.getElementById('load-error');
-      if (n) n.hidden = false;
-    });
-  </script>
-  <link rel="stylesheet" href="v/02b27c1fd1/styles.css">
-  <script type="module" src="v/02b27c1fd1/js/app.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Endpoints Paddock</title>
+<meta name="description" content="Sign-in page for Endpoints Paddock. Prototype with simulated data; sign-in is not checked.">
+<script>
+  // Apply the theme before first paint (same cookie as the status page).
+  (function () {
+    try {
+      var m = document.cookie.match(/(?:^|; )theme=([^;]*)/);
+      if (m && (m[1] === 'dark' || m[1] === 'light')) document.documentElement.setAttribute('data-theme', m[1]);
+    } catch (e) { /* ignore */ }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+:root {
+  --bg: #ffffff; --bg-band: #f5f6f8; --bg-card: #ffffff; --bg-input: #ffffff;
+  --line: #e4e7ea; --line-table: #ccd2da; --line-control: #c7ccd3;
+  --text: #434c58; --text-strong: #2e3540; --text-muted: #596371;
+  --navy: #14304f; --action: #007a52; --btn: #007a52; --btn-hover: #006644; --link: #37548a; --focus: #007a52;
+  --soon: #b45309; --mint: #ccebd4;
+  --slate-fg:#434c58; --slate-bg:#e7eaef; --blue-fg:#1e40af; --blue-bg:#dbeafe; --violet-fg:#5b21b6; --violet-bg:#ede9fe;
+  --teal-fg:#0f766e; --teal-bg:#ccfbf1; --green-fg:#15803d; --green-bg:#dcfce7;
+  --shadow: 0 12px 28px -8px rgb(15 23 42 / .16), 0 2px 6px 0 rgb(15 23 42 / .06);
+  --font: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  --mono: 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#1a2028; --bg-band:#202833; --bg-card:#2e3540; --bg-input:#262e3b;
+ --line:#434c58; --line-table:#434c58; --line-control:#566070; --text:#acb4bf; --text-strong:#ffffff; --text-muted:#a3acb8;
+ --navy:#ffffff; --action:#34d399; --link:#bed3fb; --focus:#34d399; --soon:#f1c281; --mint:#1f3a2c;
+ --slate-fg:#ccd2da; --slate-bg:#3a4350; --blue-fg:#bed3fb; --blue-bg:#1c2b4a; --violet-fg:#ddd6fe; --violet-bg:#2e2550;
+ --teal-fg:#99f6e4; --teal-bg:#12332f; --green-fg:#86efac; --green-bg:#14321f;
+ --shadow: 0 12px 28px -8px rgb(0 0 0 / .5); color-scheme: dark; } }
+:root[data-theme="dark"] { --bg:#1a2028; --bg-band:#202833; --bg-card:#2e3540; --bg-input:#262e3b;
+ --line:#434c58; --line-table:#434c58; --line-control:#566070; --text:#acb4bf; --text-strong:#ffffff; --text-muted:#a3acb8;
+ --navy:#ffffff; --action:#34d399; --link:#bed3fb; --focus:#34d399; --soon:#f1c281; --mint:#1f3a2c;
+ --slate-fg:#ccd2da; --slate-bg:#3a4350; --blue-fg:#bed3fb; --blue-bg:#1c2b4a; --violet-fg:#ddd6fe; --violet-bg:#2e2550;
+ --teal-fg:#99f6e4; --teal-bg:#12332f; --green-fg:#86efac; --green-bg:#14321f;
+ --shadow: 0 12px 28px -8px rgb(0 0 0 / .5); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 20px; -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px; }
+.sim { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
+.card { width: 100%; max-width: 380px; background: var(--bg-card); border: 1px solid var(--line-table); border-radius: 8px; padding: 28px 28px 22px; box-shadow: var(--shadow); position: relative; }
+.brand-top { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.brand-name { display: block; margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; color: var(--navy); }
+.brand-sub { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+label { display: block; font-size: 13px; font-weight: 600; color: var(--text-strong); margin: 0 0 4px; }
+.field { margin-bottom: 12px; }
+.input { width: 100%; height: 40px; padding: 0 12px; font: inherit; color: var(--text-strong); background: var(--bg-input); border: 1px solid var(--line-control); border-radius: 6px; }
+.input:focus-visible, .input:focus { outline: 2px solid var(--focus); outline-offset: 1px; border-color: var(--focus); }
+.pw { position: relative; } .pw .input { padding-right: 64px; }
+.pw-toggle { position: absolute; right: 4px; top: 4px; height: 32px; padding: 0 10px; border: 0; background: none; color: var(--link); font: 600 13px var(--font); border-radius: 4px; cursor: pointer; }
+.btn { width: 100%; height: 40px; border-radius: 6px; font: 600 14px var(--font); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn:focus-visible, .pw-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.btn-primary { background: var(--btn); color: #fff; border: 1px solid var(--btn); margin-top: 4px; cursor: pointer; }
+.btn-primary:hover { background: var(--btn-hover); border-color: var(--btn-hover); }
+.btn-gh { margin-top: 10px; background: transparent; color: var(--text-muted); border: 1px dashed var(--line-control); cursor: not-allowed; font-weight: 500; }
+.note { margin: 14px 0 0; font-size: 12px; line-height: 18px; color: var(--text-muted); }
+.proto { color: var(--soon); font-weight: 600; display: flex; gap: 6px; align-items: baseline; }
+.proto::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; transform: translateY(-1px); }
+.pill { display: inline-flex; align-items: center; min-height: 22px; padding: 1px 8px; border-radius: 11px; font-size: 12px; line-height: 18px; font-weight: 600; }
+.t-slate { color: var(--slate-fg); background: var(--slate-bg); } .t-blue { color: var(--blue-fg); background: var(--blue-bg); }
+.t-violet { color: var(--violet-fg); background: var(--violet-bg); }
+.t-teal { color: var(--teal-fg); background: var(--teal-bg); } .t-green { color: var(--green-fg); background: var(--green-bg); }
+.wait { font-weight: 600; color: var(--text-strong); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+.page { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(400px, 1fr); gap: 16px; min-height: calc(100vh - 32px); }
+.panel { background: var(--bg-band); border: 1px solid var(--line); border-radius: 10px; padding: 32px 36px; display: flex; flex-direction: column; justify-content: center; gap: 18px; min-width: 0; overflow: hidden; }
+.side { display: flex; align-items: center; justify-content: center; }
+@media (max-width: 760px) {
+  .page { display: flex; flex-direction: column; min-height: 0; }
+  .side { order: 1; } .panel { order: 2; padding: 18px 16px; }
+  .card { max-width: none; box-shadow: none; padding: 22px 18px 18px; }
+}
+/* Captions crossfade in one cell; only the first shows at t=0 and with reduced motion. */
+@keyframes cap0 { 0%, 12.5% { opacity: 1; } 15%, 97% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes cap1 { 0%, 20% { opacity: 0; } 22.5%, 32.5% { opacity: 1; } 35%, 100% { opacity: 0; } }
+@keyframes cap2 { 0%, 40% { opacity: 0; } 42.5%, 52.5% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes cap3 { 0%, 60% { opacity: 0; } 62.5%, 69.5% { opacity: 1; } 72%, 100% { opacity: 0; } }
+@keyframes cap4 { 0%, 77% { opacity: 0; } 79.5%, 94.5% { opacity: 1; } 97%, 100% { opacity: 0; } }
+
+.map { width: 100%; height: auto; max-height: calc(100vh - 220px); }
+.map .ln { fill: none; stroke: var(--navy); stroke-width: 1.6; } .map .thin { stroke-width: 1; opacity: .55; }
+.map .lane { fill: none; stroke: var(--navy); stroke-width: 2.6; }
+.map .hl { fill: var(--mint); }
+.map .lbl { fill: var(--text-strong); font: 600 13px var(--font); }
+.map .mk { fill: var(--action); stroke: var(--bg-band); stroke-width: 3; } .map .mk-in { fill: var(--bg-band); }
+.map .bot-b { fill: var(--navy); } .map .bot-e { fill: var(--bg-band); } .map .bot-l { stroke: var(--navy); stroke-width: 1.6; }
+.caps { display: grid; min-height: 30px; } .cap { grid-area: 1 / 1; margin: 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cap.c0 { animation: cap0 16s ease-in-out infinite; }
+.cap.c1 { animation: cap1 16s ease-in-out infinite; }
+.cap.c2 { animation: cap2 16s ease-in-out infinite; }
+.cap.c3 { animation: cap3 16s ease-in-out infinite; }
+.cap.c4 { animation: cap4 16s ease-in-out infinite; }
+.cap:not(.c0) { opacity: 0; }
+@media (max-width: 760px) { .map { max-height: none; } .map .lbl { font-size: 24px; } }
+</style>
 </head>
 <body>
-  <script>
-    // Apply the remembered "filters hidden" choice before first paint (app.js stores it).
-    try { if (localStorage.getItem('reviewStatus.filtersHidden') === '1') document.body.classList.add('filters-hidden'); } catch (e) { /* show by default */ }
-  </script>
-  <p id="load-error" class="load-error" role="alert" hidden>The page did not load. Reload it (Ctrl+Shift+R, or Cmd+Shift+R on a Mac). If it still fails, tell the page owner.</p>
-  <a class="skip" href="#main" data-copy="app.skipToList">Skip to submissions</a>
-
-  <header class="site-header">
-    <div class="brand">
-      <span class="brand-top" data-copy="app.brandTop">ML·Commons</span>
-      <span class="brand-bottom" data-copy="app.brandBottom">Review Status</span>
-    </div>
-    <div class="proto">
-      <span class="proto-note"><span class="proto-dot" aria-hidden="true"></span><span data-copy="app.prototype">Prototype. All data is simulated.</span></span>
-      <span id="as-of" class="as-of"></span>
-    </div>
-    <nav class="header-links">
-      <button type="button" id="menu-toggle" class="icon-btn only-phone" aria-expanded="false" aria-controls="hdr-links" data-copy-attr="aria-label:app.menu"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <span id="hdr-links" class="hdr-links">
-        <a id="source-link" class="hlink" target="_blank" rel="noopener noreferrer" hidden data-copy="app.sourceRepo">Sandbox repo</a>
-        <a id="results-link" class="hlink" target="_blank" rel="noopener noreferrer" data-copy="app.resultsLink">Endpoints results</a>
-      </span>
-      <button type="button" id="theme-toggle" class="icon-btn" data-copy-attr="aria-label:app.themeToggle"></button>
-    </nav>
-  </header>
-
-  <div id="notes" class="notes"></div>
-  <p id="load-status" class="load-status" role="status"></p>
-
-  <div class="app">
-    <aside id="filters" class="sidebar" aria-label="Filters" data-copy-attr="aria-label:filters.title">
-      <div id="filters-body"></div>
-    </aside>
-    <div id="backdrop" class="backdrop" hidden></div>
-
-    <main id="main" class="main" tabindex="-1">
-      <div id="list-view">
-        <div class="title-row">
-          <h1 class="view-heading"><span data-copy="app.suite">Endpoints</span> › <span data-copy="app.brandBottom">Review Status</span></h1>
-          <form id="search-form" class="search" role="search">
-            <label for="search" class="sr-only" data-copy="filters.search">Search</label>
-            <input id="search" type="search" class="field-control" autocomplete="off" data-copy-attr="placeholder:filters.searchPlaceholder" aria-describedby="search-help">
-            <span id="search-help" class="sr-only" data-copy="filters.searchHelp"></span>
-          </form>
-          <button type="button" id="open-filters" class="btn-pill" aria-controls="filters" aria-expanded="true">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg>
-            <span data-copy="filters.open">Filters</span><span id="filters-count" class="count-pill"></span>
-          </button>
-          <button type="button" id="copy-link" class="btn-quiet copy-link">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
-            <span data-copy="app.copyLink">Copy link to this view</span>
-          </button>
-          <span id="copy-link-status" class="meta" role="status"></span>
-        </div>
-        <div id="metrics"></div>
-        <div id="stages"></div>
-        <div class="toolbar">
-          <div id="groupbar"></div>
-          <div id="chips" class="chips"></div>
-        </div>
-        <div id="search-note"></div>
-        <div id="list"></div>
-      </div>
-      <div id="detail-view" hidden></div>
-    </main>
-  </div>
+<main class="page">
+  <section class="panel" aria-label="Paddock map">
+    <span class="sim">Simulated</span>
+    <svg class="anim map" viewBox="0 0 640 430" role="img" aria-label="A paddock: garages for submitters, pit wall for reviewers, race control for chairs, a results board. One simulated submission moves along the lane, and the place of whoever acts next lights up.">
+  <rect x="300" y="196" width="128" height="82" rx="6" class="hl" fill-opacity="0"><animate attributeName="fill-opacity" dur="16s" repeatCount="indefinite" keyTimes="0.000;0.200;0.220;0.330;0.350;1.000" values="0;0;0.9;0.9;0;0"/></rect>
+  <rect x="438" y="96" width="112" height="182" rx="6" class="hl" fill-opacity="0"><animate attributeName="fill-opacity" dur="16s" repeatCount="indefinite" keyTimes="0.000;0.400;0.420;0.530;0.550;1.000" values="0;0;0.9;0.9;0;0"/></rect>
+  <g transform="translate(70,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(124,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(178,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(232,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g>
+  <path d="M30 300 H620" class="lane"/><path d="M30 292 H620" class="ln thin"/>
+  <g transform="translate(312,214)"><path d="M0 50 H104 M8 50 V26 H96 V50" class="ln"/><circle cx="28" cy="16" r="6" class="ln"/><circle cx="52" cy="16" r="6" class="ln"/><circle cx="76" cy="16" r="6" class="ln"/></g>
+  <g transform="translate(450,108)"><rect width="88" height="160" rx="3" class="ln"/><path d="M0 34 H88" class="ln"/><rect x="12" y="46" width="28" height="22" class="ln thin"/><rect x="48" y="46" width="28" height="22" class="ln thin"/><rect x="12" y="78" width="28" height="22" class="ln thin"/><rect x="48" y="78" width="28" height="22" class="ln thin"/></g>
+  <g transform="translate(570,168)"><rect width="50" height="100" rx="3" class="ln"/><path d="M10 22 H40 M10 40 H40 M10 58 H40 M10 76 H40" class="ln thin"/></g>
+  <g transform="translate(60,120)"><rect width="110" height="70" rx="3" class="ln"/><path d="M14 22 H96 M14 38 H70 M14 54 H86" class="ln thin"/></g>
+  <text x="171" y="404" class="lbl" text-anchor="middle">Submitters</text>
+  <text x="364" y="186" class="lbl" text-anchor="middle">Reviewers</text>
+  <text x="494" y="88" class="lbl" text-anchor="middle">Chairs</text>
+  <text x="632" y="148" class="lbl" text-anchor="end">Results</text>
+  <text x="115" y="108" class="lbl" text-anchor="middle">Admins</text>
+  <g class="marker"><circle r="9" class="mk"/><circle r="3.5" class="mk-in"/>
+    <g class="bot" transform="translate(0,-26)"><path d="M0 -9 V-13" class="bot-l"/><circle cy="-14" r="1.8" class="bot-b"/><rect x="-10" y="-9" width="20" height="15" rx="4" class="bot-b"/><circle cx="-4" cy="-1.5" r="1.8" class="bot-e"/><circle cx="4" cy="-1.5" r="1.8" class="bot-e"/>
+      <animate attributeName="opacity" dur="16s" repeatCount="indefinite" keyTimes="0;0.13;0.15;0.6;0.62;0.7;0.72;0.97;1" values="1;1;0;0;1;1;0;0;1"/></g>
+    <animateMotion dur="16s" repeatCount="indefinite" path="M177 300 H595" keyPoints="0;0;0.447;0.447;0.758;0.758;0.902;0.902;1;1;0;0" keyTimes="0;0.15;0.2;0.35;0.4;0.55;0.6;0.72;0.77;0.97;0.98;1" calcMode="linear"/>
+    <animate attributeName="opacity" dur="16s" repeatCount="indefinite" keyTimes="0;0.95;0.97;0.98;1" values="1;1;0;0;1"/></g>
+</svg>
+    <div class="caps" aria-hidden="true"><p class="cap c0"><span class="pill t-slate">Compliance check pending</span><span class="wait">→ Lifecycle bot</span></p><p class="cap c1"><span class="pill t-blue">Peer review (Weeks 1–3)</span><span class="wait">→ Reviewer</span></p><p class="cap c2"><span class="pill t-violet">Objection resolution (Weeks 4–6)</span><span class="wait">→ Chair</span></p><p class="cap c3"><span class="pill t-teal">Finalized, waiting to publish</span><span class="wait">→ Lifecycle bot</span></p><p class="cap c4"><span class="pill t-green">Published</span><span class="wait">→ Nobody</span></p></div>
+  </section>
+  <section class="side"><form class="card" id="signin" action="status.html" method="get" novalidate>
+  <span class="brand-top">MLCommons</span>
+  <h1 class="brand-name">Endpoints Paddock</h1>
+  <span class="brand-sub">Submission and review status</span>
+  <div class="field"><label for="username">Username</label><input class="input" id="username" autocomplete="username" autofocus></div>
+  <div class="field"><label for="password">Password</label><div class="pw"><input class="input" id="password" type="password" autocomplete="current-password">
+    <button type="button" class="pw-toggle" id="pw-toggle" aria-controls="password" aria-pressed="false">Show</button></div></div>
+  <button type="submit" class="btn btn-primary" id="signin-btn">Sign in</button>
+  <button type="button" class="btn btn-gh" id="github-btn" disabled>GitHub sign-in · later</button>
+  <p class="note proto">Prototype. Sign-in is not checked.</p>
+  <p class="note">No access? Ask [contact].</p>
+</form></section>
+</main>
+<script>
+(function () {
+  var f = document.getElementById('signin'), pw = document.getElementById('password'), t = document.getElementById('pw-toggle');
+  // Nothing is checked: go to the status page, keeping any link state (e.g. an old shared ?sub=… link).
+  f.addEventListener('submit', function (e) { e.preventDefault(); location.href = 'status.html' + location.search + location.hash; });
+  t.addEventListener('click', function () { var show = pw.type === 'password'; pw.type = show ? 'text' : 'password'; t.textContent = show ? 'Hide' : 'Show'; t.setAttribute('aria-pressed', String(show)); });
+  var u = document.getElementById('username'); if (u) u.focus({ preventScroll: true });
+  // SVG (SMIL) motion follows the reduced-motion setting too: hold the first frame.
+  var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function apply() { document.querySelectorAll('svg.anim').forEach(function (s) { if (mq.matches) { s.pauseAnimations(); s.setCurrentTime(0); } else s.unpauseAnimations(); }); }
+  apply(); if (mq.addEventListener) mq.addEventListener('change', apply);
+})();
+</script>
 </body>
 </html>

@@ -11,7 +11,7 @@ Every org, person, model, system and number here is invented. Submitters are Ubu
 | `docs/` | The page: static HTML, CSS and plain JavaScript, with no build step. GitHub Pages serves this folder. |
 | `docs/data/snapshot.json` | The data the page reads. Generated; don't edit by hand. |
 | `scripts/build_snapshot.py` | Builds the snapshot from this repo through the GitHub API (GET requests only). |
-| `scripts/release_assets.py` | Copies `docs/js` and `docs/styles.css` into a fixed build folder `docs/v/<hash>/` and points `index.html` at it, so a deploy never mixes cached old files with new ones. Run it after editing `docs/js` or `docs/styles.css`. |
+| `scripts/release_assets.py` | Copies `docs/js` and `docs/styles.css` into a fixed build folder `docs/v/<hash>/` and points `status.html` at it, so a deploy never mixes cached old files with new ones. Run it after editing `docs/js` or `docs/styles.css`. |
 | `seed/` | Scenarios, seeding script and validator for the simulated PRs, issues and comments. See `seed/README.md`. |
 | `sim/` | Personas, calendar (holidays, publication dates) and rows with no PR or issue. |
 | `DESIGN.md` | Design tokens, status colours and the references used. |
@@ -22,18 +22,18 @@ Every org, person, model, system and number here is invented. Submitters are Ubu
 cd docs && python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
-Then open http://127.0.0.1:8765/.
+Then open http://127.0.0.1:8765/. The first page is the sign-in page; Sign in opens the status page (`status.html`). Nothing is checked.
 
 ## Before you push a page change
 
 Browsers keep each file from GitHub Pages for 10 minutes, and Pages ignores `?v=` query strings. If a cached old file meets a new one, an import fails and the page shows only a "did not load" note. So the page is served from fixed build folders. After editing anything in `docs/js` or `docs/styles.css`:
 
 ```
-python3 scripts/release_assets.py            # copy the build to docs/v/<hash>/, point index.html at it
+python3 scripts/release_assets.py            # copy the build to docs/v/<hash>/, point status.html at it
 python3 scripts/release_assets.py --check    # must print "current"
 ```
 
-Edit `docs/js`, never `docs/v/`. The newest 4 builds are kept, so a visitor with a cached older `index.html` still gets a matching set of files. The local preview also serves `docs/v/`, so run the script before checking a change in the browser.
+Edit `docs/js`, never `docs/v/`. The newest 4 builds are kept, so a visitor with a cached older `status.html` (or `index.html`, from before the sign-in page) still gets a matching set of files. The local preview also serves `docs/v/`, so run the script before checking a change in the browser.
 
 ## Rebuild the data
 

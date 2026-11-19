@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Endpoints Review Status</title>
+  <meta name="description" content="Read-only view of MLCommons Endpoints submissions in review. Prototype with simulated data.">
+  <script>
+    // Apply the theme before first paint (same cookie as the results visualizer).
+    (function () {
+      try {
+        var m = document.cookie.match(/(?:^|; )theme=([^;]*)/);
+        var t = m ? m[1] : null;
+        var dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+      } catch (e) { /* ignore */ }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
+  <script>
+    // If a module fails to load (e.g. a cached old file next to a new one), say so instead of
+    // leaving the page blank. Plain text here: copy.js may be the file that failed.
+    window.addEventListener('load', function () {
+      if (window.reviewStatusReady) return;
+      var n = document.getElementById('load-error');
+      if (n) n.hidden = false;
+    });
+  </script>
+  <link rel="stylesheet" href="v/02b27c1fd1/styles.css">
+  <script type="module" src="v/02b27c1fd1/js/app.js"></script>
+</head>
+<body>
+  <script>
+    // Apply the remembered "filters hidden" choice before first paint (app.js stores it).
+    try { if (localStorage.getItem('reviewStatus.filtersHidden') === '1') document.body.classList.add('filters-hidden'); } catch (e) { /* show by default */ }
+  </script>
+  <p id="load-error" class="load-error" role="alert" hidden>The page did not load. Reload it (Ctrl+Shift+R, or Cmd+Shift+R on a Mac). If it still fails, tell the page owner.</p>
+  <a class="skip" href="#main" data-copy="app.skipToList">Skip to submissions</a>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-top" data-copy="app.brandTop">ML·Commons</span>
+      <span class="brand-bottom" data-copy="app.brandBottom">Review Status</span>
+    </div>
+    <div class="proto">
+      <span class="proto-note"><span class="proto-dot" aria-hidden="true"></span><span data-copy="app.prototype">Prototype. All data is simulated.</span></span>
+      <span id="as-of" class="as-of"></span>
+    </div>
+    <nav class="header-links">
+      <button type="button" id="menu-toggle" class="icon-btn only-phone" aria-expanded="false" aria-controls="hdr-links" data-copy-attr="aria-label:app.menu"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <span id="hdr-links" class="hdr-links">
+        <a id="source-link" class="hlink" target="_blank" rel="noopener noreferrer" hidden data-copy="app.sourceRepo">Sandbox repo</a>
+        <a id="results-link" class="hlink" target="_blank" rel="noopener noreferrer" data-copy="app.resultsLink">Endpoints results</a>
+      </span>
+      <button type="button" id="theme-toggle" class="icon-btn" data-copy-attr="aria-label:app.themeToggle"></button>
+    </nav>
+  </header>
+
+  <div id="notes" class="notes"></div>
+  <p id="load-status" class="load-status" role="status"></p>
+
+  <div class="app">
+    <aside id="filters" class="sidebar" aria-label="Filters" data-copy-attr="aria-label:filters.title">
+      <div id="filters-body"></div>
+    </aside>
+    <div id="backdrop" class="backdrop" hidden></div>
+
+    <main id="main" class="main" tabindex="-1">
+      <div id="list-view">
+        <div class="title-row">
+          <h1 class="view-heading"><span data-copy="app.suite">Endpoints</span> › <span data-copy="app.brandBottom">Review Status</span></h1>
+          <form id="search-form" class="search" role="search">
+            <label for="search" class="sr-only" data-copy="filters.search">Search</label>
+            <input id="search" type="search" class="field-control" autocomplete="off" data-copy-attr="placeholder:filters.searchPlaceholder" aria-describedby="search-help">
+            <span id="search-help" class="sr-only" data-copy="filters.searchHelp"></span>
+          </form>
+          <button type="button" id="open-filters" class="btn-pill" aria-controls="filters" aria-expanded="true">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8L3 5z"/></svg>
+            <span data-copy="filters.open">Filters</span><span id="filters-count" class="count-pill"></span>
+          </button>
+          <button type="button" id="copy-link" class="btn-quiet copy-link">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+            <span data-copy="app.copyLink">Copy link to this view</span>
+          </button>
+          <span id="copy-link-status" class="meta" role="status"></span>
+        </div>
+        <div id="metrics"></div>
+        <div id="stages"></div>
+        <div class="toolbar">
+          <div id="groupbar"></div>
+          <div id="chips" class="chips"></div>
+        </div>
+        <div id="search-note"></div>
+        <div id="list"></div>
+      </div>
+      <div id="detail-view" hidden></div>
+    </main>
+  </div>
+</body>
+</html>

@@ -6,7 +6,8 @@ This page is a static GitHub Pages site in `docs/`: plain HTML, CSS and JavaScri
 
 | File | Holds |
 | --- | --- |
-| `docs/index.html` | Page shell: header, sidebar, main area. A small inline script applies the theme before first paint. |
+| `docs/index.html` | Sign-in page (Endpoints Paddock): the paddock map and a sign-in form. Nothing is checked; Sign in opens `status.html`. Self-contained, no local scripts. |
+| `docs/status.html` | Status page shell: header, sidebar, main area. A small inline script applies the theme before first paint. |
 | `docs/styles.css` | Colour tokens (light and dark), layout and components. |
 | `docs/js/copy.js` | **All user-facing text.** Edit wording here only. |
 | `docs/js/derive.js` | **All review rules:** stages, flags, Waiting on, turns, Pacific business days, penalties, deadlines, due cohort, metrics. No DOM code. Key single-source functions: `openTurnAsOf` (every open-turn count), `reviewerReplyDeadline` (11:59 PM PT, 2nd business day), `nextBotRun` (7:00 / 8:00 AM PT runs), `myWaits` / `owesAction` (View as). |

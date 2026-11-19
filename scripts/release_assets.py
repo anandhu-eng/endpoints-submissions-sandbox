@@ -4,16 +4,16 @@
 GitHub Pages ignores query strings and lets browsers cache each file for 10
 minutes. After a deploy a visitor can still hold the old index.html, some old
 modules, or both; if old and new modules meet, an import fails and the page is
-blank. So each build gets its own folder that never changes, and index.html
-points at the newest one. A cached old index.html still finds every file of
-its own build. The newest KEEP committed builds stay; older folders, and builds
+blank. So each build gets its own folder that never changes, and status.html
+points at the newest one. A cached old status.html (or, from before the sign-in
+page, index.html) still finds every file of its own build. The newest KEEP committed builds stay; older folders, and builds
 that were replaced before being committed, are deleted.
 
 Run it after any change under docs/js or to docs/styles.css, before committing:
 
-    python3 scripts/release_assets.py            # copy the build, point index.html at it
-    python3 scripts/release_assets.py --check    # exit 1 unless index.html is on the current build, and
-                                                 # the build and index.html are committed or staged
+    python3 scripts/release_assets.py            # copy the build, point status.html at it
+    python3 scripts/release_assets.py --check    # exit 1 unless status.html is on the current build, and
+                                                 # the build and status.html are committed or staged
 
 docs/js stays the source you edit. Only the copies under docs/v/ are served.
 """
@@ -32,11 +32,16 @@ from pathlib import Path
 DOCS = Path(__file__).resolve().parent.parent / "docs"
 BUILDS = DOCS / "v"
 LIST = BUILDS / "builds.txt"
+# The status page. index.html is the sign-in page, which loads no local scripts.
+PAGE = DOCS / "status.html"
+# Pages that pointed at a build in earlier commits: index.html was the status page
+# before the sign-in page, and a visitor may still have it cached.
+PAST_PAGES = ["docs/status.html", "docs/index.html"]
 KEEP = 4
 BUILD_ID = re.compile(r"^[0-9a-f]{10}$")
-# The two local assets index.html loads, with or without a build folder in front.
+# The two local assets status.html loads, with or without a build folder in front.
 REFS = re.compile(r"""((?:src|href)=")(?:v/\w+/)?((js/app\.js|styles\.css)")""")
-# Any other local script or stylesheet in index.html would not be versioned.
+# Any other local script or stylesheet in status.html would not be versioned.
 OTHER = re.compile(
     r"""(?:src|href)=["'](?!https?:|//|v/\w+/(?:js/app\.js|styles\.css)["'])[^"']+\.(?:m?js|css)(?:[?#][^"']*)?["']""",
     re.I,
@@ -84,13 +89,13 @@ def ok(r):
 
 
 def untracked(build):
-    """Build files or index.html that git would not deploy as they are on disk."""
-    paths = [str(p.relative_to(DOCS.parent)) for p in sorted(build.rglob("*")) if p.is_file()] + ["docs/index.html"]
+    """Build files or status.html that git would not deploy as they are on disk."""
+    paths = [str(p.relative_to(DOCS.parent)) for p in sorted(build.rglob("*")) if p.is_file()] + ["docs/status.html"]
     if not have_git():
         return ["cannot tell: git is not available here"]
     missing = [p for p in paths if not ok(git("ls-files", "--error-unmatch", p))]
     if not ok(git("diff", "--quiet", "--", *paths)):
-        missing.append("unstaged changes under docs/v or docs/index.html")
+        missing.append("unstaged changes under docs/v or docs/status.html")
     return missing
 
 
@@ -107,14 +112,16 @@ def deployed_refs():
 
 
 def live_builds(ref, pushes=4):
-    """Builds loaded by the deployed index.html and by the index.html of the last few pushes
+    """Builds loaded by the deployed status page and by the status page of the last few pushes
     (this clone's reflog of the deployed branch), since visitors may still have those cached.
     These are never deleted."""
     found = set()
     for i in range(pushes):
-        r = git("show", f"{ref}@{{{i}}}:./docs/index.html" if i else f"{ref}:./docs/index.html")
-        if ok(r):
-            found |= set(re.findall(r"v/([0-9a-f]{10})/", r.stdout))
+        rev = f"{ref}@{{{i}}}" if i else ref
+        for page in PAST_PAGES:
+            r = git("show", f"{rev}:./{page}")
+            if ok(r):
+                found |= set(re.findall(r"v/([0-9a-f]{10})/", r.stdout))
     return found
 
 
@@ -142,23 +149,23 @@ def main():
 
     bid = build_id()
     build = BUILDS / bid
-    index = DOCS / "index.html"
+    index = PAGE
     html = index.read_text(encoding="utf-8")
     new_html = REFS.sub(lambda m: f"{m.group(1)}v/{bid}/{m.group(2)}", html)
 
-    problems = [f"index.html loads {m} without a build folder" for m in OTHER.findall(new_html)]
+    problems = [f"status.html loads {m} without a build folder" for m in OTHER.findall(new_html)]
     loads = [m[2] for m in REFS.findall(html)]
     if sorted(loads) != ["js/app.js", "styles.css"]:
-        problems.append("index.html must load js/app.js and styles.css exactly once each")
+        problems.append("status.html must load js/app.js and styles.css exactly once each")
     if args.check:
         if new_html != html:
-            problems.append(f"index.html does not point at the current build v/{bid}/")
+            problems.append(f"status.html does not point at the current build v/{bid}/")
         if not build.is_dir() or not same_as_source(build):
             problems.append(f"docs/v/{bid}/ is missing or differs from docs/js and docs/styles.css")
         elif not problems:
             missing = untracked(build)
             if missing:
-                print("\n".join(f"not committed or staged: {p}" for p in missing) + "\nStage them: git add docs/v docs/index.html")
+                print("\n".join(f"not committed or staged: {p}" for p in missing) + "\nStage them: git add docs/v docs/status.html")
                 sys.exit(1)
     if problems:
         print("\n".join(problems) + "\nRun: python3 scripts/release_assets.py")
@@ -178,7 +185,7 @@ def main():
     if not have_git():
         # Without git we cannot tell which builds are live, so delete nothing.
         LIST.write_text("\n".join([b for b in listed if b != bid] + [bid]) + "\n")
-        print(f"v/{bid}: index.html points here. git not available: no old builds deleted.")
+        print(f"v/{bid}: status.html points here. git not available: no old builds deleted.")
         return
     # Only committed builds can be live or cached by a visitor, so only they count toward KEEP.
     # A build made while iterating and never committed is deleted as soon as it is replaced.
@@ -195,7 +202,7 @@ def main():
     kept = [b for b in on_disk if b in keep and b not in order] + [b for b in order if b in keep]
     LIST.write_text("\n".join(kept) + "\n")
     note = f"; live on {', '.join(refs)}: {', '.join(sorted(live)) or 'none'}" if refs else "; no deployed branch found, committed builds kept"
-    print(f"v/{bid}: index.html points here; kept {', '.join(kept)}{note}")
+    print(f"v/{bid}: status.html points here; kept {', '.join(kept)}{note}")
 
 
 if __name__ == "__main__":
