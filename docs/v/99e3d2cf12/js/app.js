@@ -10,8 +10,9 @@ import { icon } from './icons.js';
 import { setPeople, personName } from './ui.js';
 import {
   renderMetrics, renderStageCounts, renderFilters, renderChips, renderGroupBar, renderGroupTools, renderList,
+  renderCompact, renderAction, renderPaneSwitch,
 } from './render-list.js';
-import { renderDetail, renderTimeline, renderConversation } from './render-detail.js';
+import { renderDetail, renderTimeline, renderConversation, renderPane } from './render-detail.js';
 import { computeProgram, renderProgram } from './program.js';
 
 // Every import linked. index.html shows a load-error note if this never runs.
@@ -24,10 +25,17 @@ let D = null;          // deriveAll() result
 let DOM = null;        // allowed filter values
 let state = emptyState();
 let ignoredNote = [];
+const PROGRAM_KEY = 'reviewStatus.programFirst';
+const PANE_KEY = 'reviewStatus.readingPane';
+function readPane() { try { return localStorage.getItem(PANE_KEY) === 'off' ? 'off' : 'right'; } catch (e) { return 'right'; } }
+// The reading pane needs room for the panel, a list column and the pane; narrower screens open the full detail.
+const paneWide = window.matchMedia('(min-width: 1280px)');
+function readProgramFirst() { try { return localStorage.getItem(PROGRAM_KEY) !== '0'; } catch (e) { return true; } }
 const ui = {
-  showMore: false, closedOpen: false, overview: null, openSections: new Set(['review']), groupOpen: new Map(), groupDefault: null,
+  showMore: false, closedOpen: false, openSections: new Set(['review']), groupOpen: new Map(), groupDefault: null,
   detail: { types: new Set(['state', 'commit', 'comment', 'review', 'label', 'check', 'assign', 'db']), newest: false, collapsed: new Set(), tab: 'pr', showConvo: false },
   dismissed: new Set(),
+  programFirst: readProgramFirst(), programBy: 'month', programByOrg: false, pane: readPane(),
 };
 
 // ---------------------------------------------------------------------------
@@ -114,17 +122,14 @@ function writeUrl(push = false) {
 }
 function hrefFor(r) { return toQuery({ ...state, id: r.shortId, node: '' }) || '?'; }
 function hrefForId(shortId) { return toQuery({ ...state, id: shortId, node: '' }) || '?'; }
+function hrefSel(r) { return toQuery({ ...state, sel: r.shortId, id: '', node: '' }) || '?'; }
+function hrefView(view) { return toQuery({ ...state, view, sel: '', id: '', node: '' }) || '?'; }
+function paneOn() { return ui.pane === 'right' && paneWide.matches && state.view !== 'program'; }
 
 // No viewer identity: the page is for chairs, PGMs and the infra team, and has no View as.
 // The renderers still accept a viewer so per-person views can return in a later phase.
 function viewInfo() {
   return { view: { role: '', login: '' }, youName: null, myWaits: () => new Set() };
-}
-const isNarrow = () => window.matchMedia('(max-width: 760px)').matches;
-// D16: Overview and stage counts start collapsed on phones.
-function overviewOpen() {
-  if (ui.overview != null) return ui.overview;
-  return !isNarrow();
 }
 
 // S10: how many rows each Waiting-on and Queue option would show with the other filters kept.
@@ -180,41 +185,114 @@ function render() {
   writeUrl();
 }
 
+// Action needed: open, non-test submissions where a person acts next, one group per role.
+const ACTION_ROLES = [['submitter', ['submitter', 'submitter_compliance']], ['reviewer', ['reviewer']], ['chair', ['chair']]];
+function actionGroups() {
+  const open = sortRows(D.rows.filter((r) => !r.isTest && !TERMINAL.has(r.status)), 'due');
+  const groups = ACTION_ROLES.map(([value, waits]) => ({ value, rows: open.filter((r) => r.waiting.some((w) => waits.includes(w.value))) }));
+  const ids = new Set(groups.flatMap((g) => g.rows.map((r) => r.shortId)));
+  return { groups, count: ids.size, others: open.length - ids.size };
+}
+
+function renderNav(actionCount) {
+  const V = COPY.views;
+  const item = (v, ic) => `<a class="nav-item" href="${esc(hrefView(v))}" data-view="${v}"${state.view === v ? ' aria-current="page"' : ''}>${icon(ic)}<span>${esc(V[v])}</span>${v === 'action' && actionCount ? `<span class="count-pill">${actionCount}</span>` : ''}</a>`;
+  const html = item('action', 'inbox') + item('list', 'list') + item('program', 'chart');
+  $('#side-nav').innerHTML = html;
+  $('#view-tabs').innerHTML = html;
+}
+
+// The list column and the reading pane. The selected row is ?sel=, else the first row.
+function splitHtml(rows, ctxExtra, listHtml) {
+  const on = paneOn();
+  const sel = rows.find((r) => r.shortId === state.sel) || rows[0] || null;
+  // selDone: a row in two Action needed groups is marked selected once.
+  const ctx = { hrefFor, hrefSel, asOf: D.asOf, state, paneOn: on, sel: sel?.shortId, selDone: { v: false }, ...ctxExtra };
+  if (!on) return `<div class="split-list">${listHtml(ctx)}</div>`;
+  const pane = sel ? renderPane(sel, detailCtx()) : `<p class="meta">${esc(COPY.pane.pick)}</p>`;
+  return `<div class="split-body"><div class="split-list">${listHtml(ctx)}</div>
+    <section class="pane" id="pane" aria-label="${esc(COPY.pane.label)}">${pane}</section></div>`;
+}
+
 function renderListView() {
+  const view = state.view;
+  const A = actionGroups();
+  renderNav(A.count);
+  $('#view-heading').textContent = COPY.views[view];
+  document.title = `${COPY.views[view]} · ${COPY.app.title}`;
+  $('#view-action').hidden = view !== 'action';
+  $('#view-program').hidden = view !== 'program';
+  $('#view-list').hidden = view !== 'list';
+  $('#search-form').hidden = view !== 'list';
+  $('#open-filters').hidden = view !== 'list';
+  document.body.dataset.page = view;
+  // Hidden pages keep no markup, so ids such as #pane stay unique.
+  if (view !== 'action') $('#view-action').innerHTML = '';
+  if (view !== 'list') $('#list').innerHTML = '';
+  if (view !== 'program') for (const id of ['#program-top', '#metrics', '#stages', '#program-bottom']) $(id).innerHTML = '';
   keepFocus(() => {
+    // Reading pane switch: in the title row, on the pages with a list, where there is room for the pane.
+    $('#pane-slot').innerHTML = view !== 'program' && paneWide.matches ? renderPaneSwitch(ui.pane) : '';
     const { rows: mRows, noStage } = metricRows();
     const metrics = computeMetrics(mRows, noStage, D.ctx, state.period);
-    const ov = overviewOpen();
-    $('#metrics').innerHTML = (ov ? renderProgram(D.program) + renderMetrics(metrics, state, ui.showMore) : '') +
-      `<div class="overview-toggle${ov ? '' : ' collapsed'}">${ov ? '' : `<span class="meta">${esc(COPY.metrics.overviewHidden)}</span>`}<button type="button" class="btn-link" id="toggle-overview" aria-expanded="${ov}">${esc(ov ? COPY.metrics.hideOverview : COPY.metrics.showOverview)}</button></div>`;
-    $('#stages').innerHTML = ov ? renderStageCounts(metrics.M7) : '';
-    $('#filters-body').innerHTML = renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 });
+    $('#filters-body').innerHTML = view === 'list'
+      ? renderFilters(state, DOM, ui.openSections, { counts: optionCounts(), stageCounts: metrics.M7 })
+      : `<p class="meta side-note">${esc(COPY.views.filtersOnly)}</p>`;
     for (const el of $$('[data-indeterminate="true"]')) el.indeterminate = true;
-    $('#groupbar').innerHTML = renderGroupBar(state);
-    $('#chips').innerHTML = renderChips(state);
     const n = activeFilterCount();
     $('#filters-count').textContent = n ? String(n) : '';
-    const rows = visibleRows();
-    const scope = D.rows.filter((r) => state.test || !r.isTest).length;
-    // Search matches hidden by the stage filter
-    let hint = '';
-    if (state.q) {
-      const hidden = D.rows.filter((r) => rowMatches(r, state, { ignoreStage: true })).length - rows.length;
-      if (hidden > 0) hint = `<p class="note">${icon('info')}<span>${esc(COPY.filters.hiddenBySearch(hidden))}</span></p>`;
+
+    if (view === 'action') {
+      const all = A.groups.flatMap((g) => g.rows);
+      $('#view-action').innerHTML = splitHtml(all, {}, (ctx) => renderAction(A.groups, A.others, { ...ctx, hrefList: hrefView('list') }));
+    } else if (view === 'program') {
+      // Program counts every non-test submission; the Submissions filters do not apply here.
+      const base = { ...emptyState(), period: state.period };
+      const pRows = D.rows.filter((r) => !r.isTest && rowMatches(r, base));
+      const pNoStage = D.rows.filter((r) => !r.isTest && rowMatches(r, base, { ignoreStage: true }));
+      const pm = computeMetrics(pRows, pNoStage, D.ctx, state.period);
+      const program = renderProgram(D.program, ui);
+      $('#program-top').innerHTML = ui.programFirst ? program : '';
+      $('#program-bottom').innerHTML = ui.programFirst ? '' : program;
+      $('#metrics').innerHTML = renderMetrics(pm, state, ui.showMore);
+      $('#stages').innerHTML = renderStageCounts(pm.M7);
+    } else {
+      renderSubmissions();
     }
-    $('#search-note').innerHTML = hint;
-    // D19 / D10: say what the scope hides, with a one-click way back.
-    const live = (s) => D.rows.filter((r) => rowMatches(r, s)).length;
-    const foot = [];
-    if (state.queue.size) {
-      const n = live({ ...state, queue: new Set() }) - rows.length;
-      if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
-    }
-    $('#list').innerHTML = renderList(rows, scope, state, {
-      hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''), groupTools: renderGroupTools(state),
-    });
     const search = $('#search');
     if (document.activeElement !== search) search.value = state.q;
+  });
+}
+
+function renderSubmissions() {
+  const on = paneOn();
+  $('#groupbar').innerHTML = on ? '' : renderGroupBar(state);
+  $('#chips').innerHTML = renderChips(state);
+  $('#view-list .toolbar').hidden = !$('#groupbar').innerHTML.trim() && !$('#chips').innerHTML.trim();
+  const rows = visibleRows();
+  const scope = D.rows.filter((r) => state.test || !r.isTest).length;
+  // Search matches hidden by the stage filter
+  let hint = '';
+  if (state.q) {
+    const hidden = D.rows.filter((r) => rowMatches(r, state, { ignoreStage: true })).length - rows.length;
+    if (hidden > 0) hint = `<p class="note">${icon('info')}<span>${esc(COPY.filters.hiddenBySearch(hidden))}</span></p>`;
+  }
+  $('#search-note').innerHTML = hint;
+  // D19 / D10: say what the scope hides, with a one-click way back.
+  const live = (s) => D.rows.filter((r) => rowMatches(r, s)).length;
+  const foot = [];
+  if (state.queue.size) {
+    const n = live({ ...state, queue: new Set() }) - rows.length;
+    if (n > 0) foot.push(`<p class="note">${icon('info')}<span>${esc(COPY.list.hiddenQueue(n))}</span></p>`);
+  }
+  $('#list').innerHTML = splitHtml(rows, {}, (ctx) => {
+    if (!ctx.paneOn) {
+      return renderList(rows, scope, state, {
+        hrefFor, hrefForId, isExpanded, derived: D.ctx, asOf: D.asOf, state, ...viewInfo(), footer: foot.join(''), groupTools: renderGroupTools(state),
+      });
+    }
+    return `<div class="list-head"><h2 id="list-h" class="micro">${esc(COPY.list.heading)}</h2><span class="meta">${esc(COPY.list.showing(rows.length, scope))}</span></div>
+      <p class="meta view-note">${esc(COPY.pane.tableNote)}</p>${renderCompact(rows, { ...ctx, key: 'list' })}${foot.join('')}`;
   });
 }
 
@@ -252,7 +330,7 @@ function renderDetailView(r) {
     $('#detail-view').innerHTML = renderDetail(r, detailCtx(), ui.detail);
   });
   if (opening) {
-    const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
+    const h = $('#detail-view .detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
     // A link to a finding on a narrow screen: show its conversation, not the top of the page.
     if (state.node && tabsNarrow.matches) { const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' }); }
     else if (state.node) convoIntoView();
@@ -270,7 +348,7 @@ function update(fn, { push = false } = {}) {
 }
 
 function clearFilters() {
-  const keep = { group: state.group, gsort: state.gsort, sort: state.sort, period: state.period };
+  const keep = { group: state.group, gsort: state.gsort, sort: state.sort, period: state.period, view: state.view, sel: state.sel };
   state = { ...emptyState(), ...keep };
 }
 
@@ -293,14 +371,30 @@ function closeDetail() {
   const link = document.querySelector(`[data-open="${CSS.escape(id)}"]`);
   if (link) link.focus();
 }
+// j / k in the detail: the next row of the page it was opened from.
 function step(delta) {
-  const rows = visibleRows();
+  const rows = state.view === 'action' ? [...new Map(actionGroups().groups.flatMap((g) => g.rows).map((r) => [r.shortId, r])).values()] : visibleRows();
   const i = rows.findIndex((r) => r.shortId === state.id);
+  if (i < 0) return;
   const next = rows[i + delta];
   if (next) { state.id = next.shortId; state.node = ''; ui.detail.pushedNode = false; writeUrl(true); render(); }
 }
 
 function bind() {
+  // Pages: the left panel, the tabs shown when it is hidden, and in-page links such as "See all submissions".
+  document.addEventListener('click', (e) => {
+    const v = e.target.closest('[data-view]');
+    if (!v || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    state.view = v.dataset.view; state.sel = ''; state.id = ''; state.node = '';
+    writeUrl(true);
+    const drawer = $('#filters');
+    if (drawer.classList.contains('open')) { drawer.classList.remove('open'); $('#backdrop').hidden = true; }
+    render();
+    $('#view-heading').setAttribute('tabindex', '-1');
+    $('#view-heading').focus({ preventScroll: true });
+  });
+  paneWide.addEventListener('change', () => render());
   // Header
   $('#theme-toggle').addEventListener('click', () => {
     const t = currentTheme() === 'dark' ? 'light' : 'dark';
@@ -324,7 +418,7 @@ function bind() {
     clearTimeout(t);
     state.q = search.value.trim();
     render();
-    const first = $('#list .sub-link');
+    const first = $('#list .sub-link, #list .crow-link');
     if (first) first.focus();
   });
 
@@ -376,6 +470,9 @@ function bind() {
     if (e.target.closest('#hide-filters')) { showSidebar(false); $('#open-filters').focus(); }
     if (e.target.closest('#clear-all')) update(clearFilters);
   });
+  $('#list-view').addEventListener('toggle', (e) => {
+    if (e.target.id === 'program-by-org') ui.programByOrg = e.target.open;
+  }, true);
   drawer.addEventListener('toggle', (e) => {
     const d = e.target;
     if (d.matches && d.matches('details.fsection')) { const id = d.id.replace('fs-', ''); d.open ? ui.openSections.add(id) : ui.openSections.delete(id); }
@@ -405,7 +502,29 @@ function bind() {
     const per = tgt.closest('[data-period]');
     if (per) return update(() => { state.period = per.dataset.period; });
     if (tgt.closest('#more-metrics')) { ui.showMore = !ui.showMore; return render(); }
-    if (tgt.closest('#toggle-overview')) { ui.overview = !overviewOpen(); return render(); }
+    const place = tgt.closest('[data-program-place]');
+    if (place) {
+      ui.programFirst = place.dataset.programPlace === 'first';
+      try { localStorage.setItem(PROGRAM_KEY, ui.programFirst ? '1' : '0'); } catch (e) { /* storage blocked: not remembered */ }
+      render();
+      // The section moved: bring the pressed button back into view.
+      return $(`#program-place-${place.dataset.programPlace}`)?.focus();
+    }
+    const by = tgt.closest('[data-program-by]');
+    if (by) { ui.programBy = by.dataset.programBy; return render(); }
+    const pn = tgt.closest('[data-pane]');
+    if (pn) {
+      ui.pane = pn.dataset.pane;
+      try { localStorage.setItem(PANE_KEY, ui.pane); } catch (e) { /* storage blocked: not remembered */ }
+      return render();
+    }
+    const sl = tgt.closest('[data-sel]');
+    if (sl && !e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+      e.preventDefault();
+      state.sel = sl.dataset.sel;
+      writeUrl();
+      return render();
+    }
     if (tgt.closest('#copy-link')) return copyLink();
     const chip = tgt.closest('[data-chip]');
     if (chip) {
@@ -519,6 +638,11 @@ function bind() {
   window.addEventListener('popstate', () => {
     const fromNode = state.node;
     readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render();
+    // Back or forward between pages: start at the page heading.
+    if (!fromNode) {
+      const h = state.id ? $('#detail-view .detail-title') : $('#view-heading');
+      if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    }
     // Back from a finding's conversation: focus that finding in the tree (scroll is already restored).
     if (fromNode && !state.node && state.id) {
       const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(fromNode)}"]`);

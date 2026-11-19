@@ -639,7 +639,10 @@ function bind() {
     const fromNode = state.node;
     readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render();
     // Back or forward between pages: start at the page heading.
-    if (!state.id && !fromNode) { const h = $('#view-heading'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    if (!fromNode) {
+      const h = state.id ? $('#detail-view .detail-title') : $('#view-heading');
+      if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    }
     // Back from a finding's conversation: focus that finding in the tree (scroll is already restored).
     if (fromNode && !state.node && state.id) {
       const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(fromNode)}"]`);
