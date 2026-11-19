@@ -460,7 +460,8 @@ function stepText(r, value) {
 }
 
 function compactRow(r, ctx, value) {
-  const sel = ctx.paneOn && ctx.sel === r.shortId;
+  const sel = ctx.paneOn && ctx.sel === r.shortId && !ctx.selDone.v;
+  if (sel) ctx.selDone.v = true;
   const flags = stuckBadge(r) + penaltyBadge(r) + [...r.flags].filter((f) => f !== 'supersedes' && f !== 'superseded_by').map(flagBadge).join('');
   const reviewers = r.assignees.length ? r.assignees.map((a) => esc(personName(a))).join(', ') : esc(COPY.filters.unassigned);
   const step = stepText(r, value);

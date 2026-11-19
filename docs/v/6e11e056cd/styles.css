@@ -52,6 +52,7 @@
 
   --header-h: 64px;
   --sidebar-w: 300px;
+  --nav-w: 216px;
   --radius-control: 6px;
   --radius-card: 4px;
   --radius-panel: 8px;
@@ -209,8 +210,9 @@ kbd { font-family: var(--mono); font-size: 11px; background: var(--kbd-bg); bord
 
 /* ---------------------------------------------------------------- layout */
 .app { display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); align-items: start; }
-body.filters-hidden .app, body.in-detail .app { grid-template-columns: minmax(0, 1fr); }
-body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
+/* Hiding filters, or opening a full detail, keeps the pages on the left; only the filter list goes. */
+body.filters-hidden .app, body.in-detail .app { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+body.filters-hidden #filters-body, body.in-detail #filters-body { display: none; }
 .sidebar {
   position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); overflow-y: auto;
   background: var(--bg-sidebar); border-right: 1px solid var(--line); padding: 0 0 24px;
@@ -240,7 +242,6 @@ body.filters-hidden .sidebar, body.in-detail .sidebar { display: none; }
 /* The same pages as tabs, when the left panel is hidden or a drawer. */
 .view-tabs { display: none; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; }
 .view-tabs .nav-item { padding: 6px 12px; font-size: 14px; border: 1px solid var(--line-control); }
-body.filters-hidden .view-tabs { display: flex; }
 .view-note { margin: 0 0 12px; }
 
 .pane-slot:empty { display: none; }
@@ -315,6 +316,9 @@ body:not([data-page="list"]) .copy-link { margin-left: auto; }
 .pcard-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
 .pchart { list-style: none; margin: 0; padding: 0; display: flex; align-items: stretch; height: 188px; }
 .pcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+/* The open cohort is still filling up: lighter bar. */
+.pcol.open .pbar { background: var(--phase-1); }
+.pcol.open .plab { font-weight: 600; color: var(--text-strong); }
 .pval { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-strong); margin-bottom: 2px; }
 /* padding-top leaves room for the count above the tallest column; heights resolve against the rest. */
 .pbar-track { flex: 1; width: 100%; padding-top: 18px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; border-bottom: 1px solid var(--line-table); }
@@ -656,13 +660,15 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
 @media (max-width: 1279px) {
 }
 @media (max-width: 1023px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  .app { grid-template-columns: var(--nav-w) minmax(0, 1fr); }
+  /* Closed: a narrow column with the pages only. Open: the full drawer with pages and filters. */
+  .sidebar:not(.open) { position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h)); width: auto; transform: none; transition: none; box-shadow: none; z-index: auto; }
+  .sidebar:not(.open) #filters-body { display: none; }
   .sidebar { position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; width: min(320px, 88vw); z-index: 45; transform: translateX(-100%); transition: transform 250ms ease-out; box-shadow: var(--shadow-overlay); }
   .sidebar.open { transform: none; }
   body.filters-hidden .sidebar { display: block; }
   .only-drawer { display: inline-flex; }
   .only-wide { display: none; }
-  .view-tabs { display: flex; }
   #open-filters[aria-expanded="true"] { background: transparent; color: var(--navy-ui); border-color: rgba(31, 58, 92, 0.35); }
 }
 @media (max-width: 959px) {
@@ -675,6 +681,10 @@ html.dark .band-reviewer { background: rgba(28, 43, 74, 0.6); }
   .convo { margin-top: 0; border-top: 0; padding-top: 0; }
 }
 @media (max-width: 760px) {
+  /* Phone: the pages move to tabs above the content; the panel is a drawer again. */
+  .app, body.filters-hidden .app, body.in-detail .app { grid-template-columns: minmax(0, 1fr); }
+  .sidebar:not(.open) { position: fixed; top: 0; left: 0; bottom: 0; height: 100vh; width: min(320px, 88vw); z-index: 45; transform: translateX(-100%); transition: transform 250ms ease-out; box-shadow: var(--shadow-overlay); }
+  .view-tabs { display: flex; }
   .site-header { padding: 8px 16px; gap: 8px 12px; position: static; }
   .brand-bottom { font-size: 18px; }
   .header-links { margin-left: auto; }

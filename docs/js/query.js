@@ -11,7 +11,7 @@ export const GROUP_KEYS = ['model', 'org', 'sub', 'type', 'stage', 'rev', 'div',
 export const SORT_KEYS = ['due', 'day', 'stage', 'created', 'id', 'wait'];
 export const PERIODS = ['all', '90', '30'];
 export const GSORTS = ['count', 'az', 'm1', 'm2'];
-export const VIEWS = ['action', 'list', 'program'];
+export const VIEWS = ['action', 'list', 'analytics'];
 
 export const UNASSIGNED = '__unassigned__';
 
@@ -87,7 +87,8 @@ export function parseUrl(search, dom, rows) {
       const r = rows.find((x) => x.shortId === value || x.id === value);
       if (r) s[key] = r.shortId; else ignored.push(`${key}=${value}`);
     } else if (key === 'view') {
-      if (VIEWS.includes(value)) s.view = value; else ignored.push(`view=${value}`);
+      if (value === 'program') s.view = 'analytics'; // renamed; old links keep working
+      else if (VIEWS.includes(value)) s.view = value; else ignored.push(`view=${value}`);
     } else {
       s[key] = value;
     }
@@ -117,7 +118,7 @@ export function toQuery(s) {
   if (s.sort !== 'due') put('sort', s.sort);
   if (s.period !== 'all') put('period', s.period);
   if (s.view && s.view !== defaultView(s)) put('view', s.view);
-  if (s.view !== 'program') put('sel', s.sel);
+  if (s.view !== 'analytics') put('sel', s.sel);
   put('id', s.id);
   if (s.id) put('node', s.node);
   const str = p.toString().replace(/%2C/g, ',').replace(/%3A/g, ':');

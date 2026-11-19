@@ -35,7 +35,7 @@ const ui = {
   showMore: false, closedOpen: false, openSections: new Set(['review']), groupOpen: new Map(), groupDefault: null,
   detail: { types: new Set(['state', 'commit', 'comment', 'review', 'label', 'check', 'assign', 'db']), newest: false, collapsed: new Set(), tab: 'pr', showConvo: false },
   dismissed: new Set(),
-  programFirst: readProgramFirst(), programBy: 'month', programByOrg: false, pane: readPane(),
+  programFirst: readProgramFirst(), programBy: 'submitted', programByOrg: false, pane: readPane(),
 };
 
 // ---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ function hrefFor(r) { return toQuery({ ...state, id: r.shortId, node: '' }) || '
 function hrefForId(shortId) { return toQuery({ ...state, id: shortId, node: '' }) || '?'; }
 function hrefSel(r) { return toQuery({ ...state, sel: r.shortId, id: '', node: '' }) || '?'; }
 function hrefView(view) { return toQuery({ ...state, view, sel: '', id: '', node: '' }) || '?'; }
-function paneOn() { return ui.pane === 'right' && paneWide.matches && state.view !== 'program'; }
+function paneOn() { return ui.pane === 'right' && paneWide.matches && state.view !== 'analytics'; }
 
 // No viewer identity: the page is for chairs, PGMs and the infra team, and has no View as.
 // The renderers still accept a viewer so per-person views can return in a later phase.
@@ -199,7 +199,7 @@ function actionGroups() {
 function renderNav(actionCount) {
   const V = COPY.views;
   const item = (v, ic) => `<a class="nav-item" href="${esc(hrefView(v))}" data-view="${v}"${state.view === v ? ' aria-current="page"' : ''}>${icon(ic)}<span>${esc(V[v])}</span>${v === 'action' && actionCount ? `<span class="count-pill">${actionCount}</span>` : ''}</a>`;
-  const html = item('action', 'inbox') + item('list', 'list') + item('program', 'chart');
+  const html = item('action', 'inbox') + item('list', 'list') + item('analytics', 'chart');
   $('#side-nav').innerHTML = html;
   $('#view-tabs').innerHTML = html;
 }
@@ -222,7 +222,7 @@ function renderListView() {
   $('#view-heading').textContent = COPY.views[view];
   document.title = `${COPY.views[view]} · ${COPY.app.title}`;
   $('#view-action').hidden = view !== 'action';
-  $('#view-program').hidden = view !== 'program';
+  $('#view-analytics').hidden = view !== 'analytics';
   $('#view-list').hidden = view !== 'list';
   $('#search-form').hidden = view !== 'list';
   $('#open-filters').hidden = view !== 'list';
@@ -230,10 +230,10 @@ function renderListView() {
   // Hidden pages keep no markup, so ids such as #pane stay unique.
   if (view !== 'action') $('#view-action').innerHTML = '';
   if (view !== 'list') $('#list').innerHTML = '';
-  if (view !== 'program') for (const id of ['#program-top', '#metrics', '#stages', '#program-bottom']) $(id).innerHTML = '';
+  if (view !== 'analytics') for (const id of ['#program-top', '#metrics', '#stages', '#program-bottom']) $(id).innerHTML = '';
   keepFocus(() => {
     // Reading pane switch: in the title row, on the pages with a list, where there is room for the pane.
-    $('#pane-slot').innerHTML = view !== 'program' && paneWide.matches ? renderPaneSwitch(ui.pane) : '';
+    $('#pane-slot').innerHTML = view !== 'analytics' && paneWide.matches ? renderPaneSwitch(ui.pane) : '';
     const { rows: mRows, noStage } = metricRows();
     const metrics = computeMetrics(mRows, noStage, D.ctx, state.period);
     $('#filters-body').innerHTML = view === 'list'
@@ -246,8 +246,8 @@ function renderListView() {
     if (view === 'action') {
       const all = A.groups.flatMap((g) => g.rows);
       $('#view-action').innerHTML = splitHtml(all, {}, (ctx) => renderAction(A.groups, A.others, { ...ctx, hrefList: hrefView('list') }));
-    } else if (view === 'program') {
-      // Program counts every non-test submission; the Submissions filters do not apply here.
+    } else if (view === 'analytics') {
+      // Analytics counts every non-test submission; the Submissions filters do not apply here.
       const base = { ...emptyState(), period: state.period };
       const pRows = D.rows.filter((r) => !r.isTest && rowMatches(r, base));
       const pNoStage = D.rows.filter((r) => !r.isTest && rowMatches(r, base, { ignoreStage: true }));
