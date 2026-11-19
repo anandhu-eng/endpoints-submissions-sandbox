@@ -109,7 +109,7 @@ label { display: block; font-size: 13px; font-weight: 600; color: var(--text-str
 <main class="page">
   <section class="panel" aria-label="Paddock map">
     <span class="sim">Simulated</span>
-    <svg class="anim map" viewBox="0 0 640 430" role="img" aria-label="A paddock: garages for submitters, pit wall for reviewers, race control for chairs, a results board. One simulated submission moves along the lane, and the place of whoever acts next lights up.">
+    <svg class="anim map" viewBox="0 0 640 430" role="img" aria-label="A paddock: garages for submitters, pit wall for reviewers, race control for chairs, an office for admins, a results board. One simulated submission moves along the lane, and the place of whoever acts next lights up.">
   <rect x="300" y="196" width="128" height="82" rx="6" class="hl" fill-opacity="0"><animate attributeName="fill-opacity" dur="16s" repeatCount="indefinite" keyTimes="0.000;0.200;0.220;0.330;0.350;1.000" values="0;0;0.9;0.9;0;0"/></rect>
   <rect x="438" y="96" width="112" height="182" rx="6" class="hl" fill-opacity="0"><animate attributeName="fill-opacity" dur="16s" repeatCount="indefinite" keyTimes="0.000;0.400;0.420;0.530;0.550;1.000" values="0;0;0.9;0.9;0;0"/></rect>
   <g transform="translate(70,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(124,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(178,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g><g transform="translate(232,322)"><rect width="44" height="46" rx="2" class="ln"/><path d="M6 46 V20 H38 V46" class="ln thin"/></g>
@@ -137,7 +137,7 @@ label { display: block; font-size: 13px; font-weight: 600; color: var(--text-str
   <span class="brand-sub">Submission and review status</span>
   <div class="field"><label for="username">Username</label><input class="input" id="username" autocomplete="username" autofocus></div>
   <div class="field"><label for="password">Password</label><div class="pw"><input class="input" id="password" type="password" autocomplete="current-password">
-    <button type="button" class="pw-toggle" id="pw-toggle" aria-controls="password" aria-pressed="false">Show</button></div></div>
+    <button type="button" class="pw-toggle" id="pw-toggle" aria-controls="password">Show</button></div></div>
   <button type="submit" class="btn btn-primary" id="signin-btn">Sign in</button>
   <button type="button" class="btn btn-gh" id="github-btn" disabled>GitHub sign-in · later</button>
   <p class="note proto">Prototype. Sign-in is not checked.</p>
@@ -149,7 +149,7 @@ label { display: block; font-size: 13px; font-weight: 600; color: var(--text-str
   var f = document.getElementById('signin'), pw = document.getElementById('password'), t = document.getElementById('pw-toggle');
   // Nothing is checked: go to the status page, keeping any link state (e.g. an old shared ?sub=… link).
   f.addEventListener('submit', function (e) { e.preventDefault(); location.href = 'status.html' + location.search + location.hash; });
-  t.addEventListener('click', function () { var show = pw.type === 'password'; pw.type = show ? 'text' : 'password'; t.textContent = show ? 'Hide' : 'Show'; t.setAttribute('aria-pressed', String(show)); });
+  t.addEventListener('click', function () { var show = pw.type === 'password'; pw.type = show ? 'text' : 'password'; t.textContent = show ? 'Hide' : 'Show'; });
   var u = document.getElementById('username'); if (u) u.focus({ preventScroll: true });
   // SVG (SMIL) motion follows the reduced-motion setting too: hold the first frame.
   var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
