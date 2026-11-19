@@ -60,10 +60,11 @@ export function computeProgram(snapshot) {
   };
 }
 
-// "2026-11-C1" -> "Nov C1"; the full id and date go to the tooltip.
+// "2026-11-C1" -> "Nov C1" (HTML, in two parts so phones can show the month alone); the full id and date go to the tooltip.
 function cohortLabel(id) {
   const [y, m, c] = id.split('-');
-  return `${new Date(Date.UTC(+y, +m - 1, 1)).toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${c}`;
+  const month = new Date(Date.UTC(+y, +m - 1, 1)).toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+  return `<span class="plab-m">${esc(month)}</span> <span class="plab-c">${esc(c)}</span>`;
 }
 
 // Column chart in HTML, so labels keep their size at any width. A count above each non-zero column.
@@ -71,7 +72,7 @@ function columns(items, label, tip) {
   const max = Math.max(1, ...items.map((c) => c.n));
   const cols = items.map((c) => `<li class="pcol${c.open ? ' open' : ''}" title="${esc(tip(c))}">
       <span class="pbar-track"><span class="pval num">${c.n || ''}</span><span class="pbar" style="height:${c.n ? Math.max(4, (100 * c.n) / max) : 0}%"></span></span>
-      <span class="plab">${esc(label(c))}</span>
+      <span class="plab">${label(c)}</span>
     </li>`).join('');
   const summary = items.map((c) => `${tip(c)}`).join(', ');
   return `<ol class="pchart" aria-label="${esc(summary)}">${cols}</ol>`;

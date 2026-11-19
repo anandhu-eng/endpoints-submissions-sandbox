@@ -887,7 +887,22 @@ a.flag:hover { text-decoration: underline; }
   /* Title row: the header already names the page; Filters and Copy link share a row, search below. */
   .view-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .title-row { gap: 8px; }
-  #open-filters, .copy-link { flex: 1 1 auto; justify-content: center; }
+  #open-filters { flex: 1 1 auto; justify-content: center; }
+  /* Copy link moves to the header icons; the title row keeps Filters and search (Submissions only). */
+  .title-row .copy-link { display: none; }
+  body:not([data-page="list"]) .title-row { display: none; }
+  /* Pages: three equal tabs on one row. The drawer holds only the filters. */
+  .view-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .view-tabs .nav-item { position: relative; justify-content: center; padding: 8px 4px; font-size: 13px; min-height: 44px; white-space: nowrap; }
+  .view-tabs .nav-item .icon { display: none; }
+  /* The Action needed count sits on the tab's corner so the label stays on one line. */
+  .view-tabs .nav-item .count-pill { position: absolute; top: -8px; right: -4px; margin: 0; }
+  .sidebar .side-nav { display: none; }
+  /* Response times: one tile per row. */
+  .mresp { grid-template-columns: minmax(0, 1fr); }
+  /* Cohort chart: the month under each C0 column only. */
+  .plab .plab-c { display: none; }
+  .pcol:nth-child(even) .plab-m { visibility: hidden; }
 }
 
 /* Sizes of the sticky bars. They set the sticky offsets and the scroll padding, so jumps,

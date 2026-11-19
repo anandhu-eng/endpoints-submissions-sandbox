@@ -416,7 +416,7 @@ export const COPY = {
   },
 
   detail: {
-    back: 'Back to list',
+    back: 'Back',
     prevNext: 'Previous / next submission:',
     copyId: 'Copy full id',
     copied: 'Copied',

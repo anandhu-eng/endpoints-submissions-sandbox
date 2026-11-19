@@ -397,6 +397,7 @@ function bind() {
   });
   paneWide.addEventListener('change', () => render());
   // Header
+  $('#copy-link-hdr').addEventListener('click', copyLink);
   $('#theme-toggle').addEventListener('click', () => {
     const t = currentTheme() === 'dark' ? 'light' : 'dark';
     applyTheme(t);
@@ -654,7 +655,12 @@ function bind() {
 
 // D20: copy the current URL (all state lives in it).
 function copyLink() {
-  const done = () => { const s = $('#copy-link-status'); if (s) { s.textContent = COPY.app.linkCopied; setTimeout(() => { s.textContent = ''; }, 2500); } };
+  const done = () => {
+    for (const s of $$('#copy-link-status, #copy-link-status-hdr')) { s.textContent = COPY.app.linkCopied; setTimeout(() => { s.textContent = ''; }, 2500); }
+    // The phone header button has no text: show a check for a moment instead.
+    const b = $('#copy-link-hdr');
+    if (b) { const html = b.innerHTML; b.innerHTML = icon('check'); setTimeout(() => { b.innerHTML = html; }, 2500); }
+  };
   try { navigator.clipboard.writeText(location.href).then(done, done); } catch { done(); }
 }
 
