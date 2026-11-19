@@ -392,7 +392,7 @@ export function renderPane(r, ctx) {
       <h2 class="detail-title" id="pane-title" tabindex="-1"><span class="mono">${esc(r.shortId)}</span> <span class="sep">·</span> ${esc(r.org || COPY.missing)}</h2>
       <a class="btn-pill" id="pane-open" href="${esc(ctx.hrefForId(r.shortId))}" data-open="${esc(r.shortId)}">${esc(COPY.pane.openFull)}</a>
     </div>
-    <div class="status-strip">${stagePill(r.stage, { size: 'md' })}<span class="flags">${flagsHtml(r, ctx)}</span></div>
+    <div class="status-strip">${stagePill(r.stage, { size: 'md', withStatus: false })}<span class="flags">${flagsHtml(r, ctx)}</span></div>
     <div class="detail-links">${linksHtml(r)}</div>
   </header>
   <div class="pane-cards">

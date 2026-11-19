@@ -206,11 +206,12 @@ function renderNav(actionCount) {
 function splitHtml(rows, ctxExtra, listHtml) {
   const on = paneOn();
   const sel = rows.find((r) => r.shortId === state.sel) || rows[0] || null;
-  const ctx = { hrefFor, hrefSel, asOf: D.asOf, state, paneOn: on, sel: sel?.shortId, ...ctxExtra };
+  // selDone: a row in two Action needed groups is marked selected once.
+  const ctx = { hrefFor, hrefSel, asOf: D.asOf, state, paneOn: on, sel: sel?.shortId, selDone: { v: false }, ...ctxExtra };
   if (!on) return `<div class="split-list">${listHtml(ctx)}</div>`;
   const pane = sel ? renderPane(sel, detailCtx()) : `<p class="meta">${esc(COPY.pane.pick)}</p>`;
   return `<div class="split-body"><div class="split-list">${listHtml(ctx)}</div>
-    <section class="pane" id="pane" aria-label="${esc(COPY.pane.label)}" aria-live="polite">${pane}</section></div>`;
+    <section class="pane" id="pane" aria-label="${esc(COPY.pane.label)}">${pane}</section></div>`;
 }
 
 function renderListView() {
@@ -225,6 +226,10 @@ function renderListView() {
   $('#search-form').hidden = view !== 'list';
   $('#open-filters').hidden = view !== 'list';
   document.body.dataset.page = view;
+  // Hidden pages keep no markup, so ids such as #pane stay unique.
+  if (view !== 'action') $('#view-action').innerHTML = '';
+  if (view !== 'list') $('#list').innerHTML = '';
+  if (view !== 'program') for (const id of ['#program-top', '#metrics', '#stages', '#program-bottom']) $(id).innerHTML = '';
   keepFocus(() => {
     // Reading pane switch: in the title row, on the pages with a list, where there is room for the pane.
     $('#pane-slot').innerHTML = view !== 'program' && paneWide.matches ? renderPaneSwitch(ui.pane) : '';
@@ -325,7 +330,7 @@ function renderDetailView(r) {
     $('#detail-view').innerHTML = renderDetail(r, detailCtx(), ui.detail);
   });
   if (opening) {
-    const h = $('.detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
+    const h = $('#detail-view .detail-title'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); window.scrollTo(0, 0);
     // A link to a finding on a narrow screen: show its conversation, not the top of the page.
     if (state.node && tabsNarrow.matches) { const c = $('#convo'); if (c) c.scrollIntoView({ block: 'start' }); }
     else if (state.node) convoIntoView();
@@ -343,7 +348,7 @@ function update(fn, { push = false } = {}) {
 }
 
 function clearFilters() {
-  const keep = { group: state.group, gsort: state.gsort, sort: state.sort, period: state.period };
+  const keep = { group: state.group, gsort: state.gsort, sort: state.sort, period: state.period, view: state.view, sel: state.sel };
   state = { ...emptyState(), ...keep };
 }
 
@@ -366,9 +371,11 @@ function closeDetail() {
   const link = document.querySelector(`[data-open="${CSS.escape(id)}"]`);
   if (link) link.focus();
 }
+// j / k in the detail: the next row of the page it was opened from.
 function step(delta) {
-  const rows = visibleRows();
+  const rows = state.view === 'action' ? [...new Map(actionGroups().groups.flatMap((g) => g.rows).map((r) => [r.shortId, r])).values()] : visibleRows();
   const i = rows.findIndex((r) => r.shortId === state.id);
+  if (i < 0) return;
   const next = rows[i + delta];
   if (next) { state.id = next.shortId; state.node = ''; ui.detail.pushedNode = false; writeUrl(true); render(); }
 }
@@ -411,7 +418,7 @@ function bind() {
     clearTimeout(t);
     state.q = search.value.trim();
     render();
-    const first = $('#list .sub-link');
+    const first = $('#list .sub-link, #list .crow-link');
     if (first) first.focus();
   });
 
@@ -631,6 +638,8 @@ function bind() {
   window.addEventListener('popstate', () => {
     const fromNode = state.node;
     readUrl(); ui.detail.showConvo = !!state.node; ui.detail.pushedNode = false; render();
+    // Back or forward between pages: start at the page heading.
+    if (!state.id && !fromNode) { const h = $('#view-heading'); h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
     // Back from a finding's conversation: focus that finding in the tree (scroll is already restored).
     if (fromNode && !state.node && state.id) {
       const item = document.querySelector(`#issue-tree [data-node="${CSS.escape(fromNode)}"]`);
